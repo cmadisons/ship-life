@@ -1,7 +1,9 @@
 package com.example;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -44,8 +46,8 @@ public final class Chores {
 	/** Which dishes have been washed but not yet dried. */
 	private static final Map<UUID, Integer> WASHED = new HashMap<>();
 
-	/** For the mower: which end of the lawn you were last at. */
-	private static final Map<UUID, Integer> LAWN_END = new HashMap<>();
+	/** For the mower: the patches of lawn you have already been over. */
+	private static final Map<UUID, Set<Long>> MOWED = new HashMap<>();
 
 	private static final int RED_TICKS = 100;      // five seconds
 	private static final int GREEN_TICKS = 160;    // then three more
@@ -74,7 +76,6 @@ public final class Chores {
 				}
 				for (ServerPlayer player : level.players()) {
 					tickMeter(player);
-					tickMower(player);
 					tickMop(player);
 					tickArrival(player);
 				}
@@ -162,6 +163,11 @@ public final class Chores {
 			player.getInventory().add(Kit.whacker());
 			say(player, "Next door: the lawn.");
 			return InteractionResult.SUCCESS;
+		}
+
+		// --- the lawn ---------------------------------------------------------
+		if (Kit.is(held, Kit.MOWER) && Quests.on(player, 0, 1)) {
+			return mow(player, level, pos);
 		}
 
 		// --- the weeds --------------------------------------------------------
@@ -368,27 +374,19 @@ public final class Chores {
 
 	// -------------------------------------------------------------- the mower
 
-	/** A push is the length of the lawn; ten of them is the lawn mowed. */
-	private static void tickMower(ServerPlayer player) {
-		if (!Quests.on(player, 0, 1) || !Kit.is(player.getMainHandItem(), Kit.MOWER)) {
-			return;
+	/** Ten patches of the lawn, one right click each, is the lawn mowed. */
+	private static InteractionResult mow(ServerPlayer player, ServerLevel level, BlockPos pos) {
+		if (!Places.onLawn(pos)
+				|| !level.getBlockState(pos).is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)) {
+			say(player, "Mow the lawn inside the second house.");
+			return InteractionResult.SUCCESS;
 		}
-		int z = (int) Math.round(player.getZ());
-		int x = (int) Math.round(player.getX());
-		if (Math.abs(x - Places.HOUSE_TWO.getX()) > 8) {
-			return;
+		if (!MOWED.computeIfAbsent(player.getUUID(), who -> new HashSet<>()).add(pos.asLong())) {
+			return InteractionResult.SUCCESS;          // already been over this one
 		}
-		int end = z <= Places.LAWN_NORTH ? -1 : z >= Places.LAWN_SOUTH ? 1 : 0;
-		if (end == 0) {
-			return;
-		}
-		int was = LAWN_END.getOrDefault(player.getUUID(), 0);
-		if (was != 0 && was != end) {
-			player.level().playSound(null, player.blockPosition(),
-					SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.6f, 0.8f);
-			Quests.did(player);
-		}
-		LAWN_END.put(player.getUUID(), end);
+		level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.6f, 0.8f);
+		Quests.did(player);
+		return InteractionResult.SUCCESS;
 	}
 
 	// ------------------------------------------------------- getting somewhere

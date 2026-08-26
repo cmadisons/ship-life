@@ -94,6 +94,11 @@ public class ShipLifeMod implements ModInitializer {
 			Ship.build(level);
 		}
 
+		// Nothing we build is worth losing to a creeper or an enderman. Set on
+		// every join rather than only on a fresh world, so worlds made before
+		// this get it too.
+		level.getGameRules().set(GameRules.MOB_GRIEFING, false, level.getServer());
+
 		// However you made the world, you play survival.
 		if (player.gameMode.getGameModeForPlayer() != GameType.SURVIVAL) {
 			player.setGameMode(GameType.SURVIVAL);

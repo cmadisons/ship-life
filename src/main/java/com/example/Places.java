@@ -49,9 +49,15 @@ public final class Places {
 		return new BlockPos(x, GROUND + 1, z);
 	}
 
-	/** The lawn runs between these two lines of z; a push is crossing both. */
-	public static final int LAWN_NORTH = -6;
-	public static final int LAWN_SOUTH = 6;
+	/** The lawn is the whole floor of house two, right out to the walls. */
+	public static final int LAWN_REACH = 5;
+
+	/** Is this block a patch of that lawn? */
+	public static boolean onLawn(BlockPos pos) {
+		return pos.getY() == GROUND
+				&& Math.abs(pos.getX() - HOUSE_TWO.getX()) <= LAWN_REACH
+				&& Math.abs(pos.getZ() - HOUSE_TWO.getZ()) <= LAWN_REACH;
+	}
 
 	/** The five bushes at house three, left to right. */
 	public static BlockPos bush(int index) {

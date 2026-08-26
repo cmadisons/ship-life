@@ -81,7 +81,7 @@ but you do them in order, and the star only points at the part you're on.
 | Part | Where | What | Pay |
 |---|---|---|---|
 | 1 | First house | Wash 10 dishes — left-hold the **sponge**, right-hold the **towel**, one dish at a time. Both get dirty, then throw them in the garbage. | $5.00 |
-| 2 | Second house | Push the lawn mower back and forth 10 times, and right-click each of the 10 weeds once. | $94.99 |
+| 2 | Second house | Right-click 10 patches of lawn with the mower, anywhere in the house, and right-click each of the 10 weeds once. | $94.99 |
 | 3 | Third house | Find the penny — it's in the **2nd bush from the left**. | $0.01 |
 
 ### Chapter 2 — you go to the ship
