@@ -60,7 +60,7 @@ public final class Ship {
 
 		// House three: five bushes in a row. The penny is in the second one.
 		for (int i = 0; i < 5; i++) {
-			set(level, Places.bush(i), Blocks.OAK_LEAVES);
+			bush(level, Places.bush(i));
 		}
 	}
 
@@ -164,6 +164,39 @@ public final class Ship {
 		fill(level, Places.SHIP_X + 5, Places.floorY(5) + 1, Places.SHIP_Z - 12,
 				Places.SHIP_X + 5, Places.floorY(5) + 4, Places.SHIP_Z - 5,
 				Blocks.WHITE_CONCRETE);
+	}
+
+	/**
+	 * A bush.
+	 *
+	 * Leaves with no tree under them are dead leaves as far as Minecraft is
+	 * concerned, and they quietly rot away -- which is what happened to the
+	 * first five. Marking them persistent is what a player placing leaves by
+	 * hand does, and it is why theirs stay put.
+	 */
+	private static void bush(ServerLevel level, BlockPos pos) {
+		level.setBlockAndUpdate(pos, Blocks.OAK_LEAVES.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true));
+	}
+
+	/**
+	 * Put back anything that has gone missing from a world built earlier.
+	 *
+	 * Run on every join, so a world made before the bushes were persistent
+	 * gets its bushes back rather than needing to be started again.
+	 */
+	public static void repair(ServerLevel level) {
+		int replaced = 0;
+		for (int i = 0; i < 5; i++) {
+			BlockPos pos = Places.bush(i);
+			if (!level.getBlockState(pos).is(Blocks.OAK_LEAVES)) {
+				bush(level, pos);
+				replaced++;
+			}
+		}
+		if (replaced > 0) {
+			ShipLifeMod.LOGGER.info("Put {} bush(es) back at house three.", replaced);
+		}
 	}
 
 	/** A bed is two blocks that have to agree which way round they are. */

@@ -125,6 +125,10 @@ public class ShipLifeMod implements ModInitializer {
 			Ship.build(level);
 		}
 
+		// Anything a world built earlier has lost -- the bushes rotted away
+		// before they were marked persistent -- goes back now.
+		Ship.repair(level);
+
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this
 		// get it too.
