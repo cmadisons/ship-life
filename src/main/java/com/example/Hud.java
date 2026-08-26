@@ -85,7 +85,8 @@ public final class Hud {
 					where.getX() + 0.5, where.getY(), where.getZ() + 0.5)));
 			line = Component.literal("★ " + blocks + " blocks")
 					.withStyle(colourFor(blocks))
-					.append(Component.literal("  ·  " + part.todo() + "  ")
+					.append(Component.literal("  ·  "
+							+ Quests.progress(player, part, State.count(player)) + "  ")
 							.withStyle(ChatFormatting.WHITE))
 					.append(clockPart());
 			if (blocks < 48) {

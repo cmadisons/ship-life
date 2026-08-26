@@ -91,7 +91,10 @@ public final class Book {
 			String mark = i < part ? "✓ " : i == part ? "▶ " : "☐ ";
 			String progress = "";
 			if (i == part && step.need() > 1) {
-				progress = "   (" + State.count(player) + " / " + step.need() + ")";
+				progress = "   (" + (Quests.on(player, 0, 1)
+						&& player.level() instanceof net.minecraft.server.level.ServerLevel level
+						? Chores.lawnLine(level)
+						: State.count(player) + " / " + step.need()) + ")";
 			}
 			lines.add(mark + step.todo() + progress);
 		}

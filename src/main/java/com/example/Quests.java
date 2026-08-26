@@ -112,12 +112,26 @@ public final class Quests {
 		int count = State.count(player) + 1;
 		if (count < part.need()) {
 			State.count(player, count);
-			player.sendOverlayMessage(Component.literal(
-					count + " / " + part.need() + "  " + part.todo())
+			player.sendOverlayMessage(Component.literal(progress(player, part, count))
 					.withStyle(ChatFormatting.GRAY));
 			return;
 		}
 		finishPart(player);
+	}
+
+	/**
+	 * How far into a part you are, in words.
+	 *
+	 * Nearly every part is one job counted once, so one number says it. The
+	 * lawn is two jobs sharing a counter -- squares to cut and weeds to pull --
+	 * and "83 / 131" tells you nothing about which of them is left, so that one
+	 * is read off the yard and shown as both.
+	 */
+	public static String progress(ServerPlayer player, Part part, int count) {
+		if (on(player, 0, 1) && player.level() instanceof net.minecraft.server.level.ServerLevel level) {
+			return Chores.lawnLine(level);
+		}
+		return count + " / " + part.need() + "  " + part.todo();
 	}
 
 	/** Finish the part you are on outright, however far in you were. */

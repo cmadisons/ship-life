@@ -405,6 +405,36 @@ public final class Chores {
 		}
 	}
 
+	/**
+	 * How the lawn is coming along, counted off the yard rather than kept in a
+	 * number somewhere.
+	 *
+	 * A cut square is moss and a pulled weed is air, so the yard already knows
+	 * both answers, and they stay right across a restart without being saved.
+	 */
+	public static String lawnLine(ServerLevel level) {
+		int mowed = 0;
+		BlockPos.MutableBlockPos square = new BlockPos.MutableBlockPos();
+		for (int dx = -Places.LAWN_REACH; dx <= Places.LAWN_REACH; dx++) {
+			for (int dz = -Places.LAWN_REACH; dz <= Places.LAWN_REACH; dz++) {
+				square.set(Places.HOUSE_TWO.getX() + dx, Places.GROUND,
+						Places.HOUSE_TWO.getZ() + dz);
+				if (level.getBlockState(square).is(
+						net.minecraft.world.level.block.Blocks.MOSS_BLOCK)) {
+					mowed++;
+				}
+			}
+		}
+		int weeds = 0;
+		for (int i = 0; i < 10; i++) {
+			if (level.getBlockState(Places.weed(i)).isAir()) {
+				weeds++;
+			}
+		}
+		return "Mowed " + mowed + " / " + Places.LAWN_SQUARES
+				+ "  ·  Weeds " + weeds + " / 10";
+	}
+
 	// ------------------------------------------------------------------ small
 
 	private static int dishAt(BlockPos pos) {
