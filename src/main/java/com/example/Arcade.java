@@ -55,14 +55,88 @@ public final class Arcade {
 		return hit.equals(machine) || hit.equals(machine.above()) || base.equals(machine);
 	}
 
-	/** The prize counter. Nothing to spend on yet -- that comes next. */
+	/**
+	 * The prize counter: a pet for ten tickets, or the next three quests for
+	 * twenty-five.
+	 *
+	 * The quest bundle is drawn from a pool of two hundred and fifty, and the
+	 * pool only opens once you own floors 8, 9 and 10 -- so until then the
+	 * counter says what is missing rather than pretending it is for sale.
+	 */
 	private static void prizes(ServerPlayer player) {
-		player.sendSystemMessage(Component.literal("Prize counter -- you have "
-				+ State.arcade(player) + " arcade tickets.")
-				.withStyle(ChatFormatting.GOLD));
-		player.sendSystemMessage(Component.literal(
-				"10 tickets buys a pet and 25 buys the next 3 quests. "
-				+ "Neither is built yet -- keep your tickets.")
-				.withStyle(ChatFormatting.GRAY));
+		net.minecraft.world.SimpleContainer page = new net.minecraft.world.SimpleContainer(54);
+		net.minecraft.world.item.ItemStack filler = Game.cell(
+				net.minecraft.world.item.Items.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
+		for (int slot = 0; slot < 54; slot++) {
+			page.setItem(slot, filler.copy());
+		}
+
+		page.setItem(4, Book.entry(net.minecraft.world.item.Items.GOLD_NUGGET,
+				"Your Tickets", ChatFormatting.GOLD,
+				State.arcade(player) + " arcade tickets",
+				State.event(player) + " event tickets"));
+
+		Pets.Kind[] kinds = Pets.Kind.values();
+		for (int i = 0; i < kinds.length; i++) {
+			Pets.Kind kind = kinds[i];
+			int have = Pets.owned(player, kind);
+			page.setItem(19 + i, Book.entry(icon(kind), kind.label, ChatFormatting.AQUA,
+					kind.what,
+					Pets.PRICE + " arcade tickets",
+					have == 0 ? "You have none." : "You have " + have + ".",
+					kind == Pets.Kind.CAT
+							? "Buying more does not stack."
+							: "Two of a kind doubles it.",
+					kind == Pets.Kind.DOLPHIN
+							? "Today it is copying the " + Pets.dolphinToday().label + "."
+							: "",
+					"",
+					"Click to buy."));
+		}
+
+		boolean ready = State.hasFloor(player, 8) && State.hasFloor(player, 9)
+				&& State.hasFloor(player, 10);
+		page.setItem(25, Book.entry(net.minecraft.world.item.Items.WRITTEN_BOOK,
+				"The Next 3 Quests", ready ? ChatFormatting.YELLOW : ChatFormatting.DARK_GRAY,
+				"Three quests, drawn at random",
+				"from a pool of 250.",
+				"25 arcade tickets",
+				ready ? "Click to buy." : "Needs floors 8, 9 and 10 first."));
+
+		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
+				ChatFormatting.RED, "Press Escape."));
+
+		player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
+						Arcade::buy),
+				Component.literal("Prize Counter")));
+	}
+
+	private static void buy(ServerPlayer player, int slot) {
+		if (slot == 49) {
+			player.closeContainer();
+			return;
+		}
+		Pets.Kind[] kinds = Pets.Kind.values();
+		if (slot >= 19 && slot < 19 + kinds.length) {
+			if (Pets.buy(player, kinds[slot - 19])) {
+				player.closeContainer();
+			}
+			return;
+		}
+		if (slot == 25) {
+			player.sendSystemMessage(Component.literal(
+					"The quest pool opens once you own floors 8, 9 and 10.")
+					.withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	private static net.minecraft.world.item.Item icon(Pets.Kind kind) {
+		return switch (kind) {
+			case LION -> net.minecraft.world.item.Items.ORANGE_DYE;
+			case DOG -> net.minecraft.world.item.Items.BONE;
+			case CAT -> net.minecraft.world.item.Items.STRING;
+			case DOLPHIN -> net.minecraft.world.item.Items.LIGHT_BLUE_DYE;
+		};
 	}
 }
