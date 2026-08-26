@@ -31,6 +31,7 @@ public final class Kit {
 	public static final String WHACKER = "Weed Whacker";
 	public static final String PLUNGER = "Plunger";
 	public static final String MOP = "Mop";
+	public static final String PENNY = "Penny";
 
 	public static ItemStack make(Item item, String name, ChatFormatting colour, String... lore) {
 		ItemStack stack = new ItemStack(item);
@@ -90,6 +91,12 @@ public final class Kit {
 		return make(Items.STICK, PLUNGER, ChatFormatting.GRAY,
 				"Hold right-click on the toilet.",
 				"Let go while the bar is green.");
+	}
+
+	public static ItemStack penny() {
+		return make(Items.GOLD_NUGGET, PENNY, ChatFormatting.GOLD,
+				"One cent.",
+				"The last of your hundred dollars.");
 	}
 
 	public static ItemStack mop() {

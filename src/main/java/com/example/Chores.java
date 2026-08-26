@@ -191,9 +191,17 @@ public final class Chores {
 			for (int i = 0; i < 5; i++) {
 				if (pos.equals(Places.bush(i))) {
 					if (i == Places.PENNY_BUSH) {
+						// It falls out of the bush rather than appearing in your
+						// pocket, so finding it is something you watch happen.
+						net.minecraft.world.entity.item.ItemEntity dropped =
+								new net.minecraft.world.entity.item.ItemEntity(level,
+										pos.getX() + 0.5, pos.getY() + 0.2, pos.getZ() + 0.5,
+										Kit.penny());
+						dropped.setDeltaMovement(0.0, 0.18, 0.0);
+						level.addFreshEntity(dropped);
 						level.playSound(null, pos, SoundEvents.ITEM_PICKUP,
 								SoundSource.PLAYERS, 0.8f, 1.8f);
-						Quests.finishPart(player);
+						say(player, "A penny! Pick it up.");
 					} else {
 						level.playSound(null, pos, SoundEvents.GRASS_HIT,
 								SoundSource.BLOCKS, 0.8f, 1.0f);
@@ -403,6 +411,10 @@ public final class Chores {
 				&& player.blockPosition().closerThan(Places.DOOR, 3.0)) {
 			Quests.finishPart(player);
 		}
+		// The penny counts once it is actually in your pocket.
+		if (Quests.on(player, 0, 2) && hasPenny(player)) {
+			Quests.finishPart(player);
+		}
 	}
 
 	/**
@@ -436,6 +448,16 @@ public final class Chores {
 	}
 
 	// ------------------------------------------------------------------ small
+
+	/** Is the penny in their pockets? */
+	private static boolean hasPenny(ServerPlayer player) {
+		for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+			if (Kit.is(player.getInventory().getItem(slot), Kit.PENNY)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private static int dishAt(BlockPos pos) {
 		for (int i = 0; i < 10; i++) {
