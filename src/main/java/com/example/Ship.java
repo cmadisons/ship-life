@@ -96,6 +96,7 @@ public final class Ship {
 			buildFloor(level, floor);
 		}
 		furnishLobby(level);
+		furnishArcade(level);
 		furnishYourRoom(level);
 	}
 
@@ -152,6 +153,25 @@ public final class Ship {
 				Places.SHIP_X + 6, Places.GROUND, Places.SHIP_Z + 6, Blocks.POLISHED_ANDESITE);
 	}
 
+	/** Three cabinets along the far wall, and a counter facing them. */
+	private static void furnishArcade(ServerLevel level) {
+		cabinet(level, Places.SNAKE, Blocks.LIME_CONCRETE);
+		cabinet(level, Places.PACMAN, Blocks.YELLOW_CONCRETE);
+		cabinet(level, Places.GALAGA, Blocks.PURPLE_CONCRETE);
+		fill(level, Places.PRIZES.getX() - 3, Places.PRIZES.getY(), Places.PRIZES.getZ(),
+				Places.PRIZES.getX() + 3, Places.PRIZES.getY(), Places.PRIZES.getZ(),
+				Blocks.SMOOTH_QUARTZ_STAIRS);
+		set(level, Places.PRIZES, Blocks.CHISELED_QUARTZ_BLOCK);
+		set(level, Places.PRIZES.above(), Blocks.LANTERN);
+	}
+
+	/** A machine: a dark screen on a coloured box, two blocks tall. */
+	private static void cabinet(ServerLevel level, BlockPos pos, Block colour) {
+		set(level, pos, colour);
+		set(level, pos.above(), Blocks.BLACK_CONCRETE);
+		set(level, pos.above(2), Blocks.SEA_LANTERN);
+	}
+
 	private static void furnishYourRoom(ServerLevel level) {
 		set(level, Places.TOILET, Blocks.CAULDRON);
 		set(level, Places.FRIDGE, Blocks.IRON_BLOCK);
@@ -186,6 +206,11 @@ public final class Ship {
 	 * gets its bushes back rather than needing to be started again.
 	 */
 	public static void repair(ServerLevel level) {
+		// The arcade came after the first worlds were built.
+		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
+			furnishArcade(level);
+			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
+		}
 		int replaced = 0;
 		for (int i = 0; i < 5; i++) {
 			BlockPos pos = Places.bush(i);

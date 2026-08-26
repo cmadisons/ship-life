@@ -17,9 +17,10 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Chapter 2** — board the ship, get your passport off security, ride the lift to floor 5 and find your bathroom, fridge, bed and TV.
 - **Chapter 3 and 4** — Charlie in the lobby, and his quest: the plunger meter, the bed, and the moldy fridge, with mopping when you get it wrong.
 - The **elevator** — locked floors don't show, a floor your quest is opening shows with a lock, and the doors close, the car whirs and the doors open.
+- The **arcade on floor 2** — Snake, Galaga and Pac-Man, all three played inside a chest screen with buttons along the bottom, paying a ticket a food, five a round and five for a new record.
 - The **star** and the **clock** on the action bar: how far the quest is, in green, yellow or red, and the ship's date and time on a real 20-minute day.
 
-Still to build: the arcade and its three games, the pool, the race track, the pets,
+Still to build: the arcade prize counter, the pool, the race track, the pets,
 the shops, the events, floors 9 and 10, and a proper drawn heads-up display.
 
 ### Build it

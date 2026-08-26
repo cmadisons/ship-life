@@ -51,6 +51,9 @@ public final class State {
 	/** How far into that part you are. */
 	public static final AttachmentType<Integer> COUNT = of("count", 0, Codec.INT);
 
+	/** Your best Pac-Man score. Beating it is what pays. */
+	public static final AttachmentType<Integer> BEST = of("pacman_best", 0, Codec.INT);
+
 	/** Which floors your passport opens, one bit per floor. */
 	public static final AttachmentType<Integer> FLOORS = of("floors", 0, Codec.INT);
 
@@ -81,6 +84,14 @@ public final class State {
 
 	public static void event(ServerPlayer player, int change) {
 		player.setAttached(EVENT, event(player) + change);
+	}
+
+	public static int best(ServerPlayer player) {
+		return player.getAttachedOrCreate(BEST);
+	}
+
+	public static void best(ServerPlayer player, int score) {
+		player.setAttached(BEST, score);
 	}
 
 	public static int quest(ServerPlayer player) {

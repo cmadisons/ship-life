@@ -115,6 +115,17 @@ public final class Places {
 	/** Charlie's table in the lobby. */
 	public static final BlockPos TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 3);
 
+	// ----------------------------------------------------- the arcade, floor 2
+
+	private static final int ARCADE_Y = floorY(2) + 1;
+
+	public static final BlockPos SNAKE = new BlockPos(SHIP_X - 5, ARCADE_Y, SHIP_Z - 10);
+	public static final BlockPos PACMAN = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z - 10);
+	public static final BlockPos GALAGA = new BlockPos(SHIP_X + 5, ARCADE_Y, SHIP_Z - 10);
+
+	/** The prize counter, facing the cabinets. */
+	public static final BlockPos PRIZES = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z + 8);
+
 	// ------------------------------------------------------- your room, floor 5
 
 	private static final int ROOM_Y = floorY(5) + 1;
