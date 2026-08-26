@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
@@ -65,6 +67,35 @@ public class ShipLifeMod implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
 				onJoin(handler.getPlayer()));
 
+		// Dying puts you back on the ground rather than wherever the world
+		// happened to think its spawn was.
+		ServerPlayerEvents.AFTER_RESPAWN.register((was, now, alive) -> {
+			if (now.level() instanceof ServerLevel level && isShipLife(level)) {
+				putSomewhereSafe(now);
+			}
+		});
+
+		// Nobody falls out of the world. The town is a platform in an empty
+		// void, so walking off the edge would otherwise be the end of it.
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (server.getTickCount() % 10 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!isShipLife(level)) {
+					continue;
+				}
+				for (ServerPlayer player : level.players()) {
+					if (player.getY() < Places.GROUND - 8) {
+						putSomewhereSafe(player);
+						player.sendSystemMessage(Component.literal(
+								"Careful -- that is the edge of the world.")
+								.withStyle(ChatFormatting.GRAY));
+					}
+				}
+			}
+		});
+
 		LOGGER.info("Ship Life is aboard.");
 	}
 
@@ -94,6 +125,12 @@ public class ShipLifeMod implements ModInitializer {
 			Ship.build(level);
 		}
 
+		// Where the world puts people who have not chosen a bed. Set on every
+		// join rather than only on a fresh world, so worlds made before this
+		// get it too.
+		level.setRespawnData(net.minecraft.world.level.storage.LevelData.RespawnData.of(
+				net.minecraft.world.level.Level.OVERWORLD, Places.SPAWN, 0.0f, 0.0f));
+
 		// Nothing we build is worth losing to a creeper or an enderman. Set on
 		// every join rather than only on a fresh world, so worlds made before
 		// this get it too.
@@ -104,9 +141,14 @@ public class ShipLifeMod implements ModInitializer {
 			player.setGameMode(GameType.SURVIVAL);
 		}
 
-		if (State.firstTime(player, 0)) {
-			BlockPos spawn = Places.SPAWN;
-			player.teleportTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5);
+		if (!State.firstTime(player, 0)) {
+			// Coming back. Only move them if where they left off is thin air --
+			// joining used to drop you into the void beside the island.
+			if (!standingOnSomething(player)) {
+				putSomewhereSafe(player);
+			}
+		} else {
+			putSomewhereSafe(player);
 			player.getInventory().setItem(Slots.BOOK_SLOT, Kit.questBook());
 			player.getInventory().add(Kit.sponge());
 			player.getInventory().add(Kit.towel());
@@ -120,6 +162,41 @@ public class ShipLifeMod implements ModInitializer {
 					"Your Quest Book is in slot 9. Right-click it any time.")
 					.withStyle(ChatFormatting.GRAY));
 		}
+	}
+
+	/**
+	 * Put someone back on solid ground.
+	 *
+	 * Which ground depends on how far they have got: once you live on the ship
+	 * you come back to the lift on the lowest floor your passport opens, and
+	 * before that you come back to the town.
+	 */
+	private static void putSomewhereSafe(ServerPlayer player) {
+		BlockPos to = Places.SPAWN;
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			if (State.hasFloor(player, floor)) {
+				to = Places.lift(floor);
+				break;
+			}
+		}
+		player.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
+		player.setDeltaMovement(0.0, 0.0, 0.0);
+		player.resetFallDistance();
+	}
+
+	/** Is there anything at all under their feet? */
+	private static boolean standingOnSomething(ServerPlayer player) {
+		if (player.getY() < Places.GROUND - 8) {
+			return false;
+		}
+		BlockPos under = player.blockPosition().below();
+		ServerLevel level = (ServerLevel) player.level();
+		for (int drop = 0; drop < 6; drop++) {
+			if (!level.getBlockState(under.below(drop)).isAir()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** Is this one of our worlds? Everything else in the mod asks this first. */
