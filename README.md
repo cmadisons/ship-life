@@ -3,9 +3,33 @@
 A Minecraft mod where you live on a giant space ship — quests, floors you unlock
 one at a time, arcade games, pets, races and events.
 
-**Status: design only.** This repo is the spec. No mod code has been written yet.
+**Status: chapters 1 to 4 are playable.** The rest of this file is the full design;
+what is built so far is listed under [What works today](#what-works-today).
 
 - 📄 [QUESTS.md](QUESTS.md) — all 650 quests
+
+## What works today
+
+- **Ship Life world type** on the Create World screen. Whatever mode you pick alongside it, you play survival.
+- The **town** — three houses, the lawn, the bushes — and the **ship**, all fourteen floors, built into an empty void.
+- **Quest Book** locked in slot 9 and the **passport** locked in slot 8, neither of which can be lost.
+- **Chapter 1** — wash the ten dishes with the sponge and the towel, bin them, mow the lawn and whack the weeds, and find the penny in the second bush. $5.00 + $94.99 + $0.01.
+- **Chapter 2** — board the ship, get your passport off security, ride the lift to floor 5 and find your bathroom, fridge, bed and TV.
+- **Chapter 3 and 4** — Charlie in the lobby, and his quest: the plunger meter, the bed, and the moldy fridge, with mopping when you get it wrong.
+- The **elevator** — locked floors don't show, a floor your quest is opening shows with a lock, and the doors close, the car whirs and the doors open.
+- The **star** and the **clock** on the action bar: how far the quest is, in green, yellow or red, and the ship's date and time on a real 20-minute day.
+
+Still to build: the arcade and its three games, the pool, the race track, the pets,
+the shops, the events, floors 9 and 10, and a proper drawn heads-up display.
+
+### Build it
+
+```bash
+export JAVA_HOME="$HOME/Library/Application Support/minecraft/runtime/java-runtime-epsilon/mac-os/java-runtime-epsilon/jre.bundle/Contents/Home"
+./gradlew build
+```
+
+The mod lands in `build/libs/`.
 
 ---
 

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "shiplife",
+  "version": "${version}",
+  "name": "Ship Life",
+  "description": "Live on a giant space ship. Earn your first hundred dollars washing dishes and mowing lawns, board the ship, and unlock a floor at a time — arcade, pool, buffet, race track, events and bosses.",
+  "authors": [
+    "Starbr0"
+  ],
+  "contact": {
+    "homepage": "https://cmadisons.github.io/arcade/",
+    "sources": "https://github.com/cmadisons/ship-life"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/shiplife/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.example.ShipLifeMod"
+    ],
+    "client": [
+      "com.example.client.ShipLifeClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.1.2",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
