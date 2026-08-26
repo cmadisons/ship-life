@@ -13,7 +13,7 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Ship Life world type** on the Create World screen. Whatever mode you pick alongside it, you play survival.
 - The **town** — three houses, the lawn, the bushes — and the **ship**, all fourteen floors, built into an empty void.
 - **Quest Book** locked in slot 9 and the **passport** locked in slot 8, neither of which can be lost.
-- **Chapter 1** — wash the ten dishes with the sponge and the towel, bin them, mow the lawn and whack the weeds, and find the penny in the second bush. $5.00 + $94.99 + $0.01.
+- **Chapter 1** — wash the ten dishes with the sponge and the towel, bin them, mow all 121 squares of the lawn and whack the weeds, and find the penny in the second bush. $5.00 + $94.99 + $0.01.
 - **Chapter 2** — board the ship, get your passport off security, ride the lift to floor 5 and find your bathroom, fridge, bed and TV.
 - **Chapter 3 and 4** — Charlie in the lobby, and his quest: the plunger meter, the bed, and the moldy fridge, with mopping when you get it wrong.
 - The **elevator** — locked floors don't show, a floor your quest is opening shows with a lock, and the doors close, the car whirs and the doors open.
@@ -81,7 +81,7 @@ but you do them in order, and the star only points at the part you're on.
 | Part | Where | What | Pay |
 |---|---|---|---|
 | 1 | First house | Wash 10 dishes — left-hold the **sponge**, right-hold the **towel**, one dish at a time. Both get dirty, then throw them in the garbage. | $5.00 |
-| 2 | Second house | Right-click 10 patches of lawn with the mower, anywhere in the house, and right-click each of the 10 weeds once. | $94.99 |
+| 2 | Second house | Mow the whole yard -- right-click all 121 squares of grass inside house two, and each cut square turns to moss -- then right-click each of the 10 weeds once. | $94.99 |
 | 3 | Third house | Find the penny — it's in the **2nd bush from the left**. | $0.01 |
 
 ### Chapter 2 — you go to the ship

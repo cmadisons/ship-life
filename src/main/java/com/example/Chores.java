@@ -384,6 +384,9 @@ public final class Chores {
 		if (!MOWED.computeIfAbsent(player.getUUID(), who -> new HashSet<>()).add(pos.asLong())) {
 			return InteractionResult.SUCCESS;          // already been over this one
 		}
+		// Cut grass goes to moss, so the yard shows how much is left to do.
+		level.setBlockAndUpdate(pos,
+				net.minecraft.world.level.block.Blocks.MOSS_BLOCK.defaultBlockState());
 		level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.6f, 0.8f);
 		Quests.did(player);
 		return InteractionResult.SUCCESS;

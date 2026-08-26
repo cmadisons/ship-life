@@ -52,6 +52,9 @@ public final class Places {
 	/** The lawn is the whole floor of house two, right out to the walls. */
 	public static final int LAWN_REACH = 5;
 
+	/** How many squares of grass there are to cut. */
+	public static final int LAWN_SQUARES = (LAWN_REACH * 2 + 1) * (LAWN_REACH * 2 + 1);
+
 	/** Is this block a patch of that lawn? */
 	public static boolean onLawn(BlockPos pos) {
 		return pos.getY() == GROUND

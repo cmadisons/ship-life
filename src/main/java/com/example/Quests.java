@@ -42,8 +42,9 @@ public final class Quests {
 					List.of(
 							new Part("Wash the 10 dishes -- sponge, then towel  ($5.00)",
 									Places.dish(0), 10),
-							new Part("Mow the lawn and take out the 10 weeds  ($94.99)",
-									Places.HOUSE_TWO, 20),
+							new Part("Mow all " + Places.LAWN_SQUARES + " squares of lawn and "
+									+ "take out the 10 weeds  ($94.99)",
+									Places.HOUSE_TWO, Places.LAWN_SQUARES + 10),
 							new Part("Find a penny in one of the 5 bushes  ($0.01)",
 									Places.bush(0), 1))),
 

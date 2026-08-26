@@ -78,7 +78,7 @@ public final class Kit {
 
 	public static ItemStack mower() {
 		return make(Items.SHEARS, MOWER, ChatFormatting.GREEN,
-				"Right-click the lawn to mow it.");
+				"Right-click every square of grass.");
 	}
 
 	public static ItemStack whacker() {
