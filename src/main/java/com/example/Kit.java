@@ -3,6 +3,7 @@ package com.example;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -53,6 +54,15 @@ public final class Kit {
 		}
 		Component custom = stack.get(DataComponents.CUSTOM_NAME);
 		return custom != null && custom.getString().equals(name);
+	}
+
+	/** Take back the chapter 1 tools -- there is nothing left to use them on. */
+	public static void dropChores(ServerPlayer player) {
+		player.getInventory().clearOrCountMatchingItems(
+				stack -> is(stack, SPONGE) || is(stack, TOWEL)
+						|| is(stack, "Dirty " + SPONGE) || is(stack, "Dirty " + TOWEL)
+						|| is(stack, MOWER) || is(stack, WHACKER),
+				-1, player.inventoryMenu.getCraftSlots());
 	}
 
 	public static ItemStack questBook() {
