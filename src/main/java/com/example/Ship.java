@@ -262,13 +262,22 @@ public final class Ship {
 					Blocks.RED_CONCRETE);
 		}
 
-		// A tiled lip round the edge, so the deck reads as poolside.
+		// A tiled lip round the edge, and the wall that holds the water in.
+		//
+		// The lip is the part you can see. The wall under it is the part that
+		// matters: the hole passes through the arcade's airspace, so without a
+		// side to every level of it the pool would empty itself into floor 2
+		// the moment anything disturbed the water.
 		for (int x = Places.POOL_START - 1; x <= Places.POOL_END + 1; x++) {
 			for (int z = Places.SHIP_Z - half - 1; z <= Places.SHIP_Z + half + 1; z++) {
 				boolean edge = x == Places.POOL_START - 1 || x == Places.POOL_END + 1
 						|| z == Places.SHIP_Z - half - 1 || z == Places.SHIP_Z + half + 1;
-				if (edge) {
-					set(level, new BlockPos(x, y, z), Blocks.PRISMARINE_BRICKS);
+				if (!edge) {
+					continue;
+				}
+				set(level, new BlockPos(x, y, z), Blocks.PRISMARINE_BRICKS);
+				for (int dy = 1; dy <= Places.POOL_DEPTH + 1; dy++) {
+					set(level, new BlockPos(x, y - dy, z), Blocks.PRISMARINE_BRICKS);
 				}
 			}
 		}
