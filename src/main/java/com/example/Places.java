@@ -126,6 +126,10 @@ public final class Places {
 	/** The prize counter, facing the cabinets. */
 	public static final BlockPos PRIZES = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z + 8);
 
+	/** The board on floor 7 that says what is on. */
+	public static final BlockPos EVENT_BOARD =
+			new BlockPos(SHIP_X, floorY(7) + 1, SHIP_Z - 10);
+
 	// ------------------------------------------------------- your room, floor 5
 
 	private static final int ROOM_Y = floorY(5) + 1;

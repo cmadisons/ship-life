@@ -97,6 +97,7 @@ public final class Ship {
 		}
 		furnishLobby(level);
 		furnishArcade(level);
+		furnishEvents(level);
 		furnishYourRoom(level);
 	}
 
@@ -172,6 +173,15 @@ public final class Ship {
 		set(level, pos.above(2), Blocks.SEA_LANTERN);
 	}
 
+	/** Floor 7 is mostly an empty hall with a board on the wall. */
+	private static void furnishEvents(ServerLevel level) {
+		set(level, Places.EVENT_BOARD, Blocks.CHISELED_BOOKSHELF);
+		set(level, Places.EVENT_BOARD.above(), Blocks.SEA_LANTERN);
+		fill(level, Places.SHIP_X - 4, Places.floorY(7), Places.SHIP_Z - 4,
+				Places.SHIP_X + 4, Places.floorY(7), Places.SHIP_Z + 4,
+				Blocks.POLISHED_BLACKSTONE);
+	}
+
 	private static void furnishYourRoom(ServerLevel level) {
 		set(level, Places.TOILET, Blocks.CAULDRON);
 		set(level, Places.FRIDGE, Blocks.IRON_BLOCK);
@@ -209,6 +219,7 @@ public final class Ship {
 		// The arcade came after the first worlds were built.
 		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
 			furnishArcade(level);
+		furnishEvents(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}
 		int replaced = 0;

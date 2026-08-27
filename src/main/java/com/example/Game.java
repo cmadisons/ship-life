@@ -64,6 +64,10 @@ public abstract class Game {
 	/** A button in the bottom row was pressed, 0 to 8 from the left. */
 	public abstract void press(int button);
 
+	/** A cell of the picture itself was clicked. Most games ignore this. */
+	public void pick(int cell) {
+	}
+
 	// ------------------------------------------------------------- the frame
 
 	public void open() {
@@ -74,6 +78,8 @@ public abstract class Game {
 						(clicker, slot) -> {
 							if (slot >= 45) {
 								press(slot - 45);
+							} else {
+								pick(slot);
 							}
 						}),
 				Component.literal(title())));
@@ -104,8 +110,17 @@ public abstract class Game {
 		return stack;
 	}
 
-	/** Pay out, and say so. */
+	/**
+	 * Pay out, and say so.
+	 *
+	 * Summer Break doubles what the arcade pays, which is the whole of that
+	 * event -- there is nothing to play, you just come in that weekend.
+	 */
 	protected void win(int tickets, String why) {
+		if ("Summer Break".equals(Cal.eventToday())) {
+			tickets *= 2;
+			why = why + ", doubled for Summer Break";
+		}
 		State.arcade(player, tickets);
 		player.sendSystemMessage(Component.literal("+" + tickets + " ticket"
 				+ (tickets == 1 ? "" : "s") + "  --  " + why + ". You have "
