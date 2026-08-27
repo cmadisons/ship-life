@@ -126,6 +126,21 @@ public final class Places {
 	/** The prize counter, facing the cabinets. */
 	public static final BlockPos PRIZES = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z + 8);
 
+	// ------------------------------------------------------- the pool, floor 3
+
+	/** The near end of the pool, where a lap starts and finishes. */
+	public static final int POOL_START = SHIP_X - 9;
+
+	/** The far end, where you turn. */
+	public static final int POOL_END = SHIP_X + 9;
+
+	/** How wide the pool is either side of the middle. */
+	public static final int POOL_HALF_WIDTH = 3;
+
+	/** The record board on the wall of floor 3. */
+	public static final BlockPos POOL_BOARD =
+			new BlockPos(SHIP_X - 11, floorY(3) + 1, SHIP_Z + 8);
+
 	/** The board on floor 7 that says what is on. */
 	public static final BlockPos EVENT_BOARD =
 			new BlockPos(SHIP_X, floorY(7) + 1, SHIP_Z - 10);

@@ -57,6 +57,7 @@ public class ShipLifeMod implements ModInitializer {
 		Game.register();
 		Pets.register();
 		Events.register();
+		Pool.register();
 
 		// Right-clicking the book in mid-air, rather than at a block.
 		UseItemCallback.EVENT.register((player, world, hand) -> {

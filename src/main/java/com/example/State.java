@@ -54,6 +54,9 @@ public final class State {
 	/** Your best Pac-Man score. Beating it is what pays. */
 	public static final AttachmentType<Integer> BEST = of("pacman_best", 0, Codec.INT);
 
+	/** Your best lap in the pool, in ticks. Zero until you swim one. */
+	public static final AttachmentType<Integer> BEST_LAP = of("best_lap", 0, Codec.INT);
+
 	/** Which floors your passport opens, one bit per floor. */
 	public static final AttachmentType<Integer> FLOORS = of("floors", 0, Codec.INT);
 
@@ -92,6 +95,14 @@ public final class State {
 
 	public static void best(ServerPlayer player, int score) {
 		player.setAttached(BEST, score);
+	}
+
+	public static int bestLap(ServerPlayer player) {
+		return player.getAttachedOrCreate(BEST_LAP);
+	}
+
+	public static void bestLap(ServerPlayer player, int ticks) {
+		player.setAttached(BEST_LAP, ticks);
 	}
 
 	public static int quest(ServerPlayer player) {

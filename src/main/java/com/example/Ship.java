@@ -97,6 +97,7 @@ public final class Ship {
 		}
 		furnishLobby(level);
 		furnishArcade(level);
+		furnishPool(level);
 		furnishEvents(level);
 		furnishYourRoom(level);
 	}
@@ -173,6 +174,35 @@ public final class Ship {
 		set(level, pos.above(2), Blocks.SEA_LANTERN);
 	}
 
+	/**
+	 * The pool: a glass tank standing on floor 3.
+	 *
+	 * It is built up rather than dug down, because two blocks of digging would
+	 * come out through the ceiling of the arcade below.
+	 */
+	private static void furnishPool(ServerLevel level) {
+		int y = Places.floorY(3);
+		int half = Places.POOL_HALF_WIDTH;
+		// The glass sides, two high, all the way round.
+		for (int x = Places.POOL_START - 1; x <= Places.POOL_END + 1; x++) {
+			for (int z = Places.SHIP_Z - half - 1; z <= Places.SHIP_Z + half + 1; z++) {
+				boolean edge = x == Places.POOL_START - 1 || x == Places.POOL_END + 1
+						|| z == Places.SHIP_Z - half - 1 || z == Places.SHIP_Z + half + 1;
+				for (int dy = 1; dy <= 2; dy++) {
+					set(level, new BlockPos(x, y + dy, z),
+							edge ? Blocks.GLASS : Blocks.WATER);
+				}
+			}
+		}
+		// A line of colour at each end, so you can see where a lap turns.
+		for (int z = Places.SHIP_Z - half; z <= Places.SHIP_Z + half; z++) {
+			set(level, new BlockPos(Places.POOL_START, y, z), Blocks.LIME_CONCRETE);
+			set(level, new BlockPos(Places.POOL_END, y, z), Blocks.RED_CONCRETE);
+		}
+		set(level, Places.POOL_BOARD, Blocks.CHISELED_QUARTZ_BLOCK);
+		set(level, Places.POOL_BOARD.above(), Blocks.SEA_LANTERN);
+	}
+
 	/** Floor 7 is mostly an empty hall with a board on the wall. */
 	private static void furnishEvents(ServerLevel level) {
 		set(level, Places.EVENT_BOARD, Blocks.CHISELED_BOOKSHELF);
@@ -219,6 +249,7 @@ public final class Ship {
 		// The arcade came after the first worlds were built.
 		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
 			furnishArcade(level);
+		furnishPool(level);
 		furnishEvents(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}
