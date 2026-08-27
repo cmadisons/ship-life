@@ -80,7 +80,7 @@ public final class Arcade {
 				State.arcade(player) + " arcade tickets",
 				State.event(player) + " event tickets"));
 
-		Pets.Kind[] kinds = Pets.Kind.values();
+		Pets.Kind[] kinds = Pets.ARCADE_PETS;
 		for (int i = 0; i < kinds.length; i++) {
 			Pets.Kind kind = kinds[i];
 			int have = Pets.owned(player, kind);
@@ -105,7 +105,8 @@ public final class Arcade {
 				"Three quests, drawn at random",
 				"from a pool of 250.",
 				"25 arcade tickets",
-				ready ? "Click to buy." : "Needs floors 8, 9 and 10 first."));
+				ready ? "Click to buy." : "Needs floors 8, 9 and 10 first.",
+				"You are carrying " + QuestPool.carrying(player) + "."));
 
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));
@@ -121,7 +122,7 @@ public final class Arcade {
 			player.closeContainer();
 			return;
 		}
-		Pets.Kind[] kinds = Pets.Kind.values();
+		Pets.Kind[] kinds = Pets.ARCADE_PETS;
 		if (slot >= 19 && slot < 19 + kinds.length) {
 			if (Pets.buy(player, kinds[slot - 19])) {
 				player.closeContainer();
@@ -129,9 +130,21 @@ public final class Arcade {
 			return;
 		}
 		if (slot == 25) {
-			player.sendSystemMessage(Component.literal(
-					"The quest pool opens once you own floors 8, 9 and 10.")
-					.withStyle(ChatFormatting.GRAY));
+			if (!(State.hasFloor(player, 8) && State.hasFloor(player, 9)
+					&& State.hasFloor(player, 10))) {
+				player.sendSystemMessage(Component.literal(
+						"The quest pool opens once you own floors 8, 9 and 10.")
+						.withStyle(ChatFormatting.GRAY));
+				return;
+			}
+			if (State.arcade(player) < 25) {
+				player.sendSystemMessage(Component.literal("That is 25 arcade tickets and you have "
+						+ State.arcade(player) + ".").withStyle(ChatFormatting.RED));
+				return;
+			}
+			State.arcade(player, -25);
+			QuestPool.give(player, 3);
+			player.closeContainer();
 		}
 	}
 
@@ -141,6 +154,8 @@ public final class Arcade {
 			case DOG -> net.minecraft.world.item.Items.BONE;
 			case CAT -> net.minecraft.world.item.Items.STRING;
 			case DOLPHIN -> net.minecraft.world.item.Items.LIGHT_BLUE_DYE;
+			case SKELETON -> net.minecraft.world.item.Items.BONE;
+			case SHADOW -> net.minecraft.world.item.Items.ENDER_PEARL;
 		};
 	}
 }

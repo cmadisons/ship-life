@@ -65,6 +65,10 @@ public final class Events {
 	 * "do an event", and having been paid by one is the proof of it.
 	 */
 	public static void payTickets(ServerPlayer player, int tickets, String why) {
+		if (tickets > 0) {
+			tickets = Shops.multiplied(player, tickets);
+			State.add(player, State.EVENT_EARNED, tickets);
+		}
 		State.event(player, tickets);
 		if (tickets > 0 && !State.hasFloor(player, 10)) {
 			State.unlock(player, 10);

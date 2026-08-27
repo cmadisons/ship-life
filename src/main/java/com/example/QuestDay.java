@@ -33,7 +33,12 @@ public final class QuestDay {
 		PACMAN_BEST("Pac-Man record"),
 		ARCADE("arcade tickets earned"),
 		LAPS("laps swum"),
-		PETS("pets owned");
+		PETS("pets owned"),
+		WAVES("waves cleared on floor 9"),
+		BOSSES("bosses beaten"),
+		RACES("races finished"),
+		EVENT("event tickets earned"),
+		MONEY("dollars");
 
 		public final String label;
 
@@ -50,12 +55,17 @@ public final class QuestDay {
 				case ARCADE -> State.tally(player, State.EARNED);
 				case LAPS -> State.tally(player, State.LAPS);
 				case PETS -> Pets.total(player);
+				case WAVES -> State.tally(player, State.WAVES);
+				case BOSSES -> State.tally(player, State.BOSSES);
+				case RACES -> State.tally(player, State.RACES);
+				case EVENT -> State.tally(player, State.EVENT_EARNED);
+				case MONEY -> State.money(player) / 100;
 			};
 		}
 
 		/** A record is a height to reach, not a number to add to. */
 		public boolean absolute() {
-			return this == PACMAN_BEST || this == PETS;
+			return this == PACMAN_BEST || this == PETS || this == MONEY;
 		}
 	}
 

@@ -40,7 +40,9 @@ public final class Pets {
 		LION("Lion", "Helps you fight"),
 		DOG("Dog", "A swimming boost every 7 seconds"),
 		CAT("Cat", "Opens floor 6, for good"),
-		DOLPHIN("Dolphin", "A random one of the others, each day");
+		DOLPHIN("Dolphin", "A random one of the others, each day"),
+		SKELETON("Skeleton", "A combat boost"),
+		SHADOW("Shadow", "0.25 of every pet's boost");
 
 		public final String label;
 		public final String what;
@@ -50,6 +52,9 @@ public final class Pets {
 			this.what = what;
 		}
 	}
+
+	/** The four the arcade sells. The other two are the pet store's. */
+	public static final Kind[] ARCADE_PETS = { Kind.LION, Kind.DOG, Kind.CAT, Kind.DOLPHIN };
 
 	/** What a pet costs at the arcade counter. */
 	public static final int PRICE = 10;
@@ -113,6 +118,78 @@ public final class Pets {
 		return true;
 	}
 
+	/** Hand one over without charging arcade tickets for it. */
+	public static void grant(ServerPlayer player, Kind kind) {
+		player.setAttached(OWNED[kind.ordinal()], owned(player, kind) + 1);
+		spawn(player, kind);
+		player.sendSystemMessage(Component.literal("A " + kind.label
+				+ " follows you now. " + kind.what + ".").withStyle(ChatFormatting.GREEN));
+	}
+
+	/**
+	 * How much better than standard one kind of your pets is.
+	 *
+	 * Food compounds at a tenth each time and stops at twice, so the eighth
+	 * one is the last that does anything -- 1.1 to the seventh is 1.95.
+	 */
+	public static double strength(ServerPlayer player, Kind kind) {
+		return Math.min(2.0, Math.pow(1.1, fed(player, kind)));
+	}
+
+	private static int fed(ServerPlayer player, Kind kind) {
+		for (String part : State.petFood(player).split(",")) {
+			String[] bits = part.split(":");
+			if (bits.length == 2 && bits[0].equals(kind.name())) {
+				return Integer.parseInt(bits[1]);
+			}
+		}
+		return 0;
+	}
+
+	/** Feed one kind of pet, if it is not already as good as it gets. */
+	public static void feed(ServerPlayer player, Kind kind) {
+		if (owned(player, kind) == 0) {
+			player.sendSystemMessage(Component.literal("You do not have a " + kind.label + ".")
+					.withStyle(ChatFormatting.RED));
+			return;
+		}
+		if (strength(player, kind) >= 2.0) {
+			player.sendSystemMessage(Component.literal("Your " + kind.label
+					+ " is already at x2 -- as good as they go.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		if (State.event(player) < Shops.PET_FOOD_COST) {
+			player.sendSystemMessage(Component.literal("Pet food is "
+					+ Shops.PET_FOOD_COST + " event tickets and you have "
+					+ State.event(player) + ".").withStyle(ChatFormatting.RED));
+			return;
+		}
+		State.event(player, -Shops.PET_FOOD_COST);
+
+		int now = fed(player, kind) + 1;
+		java.util.List<String> parts = new java.util.ArrayList<>();
+		boolean replaced = false;
+		for (String part : State.petFood(player).split(",")) {
+			if (part.isEmpty()) {
+				continue;
+			}
+			if (part.startsWith(kind.name() + ":")) {
+				parts.add(kind.name() + ":" + now);
+				replaced = true;
+			} else {
+				parts.add(part);
+			}
+		}
+		if (!replaced) {
+			parts.add(kind.name() + ":" + now);
+		}
+		State.petFood(player, String.join(",", parts));
+		player.sendSystemMessage(Component.literal("Your " + kind.label + " is now x"
+				+ String.format("%.2f", strength(player, kind)) + ".")
+				.withStyle(ChatFormatting.GREEN));
+	}
+
 	/** Put the animal in the world, tamed, so it comes with you. */
 	private static void spawn(ServerPlayer player, Kind kind) {
 		ServerLevel level = (ServerLevel) player.level();
@@ -155,9 +232,11 @@ public final class Pets {
 	}
 
 	private static void boosts(ServerPlayer player) {
-		int lions = owned(player, Kind.LION);
+		int lions = owned(player, Kind.LION) + owned(player, Kind.SKELETON);
 		int dogs = owned(player, Kind.DOG);
 		int dolphins = owned(player, Kind.DOLPHIN);
+		// A Shadow is a quarter of everything else you have.
+		int shadows = owned(player, Kind.SHADOW);
 
 		// The dolphin stands in for one of the others, and doubles like the
 		// pet it is copying rather than on its own.
@@ -168,15 +247,25 @@ public final class Pets {
 			dogs += dolphins;
 		}
 
-		if (lions > 0) {
+		double lionPower = lions * strength(player, Kind.LION) * (1 + 0.25 * shadows);
+		double dogPower = dogs * strength(player, Kind.DOG) * (1 + 0.25 * shadows);
+		// The Keg's fighting dish is another hand in the same fight.
+		if (Shops.running(player, "fight")) {
+			lionPower += 1;
+		}
+		if (Shops.running(player, "swim")) {
+			dogPower += 1;
+		}
+
+		if (lionPower > 0) {
 			player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40,
-					lions >= 2 ? 1 : 0, true, false, false));
+					lionPower >= 2 ? 1 : 0, true, false, false));
 		}
 		// Every seven seconds, and only when there is water to be quick in.
-		if (dogs > 0 && player.isInWater()
+		if (dogPower > 0 && player.isInWater()
 				&& player.level().getGameTime() % 140 < 20) {
 			player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 60,
-					dogs >= 2 ? 1 : 0, true, false, false));
+					dogPower >= 2 ? 1 : 0, true, false, false));
 		}
 	}
 }

@@ -23,10 +23,11 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Floor 6, the race track** — three lanes, 250 gas, boost for double speed, cars that slow you when you hit them. Five laps in two minutes opens floor 7.
 - **Floor 7, the events** — a board saying what is on today. Spooky Shooter and Christmas (a crowd of 100 and a photograph), Quest Day (four quests, 500 tickets for all four), May the Fourth (lightsaber fights, 25 a fight and 100 a win), and Summer Break, which needs no screen because it doubles what the arcade pays.
 - **Floor 9 and floor 10** — waves that get bigger and pay when you clear them, and a door each for Arachnes and the dragon.
+- **The shops** — floor 8 gives a free quest at a time from a pool of 250, all of them things the game can watch you do; floor 11 hands out one reward a month on the 70 / 25 / 4.9 / 0.1 table; floor 12 sells pet food (x1.1 a time, stopping at x2), the Skeleton and the Shadow; floor 13 is The Keg, three dishes at 25 tickets that last a day each; and the event ticket counter on floor 7 sells floors 11 to 13 together, the Go To Event Star and the x2.5.
 - A **drawn heads-up display** — the star is out in the world where the quest is, through walls and through the floors of the ship, pinned to the edge of the screen with an arrow when it is behind you; the ship's clock, the date, your money and your tickets sit in the top-right corner.
 
-Still to build: the shops on floors 8 and 11 to 13, the 250-quest pool behind the
-25-ticket prize, passport upgrades, friends, and chapters past 4.
+Still to build: passport upgrades, friends, chapters past 4, and whatever is on
+floor 14.
 
 ### Build it
 

@@ -64,6 +64,27 @@ public final class State {
 	public static final AttachmentType<Integer> EARNED = of("tickets_earned", 0, Codec.INT);
 	public static final AttachmentType<Integer> WAVES = of("waves_cleared", 0, Codec.INT);
 	public static final AttachmentType<Integer> BOSSES = of("bosses_beaten", 0, Codec.INT);
+	public static final AttachmentType<Integer> RACES = of("races_finished", 0, Codec.INT);
+	public static final AttachmentType<Integer> EVENT_EARNED = of("event_earned", 0, Codec.INT);
+
+	/** Side quests you are carrying, as "stat:target:tickets" separated by commas. */
+	public static final AttachmentType<String> SIDE = of("side_quests", "", Codec.STRING);
+
+	/** The in-game month you last took the floor 11 reward in. Zero for never. */
+	public static final AttachmentType<Integer> REWARD_MONTH = of("reward_month", 0, Codec.INT);
+
+	/** Which phone shops you can call, one bit each: store, arcade, event. */
+	public static final AttachmentType<Integer> PHONES = of("phone_shops", 0, Codec.INT);
+
+	/** Food boosts running today: swim, race, fight -- as the day they run out. */
+	public static final AttachmentType<String> BOOSTS = of("keg_boosts", "", Codec.STRING);
+
+	/** Events left on a x2.5, and whether it is the permanent one. */
+	public static final AttachmentType<Integer> MULTIPLIER = of("multiplier_left", 0, Codec.INT);
+	public static final AttachmentType<Integer> FOREVER = of("multiplier_forever", 0, Codec.INT);
+
+	/** Pet food eaten, per pet kind, as "kind:count" pairs. */
+	public static final AttachmentType<String> PET_FOOD = of("pet_food", "", Codec.STRING);
 
 	/** The four quests running today, as "stat:target:amount" four times over. */
 	public static final AttachmentType<String> QUEST_DAY = of("quest_day", "", Codec.STRING);
@@ -122,6 +143,30 @@ public final class State {
 
 	public static void add(ServerPlayer player, AttachmentType<Integer> what, int by) {
 		player.setAttached(what, tally(player, what) + by);
+	}
+
+	public static String side(ServerPlayer player) {
+		return player.getAttachedOrCreate(SIDE);
+	}
+
+	public static void side(ServerPlayer player, String quests) {
+		player.setAttached(SIDE, quests);
+	}
+
+	public static String boosts(ServerPlayer player) {
+		return player.getAttachedOrCreate(BOOSTS);
+	}
+
+	public static void boosts(ServerPlayer player, String running) {
+		player.setAttached(BOOSTS, running);
+	}
+
+	public static String petFood(ServerPlayer player) {
+		return player.getAttachedOrCreate(PET_FOOD);
+	}
+
+	public static void petFood(ServerPlayer player, String fed) {
+		player.setAttached(PET_FOOD, fed);
 	}
 
 	public static String questDay(ServerPlayer player) {

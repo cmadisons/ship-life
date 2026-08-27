@@ -159,6 +159,23 @@ public final class Places {
 	public static final BlockPos BOSS_SPOT =
 			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z + 4);
 
+	/** The counter in the store on floor 8. */
+	public static final BlockPos STORE = new BlockPos(SHIP_X, floorY(8) + 1, SHIP_Z - 8);
+
+	/** The event ticket shop, next to the board on floor 7. */
+	public static final BlockPos TICKET_SHOP =
+			new BlockPos(SHIP_X + 4, floorY(7) + 1, SHIP_Z - 10);
+
+	/** The desk on floor 11 that hands out the monthly reward. */
+	public static final BlockPos REWARD_DESK =
+			new BlockPos(SHIP_X, floorY(11) + 1, SHIP_Z - 8);
+
+	/** The counter in the pet store on floor 12. */
+	public static final BlockPos PET_STORE = new BlockPos(SHIP_X, floorY(12) + 1, SHIP_Z - 8);
+
+	/** The bar at The Keg on floor 13. */
+	public static final BlockPos KEG = new BlockPos(SHIP_X, floorY(13) + 1, SHIP_Z - 8);
+
 	/** The board on floor 7 that says what is on. */
 	public static final BlockPos EVENT_BOARD =
 			new BlockPos(SHIP_X, floorY(7) + 1, SHIP_Z - 10);

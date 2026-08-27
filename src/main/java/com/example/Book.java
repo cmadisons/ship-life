@@ -58,6 +58,15 @@ public final class Book {
 			page.setItem(slot, questIcon(player, index, here));
 		}
 
+		java.util.List<String> side = QuestPool.lines(player);
+		if (!side.isEmpty()) {
+			java.util.List<String> lore = new ArrayList<>(side);
+			lore.add("");
+			lore.add("From the store on floor 8 and the prize counter.");
+			page.setItem(40, entry(Items.PAPER, "Side Quests", ChatFormatting.YELLOW,
+					lore.toArray(new String[0])));
+		}
+
 		page.setItem(49, entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
 
 		player.openMenu(new SimpleMenuProvider(

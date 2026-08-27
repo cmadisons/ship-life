@@ -126,6 +126,7 @@ public class Race extends Game {
 
 	private void finish() {
 		over = true;
+		State.add(player, State.RACES, 1);
 		int ticks = age - startedAt;
 		player.sendSystemMessage(Component.literal(LAPS + " laps in "
 				+ Pool.time(ticks) + ".").withStyle(ChatFormatting.GREEN));

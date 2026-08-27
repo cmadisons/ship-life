@@ -101,6 +101,7 @@ public final class Ship {
 		furnishRace(level);
 		furnishFighting(level);
 		furnishEvents(level);
+		furnishShops(level);
 		furnishYourRoom(level);
 	}
 
@@ -235,6 +236,23 @@ public final class Ship {
 				Blocks.POLISHED_BLACKSTONE);
 	}
 
+	/** A counter apiece on floors 8, 11, 12 and 13, and one more on 7. */
+	private static void furnishShops(ServerLevel level) {
+		counter(level, Places.STORE, Blocks.BOOKSHELF);
+		counter(level, Places.TICKET_SHOP, Blocks.GOLD_BLOCK);
+		counter(level, Places.REWARD_DESK, Blocks.CHEST);
+		counter(level, Places.PET_STORE, Blocks.HAY_BLOCK);
+		counter(level, Places.KEG, Blocks.BARREL);
+	}
+
+	/** A shop counter: something to click, lit so you can find it. */
+	private static void counter(ServerLevel level, BlockPos pos, Block front) {
+		set(level, pos, front);
+		set(level, pos.above(), Blocks.LANTERN);
+		fill(level, pos.getX() - 3, pos.getY() - 1, pos.getZ(),
+				pos.getX() + 3, pos.getY() - 1, pos.getZ(), Blocks.POLISHED_ANDESITE);
+	}
+
 	/** Floor 7 is mostly an empty hall with a board on the wall. */
 	private static void furnishEvents(ServerLevel level) {
 		set(level, Places.EVENT_BOARD, Blocks.CHISELED_BOOKSHELF);
@@ -285,6 +303,7 @@ public final class Ship {
 		furnishRace(level);
 		furnishFighting(level);
 		furnishEvents(level);
+		furnishShops(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}
 		int replaced = 0;
