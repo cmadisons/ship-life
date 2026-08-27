@@ -49,6 +49,8 @@ public class ShipLifeMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		// First, before a world can be loaded: everything the game remembers.
+		State.register();
 		Ticker.register();
 		Slots.register();
 		Hud.register();

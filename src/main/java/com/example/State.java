@@ -25,6 +25,24 @@ public final class State {
 	private State() {
 	}
 
+	/**
+	 * Make sure every attachment above exists before any world is loaded.
+	 *
+	 * This is the whole reason the class has a method that does nothing. Java
+	 * only runs a class's static fields the first time something touches the
+	 * class, and nothing touched this one until a player was already in a
+	 * world -- by which point their saved Ship Life data had been read, found
+	 * to belong to an attachment nobody had registered, and dropped. Every
+	 * quest, every ticket, every unlocked floor, gone on every reload.
+	 *
+	 * Calling this from onInitialize touches the class early, so the
+	 * attachments are registered before there is anything to restore.
+	 */
+	public static void register() {
+		// Touching the class is the point; this line is just proof it happened.
+		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 24);
+	}
+
 	private static <T> AttachmentType<T> of(String name, T start, Codec<T> codec) {
 		return AttachmentRegistry.<T>builder()
 				.initializer(() -> start)
