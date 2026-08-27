@@ -43,6 +43,10 @@ public final class Chores {
 	/** Who has a mess on the floor to mop up. */
 	private static final Map<UUID, Integer> MESS = new HashMap<>();
 
+	/** The food actually lying on the floor, so it can be swept up later. */
+	private static final Map<UUID, java.util.List<net.minecraft.world.entity.item.ItemEntity>>
+			SPILLED = new HashMap<>();
+
 	/** Which dishes have been washed but not yet dried. */
 	private static final Map<UUID, Integer> WASHED = new HashMap<>();
 
@@ -352,6 +356,44 @@ public final class Chores {
 				? "The food fell on the floor. Mop it up."
 				: "It exploded. Mop it up.").withStyle(ChatFormatting.RED));
 		MESS.put(player.getUUID(), 60);
+		spill(player, fridge);
+	}
+
+	/**
+	 * Put the mess on the floor where you can see it.
+	 *
+	 * The food that fell is really there -- five pieces of it, scattered in
+	 * front of the fridge -- and it cannot be picked up, only mopped. Being
+	 * told you made a mess and seeing the mess are not the same thing.
+	 */
+	private static void spill(ServerPlayer player, boolean fridge) {
+		ServerLevel level = (ServerLevel) player.level();
+		BlockPos from = Places.onShip(fridge ? Places.FRIDGE : Places.TOILET,
+				Places.shipOf(player.getX()));
+		java.util.List<net.minecraft.world.entity.item.ItemEntity> dropped =
+				new java.util.ArrayList<>();
+		java.util.Random random = new java.util.Random();
+		for (int i = 0; i < 5; i++) {
+			ItemStack piece = Kit.make(
+					fridge ? net.minecraft.world.item.Items.ROTTEN_FLESH
+							: net.minecraft.world.item.Items.SLIME_BALL,
+					fridge ? "Moldy Food" : "Mess",
+					ChatFormatting.DARK_GREEN, "Mop it up.");
+			net.minecraft.world.entity.item.ItemEntity mess =
+					new net.minecraft.world.entity.item.ItemEntity(level,
+							from.getX() + 0.5 + (random.nextDouble() - 0.5) * 3,
+							from.getY() + 0.4,
+							from.getZ() + 0.5 + (random.nextDouble() - 0.5) * 3,
+							piece);
+			mess.setDeltaMovement((random.nextDouble() - 0.5) * 0.15, 0.12,
+					(random.nextDouble() - 0.5) * 0.15);
+			// It is rubbish on the floor, not something to put in your pocket.
+			mess.setNeverPickUp();
+			mess.setUnlimitedLifetime();
+			level.addFreshEntity(mess);
+			dropped.add(mess);
+		}
+		SPILLED.put(player.getUUID(), dropped);
 	}
 
 	private static boolean mopping(ServerPlayer player) {
@@ -374,8 +416,23 @@ public final class Chores {
 					.withStyle(ChatFormatting.GRAY));
 			if (left <= 0) {
 				MESS.remove(player.getUUID());
+				sweepUp(player);
 				player.sendSystemMessage(Component.literal("All clean. Try again.")
 						.withStyle(ChatFormatting.GREEN));
+			}
+		}
+	}
+
+	/** The mop got it: take the food off the floor. */
+	private static void sweepUp(ServerPlayer player) {
+		java.util.List<net.minecraft.world.entity.item.ItemEntity> dropped =
+				SPILLED.remove(player.getUUID());
+		if (dropped == null) {
+			return;
+		}
+		for (net.minecraft.world.entity.item.ItemEntity mess : dropped) {
+			if (mess.isAlive()) {
+				mess.discard();
 			}
 		}
 	}
