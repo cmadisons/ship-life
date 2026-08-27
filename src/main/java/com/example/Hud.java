@@ -1,6 +1,8 @@
 package com.example;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -53,6 +55,7 @@ public final class Hud {
 	}
 
 	public static void register() {
+		PayloadTypeRegistry.clientboundPlay().register(HudPacket.TYPE, HudPacket.CODEC);
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			// Four times a second: smooth enough to watch a distance count down.
 			if (server.getTickCount() % 5 != 0) {
@@ -64,6 +67,7 @@ public final class Hud {
 				}
 				for (ServerPlayer player : level.players()) {
 					show(player, level);
+					ServerPlayNetworking.send(player, new HudPacket(state(player)));
 				}
 			}
 		});
@@ -96,6 +100,44 @@ public final class Hud {
 			}
 		}
 		player.sendOverlayMessage(line);
+	}
+
+	/**
+	 * The same facts, packed for the drawn display.
+	 *
+	 * quest | what to do | blocks | colour | x | y | z | clock | date | money |
+	 * arcade | event | today's event
+	 */
+	private static String state(ServerPlayer player) {
+		Quests.Quest quest = Quests.current(player);
+		Quests.Part part = Quests.currentPart(player);
+		String todo = part == null ? "" : Quests.progress(player, part, State.count(player));
+		int blocks = 0;
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		if (part != null) {
+			BlockPos where = part.where();
+			x = where.getX();
+			y = where.getY();
+			z = where.getZ();
+			blocks = (int) Math.round(Math.sqrt(player.distanceToSqr(
+					x + 0.5, y, z + 0.5)));
+		}
+		String event = Cal.eventToday();
+		return String.join("|",
+				quest == null ? "" : quest.name(),
+				todo,
+				String.valueOf(blocks),
+				String.valueOf(colourFor(blocks).getColor() == null
+						? 0xFFFFFF : colourFor(blocks).getColor()),
+				String.valueOf(x), String.valueOf(y), String.valueOf(z),
+				Cal.clock(),
+				Cal.weekday() + " " + Cal.dayOfMonth() + " " + Cal.month(),
+				State.dollars(State.money(player)),
+				String.valueOf(State.arcade(player)),
+				String.valueOf(State.event(player)),
+				event == null ? "" : event);
 	}
 
 	/** The clock and your money, at the end of the line. */

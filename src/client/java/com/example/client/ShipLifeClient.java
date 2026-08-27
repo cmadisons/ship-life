@@ -1,20 +1,29 @@
 package com.example.client;
 
+import com.example.HudPacket;
+import com.example.ShipLifeMod;
+
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 
 /**
  * The client half of Ship Life.
  *
- * Nothing to do here yet. Everything the player sees -- the quest star, the
- * clock, the meters on the chores -- is written to the action bar by the
- * server, so it works in single player and on a server without the client
- * having to draw anything. A real heads-up display, with the star drawn in the
- * world and the clock pinned to the top-right corner, belongs here when it
- * comes.
+ * Two jobs: take the line the server sends four times a second, and draw it.
+ * The drawing itself is in {@link Screen}.
  */
 public class ShipLifeClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		// Intentionally empty -- see the class comment above.
+		ClientPlayNetworking.registerGlobalReceiver(HudPacket.TYPE,
+				(payload, context) -> context.client().execute(
+						() -> Screen.take(payload.line())));
+
+		// Leaving a world clears the display, so nothing is left over from it.
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> Screen.forget());
+
+		HudElementRegistry.addLast(ShipLifeMod.id("hud"), Screen::draw);
 	}
 }
