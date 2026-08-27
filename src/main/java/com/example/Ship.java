@@ -98,6 +98,7 @@ public final class Ship {
 		furnishLobby(level);
 		furnishArcade(level);
 		furnishPool(level);
+		furnishRace(level);
 		furnishEvents(level);
 		furnishYourRoom(level);
 	}
@@ -203,6 +204,19 @@ public final class Ship {
 		set(level, Places.POOL_BOARD.above(), Blocks.SEA_LANTERN);
 	}
 
+	/** Floor 6: a strip of track and a car to get into. */
+	private static void furnishRace(ServerLevel level) {
+		int y = Places.floorY(6);
+		fill(level, Places.SHIP_X - 9, y, Places.SHIP_Z - 6,
+				Places.SHIP_X + 9, y, Places.SHIP_Z + 6, Blocks.BLACK_CONCRETE);
+		for (int x = Places.SHIP_X - 9; x <= Places.SHIP_X + 9; x += 2) {
+			set(level, new BlockPos(x, y, Places.SHIP_Z), Blocks.WHITE_CONCRETE);
+		}
+		set(level, Places.RACE_CAR, Blocks.RED_CONCRETE);
+		set(level, Places.RACE_CAR.above(), Blocks.BLACK_CONCRETE);
+		set(level, Places.RACE_CAR.above(2), Blocks.SEA_LANTERN);
+	}
+
 	/** Floor 7 is mostly an empty hall with a board on the wall. */
 	private static void furnishEvents(ServerLevel level) {
 		set(level, Places.EVENT_BOARD, Blocks.CHISELED_BOOKSHELF);
@@ -250,6 +264,7 @@ public final class Ship {
 		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
 			furnishArcade(level);
 		furnishPool(level);
+		furnishRace(level);
 		furnishEvents(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}

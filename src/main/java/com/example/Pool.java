@@ -109,6 +109,7 @@ public final class Pool {
 		player.level().playSound(null, player.blockPosition(),
 				SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.8f, 1.4f);
 
+		State.add(player, State.LAPS, 1);
 		int best = State.bestLap(player);
 		boolean record = best == 0 || ticks < best;
 		if (record) {
@@ -132,6 +133,7 @@ public final class Pool {
 
 	/** The record board on the wall. */
 	private static void records(ServerPlayer player) {
+		State.add(player, State.LAPS, 1);
 		int best = State.bestLap(player);
 		player.sendSystemMessage(Component.literal("Pool records -- "
 				+ (best == 0 ? "you have not done a lap yet."

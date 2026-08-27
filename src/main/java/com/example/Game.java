@@ -122,6 +122,7 @@ public abstract class Game {
 			why = why + ", doubled for Summer Break";
 		}
 		State.arcade(player, tickets);
+		State.add(player, State.EARNED, tickets);
 		player.sendSystemMessage(Component.literal("+" + tickets + " ticket"
 				+ (tickets == 1 ? "" : "s") + "  --  " + why + ". You have "
 				+ State.arcade(player) + ".").withStyle(ChatFormatting.GREEN));

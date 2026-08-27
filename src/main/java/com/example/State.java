@@ -57,6 +57,15 @@ public final class State {
 	/** Your best lap in the pool, in ticks. Zero until you swim one. */
 	public static final AttachmentType<Integer> BEST_LAP = of("best_lap", 0, Codec.INT);
 
+	/** Running tallies, for the quests that ask you to do a thing N times. */
+	public static final AttachmentType<Integer> FOODS = of("snake_foods", 0, Codec.INT);
+	public static final AttachmentType<Integer> ROUNDS = of("galaga_rounds", 0, Codec.INT);
+	public static final AttachmentType<Integer> LAPS = of("pool_laps", 0, Codec.INT);
+	public static final AttachmentType<Integer> EARNED = of("tickets_earned", 0, Codec.INT);
+
+	/** The four quests running today, as "stat:target:amount" four times over. */
+	public static final AttachmentType<String> QUEST_DAY = of("quest_day", "", Codec.STRING);
+
 	/** Which floors your passport opens, one bit per floor. */
 	public static final AttachmentType<Integer> FLOORS = of("floors", 0, Codec.INT);
 
@@ -103,6 +112,22 @@ public final class State {
 
 	public static void bestLap(ServerPlayer player, int ticks) {
 		player.setAttached(BEST_LAP, ticks);
+	}
+
+	public static int tally(ServerPlayer player, AttachmentType<Integer> what) {
+		return player.getAttachedOrCreate(what);
+	}
+
+	public static void add(ServerPlayer player, AttachmentType<Integer> what, int by) {
+		player.setAttached(what, tally(player, what) + by);
+	}
+
+	public static String questDay(ServerPlayer player) {
+		return player.getAttachedOrCreate(QUEST_DAY);
+	}
+
+	public static void questDay(ServerPlayer player, String set) {
+		player.setAttached(QUEST_DAY, set);
 	}
 
 	public static int quest(ServerPlayer player) {

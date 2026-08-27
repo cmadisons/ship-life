@@ -61,6 +61,7 @@ public class Snake extends Game {
 		body.addFirst(new int[] { x, y });
 		if (x == food[0] && y == food[1]) {
 			eaten++;
+			State.add(player, State.FOODS, 1);
 			win(1, "one food");
 			player.level().playSound(null, player.blockPosition(),
 					SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.5f, 1.8f);

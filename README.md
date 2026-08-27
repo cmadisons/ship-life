@@ -19,6 +19,9 @@ what is built so far is listed under [What works today](#what-works-today).
 - The **elevator** — locked floors don't show, a floor your quest is opening shows with a lock, and the doors close, the car whirs and the doors open.
 - The **arcade on floor 2** — Snake, Galaga and Pac-Man, all three played inside a chest screen with buttons along the bottom, paying a ticket a food, five a round and five for a new record.
 - The **prize counter** — pets for 10 tickets each: lion, dog, cat and dolphin, all following you at once, two of a kind doubling the boost, and the cat opening floor 6 for good.
+- **Floor 3, the pool** — a lap is the length and back, timed; thirty seconds opens floor 9, which a bare lap does not quite manage without a dog.
+- **Floor 6, the race track** — three lanes, 250 gas, boost for double speed, cars that slow you when you hit them. Five laps in two minutes opens floor 7.
+- **Floor 7, the events** — a board saying what is on today. Spooky Shooter and Christmas (a crowd of 100 and a photograph), Quest Day (four quests, 500 tickets for all four), May the Fourth (lightsaber fights, 25 a fight and 100 a win), and Summer Break, which needs no screen because it doubles what the arcade pays.
 - The **star** and the **clock** on the action bar: how far the quest is, in green, yellow or red, and the ship's date and time on a real 20-minute day.
 
 Still to build: the 250-quest pool behind the 25-ticket prize, the pool, the race track, the pets,

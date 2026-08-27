@@ -42,6 +42,10 @@ public final class Arcade {
 				new Galaga(who).open();
 				return InteractionResult.SUCCESS;
 			}
+			if (matches(pos, base, Places.RACE_CAR)) {
+				new Race(who).open();
+				return InteractionResult.SUCCESS;
+			}
 			if (matches(pos, base, Places.PRIZES)) {
 				prizes(who);
 				return InteractionResult.SUCCESS;

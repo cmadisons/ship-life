@@ -63,6 +63,7 @@ public class Galaga extends Game {
 		}
 
 		if (cleared()) {
+			State.add(player, State.ROUNDS, 1);
 			win(5, "round " + round + " passed");
 			round++;
 			fill();

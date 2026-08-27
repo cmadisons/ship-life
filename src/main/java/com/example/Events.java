@@ -104,7 +104,7 @@ public final class Events {
 
 	/** Is there something to walk into, or does the event just happen to you? */
 	private static boolean playable(String name) {
-		return name.equals("Spooky Shooter") || name.equals("Christmas");
+		return !name.equals("Summer Break");
 	}
 
 	private static void click(ServerPlayer player, int slot) {
@@ -125,6 +125,8 @@ public final class Events {
 		switch (name) {
 			case "Spooky Shooter" -> new Shooter(player, false).open();
 			case "Christmas" -> new Shooter(player, true).open();
+			case "Quest Day" -> QuestDay.open(player);
+			case "May the Fourth" -> new Duel(player).open();
 			case "Summer Break" -> player.sendSystemMessage(Component.literal(
 					"Summer Break is on: the arcade pays double all day.")
 					.withStyle(ChatFormatting.GREEN));
