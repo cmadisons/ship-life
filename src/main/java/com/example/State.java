@@ -62,6 +62,8 @@ public final class State {
 	public static final AttachmentType<Integer> ROUNDS = of("galaga_rounds", 0, Codec.INT);
 	public static final AttachmentType<Integer> LAPS = of("pool_laps", 0, Codec.INT);
 	public static final AttachmentType<Integer> EARNED = of("tickets_earned", 0, Codec.INT);
+	public static final AttachmentType<Integer> WAVES = of("waves_cleared", 0, Codec.INT);
+	public static final AttachmentType<Integer> BOSSES = of("bosses_beaten", 0, Codec.INT);
 
 	/** The four quests running today, as "stat:target:amount" four times over. */
 	public static final AttachmentType<String> QUEST_DAY = of("quest_day", "", Codec.STRING);

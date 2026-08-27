@@ -99,6 +99,7 @@ public final class Ship {
 		furnishArcade(level);
 		furnishPool(level);
 		furnishRace(level);
+		furnishFighting(level);
 		furnishEvents(level);
 		furnishYourRoom(level);
 	}
@@ -217,6 +218,23 @@ public final class Ship {
 		set(level, Places.RACE_CAR.above(2), Blocks.SEA_LANTERN);
 	}
 
+	/** Floors 9 and 10: an empty room with a button, and one with two doors. */
+	private static void furnishFighting(ServerLevel level) {
+		set(level, Places.FIGHT_BUTTON, Blocks.REDSTONE_BLOCK);
+		set(level, Places.FIGHT_BUTTON.above(), Blocks.REDSTONE_LAMP);
+		fill(level, Places.SHIP_X - 9, Places.floorY(9), Places.SHIP_Z - 9,
+				Places.SHIP_X + 9, Places.floorY(9), Places.SHIP_Z + 9,
+				Blocks.POLISHED_BLACKSTONE_BRICKS);
+
+		set(level, Places.ARACHNES_DOOR, Blocks.COBWEB);
+		set(level, Places.ARACHNES_DOOR.above(), Blocks.SEA_LANTERN);
+		set(level, Places.DRAGON_DOOR, Blocks.OBSIDIAN);
+		set(level, Places.DRAGON_DOOR.above(), Blocks.SEA_LANTERN);
+		fill(level, Places.SHIP_X - 9, Places.floorY(10), Places.SHIP_Z - 9,
+				Places.SHIP_X + 9, Places.floorY(10), Places.SHIP_Z + 9,
+				Blocks.POLISHED_BLACKSTONE);
+	}
+
 	/** Floor 7 is mostly an empty hall with a board on the wall. */
 	private static void furnishEvents(ServerLevel level) {
 		set(level, Places.EVENT_BOARD, Blocks.CHISELED_BOOKSHELF);
@@ -265,6 +283,7 @@ public final class Ship {
 			furnishArcade(level);
 		furnishPool(level);
 		furnishRace(level);
+		furnishFighting(level);
 		furnishEvents(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}

@@ -145,6 +145,20 @@ public final class Places {
 	public static final BlockPos RACE_CAR =
 			new BlockPos(SHIP_X, floorY(6) + 1, SHIP_Z - 8);
 
+	/** The button on floor 9 that calls in a wave. */
+	public static final BlockPos FIGHT_BUTTON =
+			new BlockPos(SHIP_X - 10, floorY(9) + 1, SHIP_Z);
+
+	/** The two doors on floor 10, one boss behind each. */
+	public static final BlockPos ARACHNES_DOOR =
+			new BlockPos(SHIP_X - 6, floorY(10) + 1, SHIP_Z - 10);
+	public static final BlockPos DRAGON_DOOR =
+			new BlockPos(SHIP_X + 6, floorY(10) + 1, SHIP_Z - 10);
+
+	/** Where a boss comes in. */
+	public static final BlockPos BOSS_SPOT =
+			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z + 4);
+
 	/** The board on floor 7 that says what is on. */
 	public static final BlockPos EVENT_BOARD =
 			new BlockPos(SHIP_X, floorY(7) + 1, SHIP_Z - 10);

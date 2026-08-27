@@ -58,9 +58,20 @@ public final class Events {
 		});
 	}
 
-	/** Pay event tickets, and say what for. */
+	/**
+	 * Pay event tickets, and say what for.
+	 *
+	 * Earning at an event is also how floor 10 opens: the quest was always
+	 * "do an event", and having been paid by one is the proof of it.
+	 */
 	public static void payTickets(ServerPlayer player, int tickets, String why) {
 		State.event(player, tickets);
+		if (tickets > 0 && !State.hasFloor(player, 10)) {
+			State.unlock(player, 10);
+			player.sendSystemMessage(Component.literal(
+					"You did an event. Floor 10 -- the boss room -- is open.")
+					.withStyle(ChatFormatting.AQUA));
+		}
 		player.sendSystemMessage(Component.literal("+" + tickets + " event tickets  --  "
 				+ why + ". You have " + State.event(player) + ".")
 				.withStyle(ChatFormatting.GREEN));
