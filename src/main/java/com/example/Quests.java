@@ -38,7 +38,7 @@ public final class Quests {
 
 	public static final Quest[] ALL = {
 			new Quest("Chapter 1", "Make the Money",
-					"$100.00 in all -- a month on the ship",
+					"$100.00 in all -- the ship, for good",
 					List.of(
 							new Part("Wash the 10 dishes -- sponge, then towel  ($5.00)",
 									Places.dish(0), 10),
@@ -191,7 +191,7 @@ public final class Quests {
 	private static void reward(ServerPlayer player, int quest) {
 		switch (quest) {
 			case 0 -> player.sendSystemMessage(Component.literal(
-					"$100. That is a month on the ship. Head east down the walkway.")
+					"$100. The ship is yours for good now. Head east down the walkway.")
 					.withStyle(ChatFormatting.YELLOW));
 			case 1 -> {
 				State.unlock(player, 1);

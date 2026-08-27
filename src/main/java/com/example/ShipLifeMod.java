@@ -163,7 +163,7 @@ public class ShipLifeMod implements ModInitializer {
 			player.getInventory().add(Kit.sponge());
 			player.getInventory().add(Kit.towel());
 			player.sendSystemMessage(Component.literal(
-					"A letter for you: get $100 and you can live on the ship for a month.")
+					"A letter for you: get $100 and you can live on the ship forever.")
 					.withStyle(ChatFormatting.YELLOW));
 			player.sendSystemMessage(Component.literal(
 					"Chapter 1 -- Make the Money. Start with the dishes in the first house.")

@@ -79,7 +79,7 @@ Pick any of those alongside it and you still play **survival**.
 ## The story
 
 ### Chapter 1 — the mail
-Get **$100** and you can live on the ship for 1 month.
+Get **$100** and you can live on the ship **forever**.
 
 **Quest 1 — Make the Money.** The book shows all three parts and what they pay up front,
 but you do them in order, and the star only points at the part you're on.
