@@ -134,14 +134,25 @@ public class GalagaScreen extends ArcadeScreen {
 			shot[1] -= 0.7;
 			return shot[1] < 0;
 		});
-		bombs.removeIf(bomb -> {
+
+		// Bombs are walked by hand rather than with removeIf, because being
+		// hit clears the list, and clearing a list part way through removing
+		// from it leaves holes in it. That crash was real.
+		boolean bombed = false;
+		for (int i = bombs.size() - 1; i >= 0; i--) {
+			double[] bomb = bombs.get(i);
 			bomb[1] += 0.35;
 			if (bomb[1] >= ROWS - 1 && Math.abs(bomb[0] - ship) < 0.9) {
-				hit();
-				return true;
+				bombed = true;
+				bombs.remove(i);
+			} else if (bomb[1] > ROWS) {
+				bombs.remove(i);
 			}
-			return bomb[1] > ROWS;
-		});
+		}
+		if (bombed) {
+			hit();
+			return;
+		}
 
 		hits();
 
@@ -159,18 +170,25 @@ public class GalagaScreen extends ArcadeScreen {
 		}
 	}
 
-	/** Shots meeting enemies, and what each one is worth. */
+	/**
+	 * Shots meeting enemies, and what each one is worth.
+	 *
+	 * Both lists are walked backwards by index. Taking an enemy out of the
+	 * list you are looping over is the other way to break this.
+	 */
 	private void hits() {
-		shots.removeIf(shot -> {
-			for (Enemy enemy : enemies) {
+		for (int s = shots.size() - 1; s >= 0; s--) {
+			double[] shot = shots.get(s);
+			for (int e = enemies.size() - 1; e >= 0; e--) {
+				Enemy enemy = enemies.get(e);
 				if (Math.abs(enemy.x - shot[0]) < 0.9 && Math.abs(enemy.y - shot[1]) < 0.9) {
 					score += worth(enemy);
-					enemies.remove(enemy);
-					return true;
+					enemies.remove(e);
+					shots.remove(s);
+					break;
 				}
 			}
-			return false;
-		});
+		}
 	}
 
 	/** Diving is worth double, as it always has been. */
