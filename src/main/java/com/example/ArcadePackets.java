@@ -47,6 +47,9 @@ public final class ArcadePackets {
 		}
 	}
 
+	/** Tickets earned at the arcade before the store opens. */
+	public static final int STORE_AT = 50;
+
 	public static void register() {
 		PayloadTypeRegistry.clientboundPlay().register(Open.TYPE, Open.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Score.TYPE, Score.CODEC);
@@ -108,5 +111,15 @@ public final class ArcadePackets {
 		player.sendSystemMessage(Component.literal("+" + tickets + " ticket"
 				+ (tickets == 1 ? "" : "s") + "  --  " + why + ". You have "
 				+ State.arcade(player) + ".").withStyle(ChatFormatting.GREEN));
+
+		// Fifty tickets earned at the arcade opens the store on floor 8. It is
+		// counted on what you have won rather than what you are holding, so
+		// spending your tickets on a pet cannot take the floor away again.
+		if (State.tally(player, State.EARNED) >= STORE_AT && !State.hasFloor(player, 8)) {
+			State.unlock(player, 8);
+			player.sendSystemMessage(Component.literal(
+					"Fifty tickets earned. Floor 8 -- the store -- is open.")
+					.withStyle(ChatFormatting.AQUA));
+		}
 	}
 }
