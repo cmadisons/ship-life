@@ -138,6 +138,11 @@ public class ShipLifeMod implements ModInitializer {
 			Ship.build(level);
 		}
 
+		// Nothing spawns on its own anywhere. The fight room and the boss room
+		// put their own enemies there deliberately, which the rule does not
+		// touch -- see Fight. Set on every join so older worlds get it too.
+		level.getGameRules().set(GameRules.SPAWN_MOBS, false, level.getServer());
+
 		// Creative is the mod's edit mode: the ship and the world are yours to
 		// change, so nothing here puts anything back where it thinks it should
 		// be. Repairs only run for people playing the game rather than

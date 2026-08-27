@@ -46,6 +46,14 @@ public final class Fight {
 
 	private static final Random RANDOM = new Random();
 
+	/**
+	 * The only floors anything hostile is allowed on.
+	 *
+	 * Add a number here and that floor becomes a place things can be; leave it
+	 * out and anything hostile that turns up there is taken away.
+	 */
+	private static final java.util.Set<Integer> FIGHTING_FLOORS = java.util.Set.of(9, 10);
+
 	public static void register() {
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (!(player instanceof ServerPlayer who) || !(world instanceof ServerLevel level)
@@ -66,6 +74,26 @@ public final class Fight {
 				return InteractionResult.SUCCESS;
 			}
 			return InteractionResult.PASS;
+		});
+
+		// Nothing hostile anywhere but the fighting floors. The town is a place
+		// to do chores in and the ship is a place to live, and neither is
+		// improved by a creeper turning up in it.
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (server.getTickCount() % 40 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				for (net.minecraft.world.entity.Entity entity : level.getAllEntities()) {
+					if (entity instanceof net.minecraft.world.entity.monster.Monster
+							&& !FIGHTING_FLOORS.contains(Places.floorAt(entity.getY()))) {
+						entity.discard();
+					}
+				}
+			}
 		});
 
 		// When everything a fight spawned is dead, the fight is over and it pays.
