@@ -31,15 +31,15 @@ public final class Arcade {
 			BlockPos base = level.getBlockState(pos.below()).isAir() ? pos : pos.below();
 
 			if (matches(pos, base, Places.SNAKE)) {
-				new Snake(who).open();
+				ArcadePackets.open(who, "snake");
 				return InteractionResult.SUCCESS;
 			}
 			if (matches(pos, base, Places.PACMAN)) {
-				new PacMan(who).open();
+				ArcadePackets.open(who, "pacman");
 				return InteractionResult.SUCCESS;
 			}
 			if (matches(pos, base, Places.GALAGA)) {
-				new Galaga(who).open();
+				ArcadePackets.open(who, "galaga");
 				return InteractionResult.SUCCESS;
 			}
 			if (matches(pos, base, Places.RACE_CAR)) {

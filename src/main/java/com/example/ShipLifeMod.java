@@ -58,6 +58,7 @@ public class ShipLifeMod implements ModInitializer {
 		Chores.register();
 		Arcade.register();
 		Game.register();
+		ArcadePackets.register();
 		Pets.register();
 		Events.register();
 		Pool.register();

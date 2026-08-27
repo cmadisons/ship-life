@@ -17,7 +17,7 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Chapter 2** — board the ship, get your passport off security, ride the lift to floor 5 and find your bathroom, fridge, bed and TV.
 - **Chapter 3 and 4** — Charlie in the lobby, and his quest: the plunger meter, the bed, and the moldy fridge, with mopping when you get it wrong.
 - The **elevator** — locked floors don't show, a floor your quest is opening shows with a lock, and the doors close, the car whirs and the doors open.
-- The **arcade on floor 2** — Snake, Galaga and Pac-Man, all three played inside a chest screen with buttons along the bottom, paying a ticket a food, five a round and five for a new record.
+- The **arcade on floor 2** — Snake, Pac-Man and Galaga, played properly on their own screens with the arrow keys or WASD. Pac-Man has the maze, the power pellets at 200-400-800-1600 and four ghosts who each hunt you differently; Galaga has the formation, the dives worth double, and two shots on screen at a time. A ticket a food, five a stage, five for a new record.
 - The **prize counter** — pets for 10 tickets each: lion, dog, cat and dolphin, all following you at once, two of a kind doubling the boost, and the cat opening floor 6 for good.
 - **Floor 3, the pool** — a lap is the length and back, timed; thirty seconds opens floor 9, which a bare lap does not quite manage without a dog.
 - **Floor 6, the race track** — three lanes, 250 gas, boost for double speed, cars that slow you when you hit them. Five laps in two minutes opens floor 7.
