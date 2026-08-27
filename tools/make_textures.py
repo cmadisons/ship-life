@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Draws every texture Ship Life adds, and writes the JSON that goes with them.
 
+That includes the loot tables. A block with no loot table drops nothing when
+you break it, which is how the dishes were vanishing off the counter rather
+than going into your pocket.
+
 Six things you handle or press: the sponge and towel you do the dishes with,
 the dish itself, the weed whacker and the lawn mower, and the elevator button.
 They started out as vanilla items wearing a name, which reads fine in a list
@@ -222,6 +226,14 @@ def main():
         })
         write(os.path.join(ASSETS, "items/%s.json" % name), {
             "model": {"type": "minecraft:model", "model": "shiplife:block/%s" % name},
+        })
+        # Break it and you get it: without a loot table a block drops nothing.
+        write(os.path.join(ROOT, "src/main/resources/data/shiplife/loot_table/blocks/%s.json" % name), {
+            "type": "minecraft:block",
+            "pools": [{
+                "rolls": 1,
+                "entries": [{"type": "minecraft:item", "name": "shiplife:%s" % name}],
+            }],
         })
         names["block.shiplife.%s" % name] = title(name)
 
