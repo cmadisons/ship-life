@@ -24,8 +24,8 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Floor 7, the events** — a board saying what is on today. Spooky Shooter and Christmas (a crowd of 100 and a photograph), Quest Day (four quests, 500 tickets for all four), May the Fourth (lightsaber fights, 25 a fight and 100 a win), and Summer Break, which needs no screen because it doubles what the arcade pays.
 - The **star** and the **clock** on the action bar: how far the quest is, in green, yellow or red, and the ship's date and time on a real 20-minute day.
 
-Still to build: the 250-quest pool behind the 25-ticket prize, the pool, the race track, the pets,
-the shops, the events, floors 9 and 10, and a proper drawn heads-up display.
+Still to build: floors 9 and 10, the shops on 8 and 11 to 13, the 250-quest pool
+behind the 25-ticket prize, and a proper drawn heads-up display.
 
 ### Build it
 
