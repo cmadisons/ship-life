@@ -131,15 +131,12 @@ public class Race extends Game {
 		player.sendSystemMessage(Component.literal(LAPS + " laps in "
 				+ Pool.time(ticks) + ".").withStyle(ChatFormatting.GREEN));
 		if (ticks <= TARGET_TICKS) {
-			if (!State.hasFloor(player, 7)) {
-				State.unlock(player, 7);
-				player.sendSystemMessage(Component.literal(
-						"Under two minutes. Floor 7 -- the events -- is open.")
-						.withStyle(ChatFormatting.AQUA));
-			}
+			player.sendSystemMessage(Component.literal(
+					"Under two minutes -- Charlie's time. Not many manage it.")
+					.withStyle(ChatFormatting.AQUA));
 		} else {
 			player.sendSystemMessage(Component.literal(
-					"Charlie wants five laps in two minutes. Boost more, refill less.")
+					"Charlie's time is two minutes. Boost more, refill less.")
 					.withStyle(ChatFormatting.GRAY));
 		}
 	}

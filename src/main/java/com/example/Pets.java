@@ -78,6 +78,16 @@ public final class Pets {
 		return player.getAttachedOrCreate(OWNED[kind.ordinal()]);
 	}
 
+	/** Do they have one of each of the four the arcade sells? */
+	public static boolean everyPet(ServerPlayer player) {
+		for (Kind kind : ARCADE_PETS) {
+			if (owned(player, kind) == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static int total(ServerPlayer player) {
 		int all = 0;
 		for (Kind kind : Kind.values()) {
@@ -108,6 +118,19 @@ public final class Pets {
 			State.unlock(player, 6);
 			player.sendSystemMessage(Component.literal(
 					"The cat opens floor 6 -- the race track.")
+					.withStyle(ChatFormatting.AQUA));
+		}
+
+		// One of each of the four the arcade sells opens floor 7.
+		//
+		// The other two are sold on floor 12, which is bought with event
+		// tickets, which come from the events on floor 7 -- so asking for
+		// those as well would be asking you to have floor 7 before you can
+		// have floor 7.
+		if (!State.hasFloor(player, 7) && everyPet(player)) {
+			State.unlock(player, 7);
+			player.sendSystemMessage(Component.literal(
+					"One of every pet. Floor 7 -- the events -- is open.")
 					.withStyle(ChatFormatting.AQUA));
 		}
 		player.sendSystemMessage(Component.literal("A " + kind.label + " follows you now. "

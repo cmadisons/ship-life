@@ -58,6 +58,16 @@ public final class Book {
 			page.setItem(slot, questIcon(player, index, here));
 		}
 
+		// The ship itself: every floor, whether it is yours, and what opens it.
+		java.util.List<String> floors = new ArrayList<>();
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			floors.add((State.hasFloor(player, floor) ? "✓ " : "☐ ")
+					+ "Floor " + floor + " -- " + Floors.name(floor)
+					+ (State.hasFloor(player, floor) ? "" : "  (" + Floors.how(floor) + ")"));
+		}
+		page.setItem(38, entry(Items.IRON_DOOR, "The Ship", ChatFormatting.AQUA,
+				floors.toArray(new String[0])));
+
 		java.util.List<String> side = QuestPool.lines(player);
 		if (!side.isEmpty()) {
 			java.util.List<String> lore = new ArrayList<>(side);
