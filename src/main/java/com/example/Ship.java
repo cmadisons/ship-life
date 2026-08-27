@@ -145,7 +145,7 @@ public final class Ship {
 					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
 					boolean window = dy >= 3 && dy <= 4 && Math.abs(dx) == r
 							&& Math.abs(dz) % 4 == 0;
-					set(level, pos, window ? Blocks.GLASS : Blocks.QUARTZ_BLOCK);
+					set(level, pos, window ? Blocks.GLASS : Blocks.BLACK_CONCRETE);
 				}
 			}
 		}
@@ -380,6 +380,30 @@ public final class Ship {
 	 * gets its bushes back rather than needing to be started again.
 	 */
 	public static void repair(ServerLevel level) {
+		// The walls went black. Rebuilding a floor only lays the shell -- the
+		// furniture sits a block above it -- but the fittings are put back
+		// afterwards anyway, so nothing is lost either way.
+		BlockPos wall = new BlockPos(Places.SHIP_X, Places.floorY(1) + 3,
+				Places.SHIP_Z - Places.ROOM);
+		if (!level.getBlockState(wall).is(Blocks.BLACK_CONCRETE)
+				&& !level.getBlockState(wall).is(Blocks.GLASS)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				buildFloor(level, floor);
+				if (level.getBlockState(Places.onShip(Places.panel(floor), 2))
+						.is(Made.elevatorButton)) {
+					buildFloor(level, floor, 2);
+				}
+			}
+			furnishLobby(level);
+			furnishArcade(level);
+			furnishPool(level);
+			furnishRace(level);
+			furnishFighting(level);
+			furnishEvents(level);
+			furnishShops(level);
+			furnishYourRoom(level);
+			ShipLifeMod.LOGGER.info("Repainted the ship's walls black.");
+		}
 		// The lift moved to the near left corner, and left a door behind.
 		if (!level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
