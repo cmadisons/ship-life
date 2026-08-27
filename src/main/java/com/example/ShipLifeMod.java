@@ -135,9 +135,15 @@ public class ShipLifeMod implements ModInitializer {
 			Ship.build(level);
 		}
 
-		// Anything a world built earlier has lost -- the bushes rotted away
-		// before they were marked persistent -- goes back now.
-		Ship.repair(level);
+		// Creative is the mod's edit mode: the ship and the world are yours to
+		// change, so nothing here puts anything back where it thinks it should
+		// be. Repairs only run for people playing the game rather than
+		// building it -- otherwise a wall you took out would be back by
+		// morning.
+		boolean building = player.gameMode.getGameModeForPlayer() == GameType.CREATIVE;
+		if (!building) {
+			Ship.repair(level);
+		}
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this
@@ -150,9 +156,18 @@ public class ShipLifeMod implements ModInitializer {
 		// this get it too.
 		level.getGameRules().set(GameRules.MOB_GRIEFING, false, level.getServer());
 
-		// However you made the world, you play survival.
-		if (player.gameMode.getGameModeForPlayer() != GameType.SURVIVAL) {
+		// Hardcore, adventure, spectator: they all become survival, because
+		// the game is earning your way onto the ship and up it. Creative is
+		// the exception and is left alone -- picking it says you are here to
+		// change the ship rather than to live on it.
+		if (!building && player.gameMode.getGameModeForPlayer() != GameType.SURVIVAL) {
 			player.setGameMode(GameType.SURVIVAL);
+		}
+
+		if (building && State.firstTime(player, 1)) {
+			player.sendSystemMessage(Component.literal(
+					"Creative: the ship and the world are yours to change. Nothing "
+					+ "will be put back.").withStyle(ChatFormatting.LIGHT_PURPLE));
 		}
 
 		if (!State.firstTime(player, 0)) {

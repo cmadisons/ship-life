@@ -58,7 +58,11 @@ The mod lands in `build/libs/`.
 ## What it is
 
 **Ship Life** is picked in the New World **options**, like creative / hardcore / survival.
-Pick any of those alongside it and you still play **survival**.
+
+Pick hardcore, adventure or spectator alongside it and you play **survival** anyway,
+because the game is earning your way onto the ship and then up it. **Creative is the
+exception**: picking it says you are here to change the ship rather than to live on
+it, so you keep it, and nothing the mod builds is ever put back afterwards.
 
 ## Core systems
 
