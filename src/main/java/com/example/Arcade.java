@@ -54,9 +54,18 @@ public final class Arcade {
 		});
 	}
 
-	/** A cabinet is two blocks tall, so either half of it counts. */
+	/**
+	 * Did they click this machine?
+	 *
+	 * A cabinet is three wide, four tall and has a control panel sticking out
+	 * at the front, and clicking any part of it should start the game -- so
+	 * the whole box counts rather than one particular block of it.
+	 */
 	private static boolean matches(BlockPos hit, BlockPos base, BlockPos machine) {
-		return hit.equals(machine) || hit.equals(machine.above()) || base.equals(machine);
+		int dx = hit.getX() - machine.getX();
+		int dy = hit.getY() - machine.getY();
+		int dz = hit.getZ() - machine.getZ();
+		return Math.abs(dx) <= 1 && dy >= 0 && dy <= 3 && dz >= 0 && dz <= 1;
 	}
 
 	/**

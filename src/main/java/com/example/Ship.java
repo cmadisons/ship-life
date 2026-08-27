@@ -195,11 +195,37 @@ public final class Ship {
 		set(level, Places.PRIZES.above(), Blocks.LANTERN);
 	}
 
-	/** A machine: a dark screen on a coloured box, two blocks tall. */
+	/**
+	 * An upright arcade cabinet, built the way the real ones are.
+	 *
+	 * Three blocks wide and four tall: coloured side panels, a black glass
+	 * screen at eye height, a lit marquee across the top, and a control panel
+	 * sloping out towards you at waist height. You play it by right-clicking
+	 * any part of it.
+	 */
 	private static void cabinet(ServerLevel level, BlockPos pos, Block colour) {
-		set(level, pos, colour);
-		set(level, pos.above(), Blocks.BLACK_CONCRETE);
-		set(level, pos.above(2), Blocks.SEA_LANTERN);
+		// The two side panels, full height, in the machine's own colour.
+		for (int dx = -1; dx <= 1; dx += 2) {
+			for (int dy = 0; dy <= 2; dy++) {
+				set(level, pos.offset(dx, dy, 0), colour);
+			}
+		}
+		// The middle: a dark base, the screen, and the marquee above it.
+		set(level, pos, Blocks.POLISHED_BLACKSTONE);
+		set(level, pos.above(), Blocks.BLACK_STAINED_GLASS);
+		set(level, pos.above(2), colour);
+		// The marquee is lit, which is what makes a row of them look like an
+		// arcade rather than a row of boxes.
+		for (int dx = -1; dx <= 1; dx++) {
+			set(level, pos.offset(dx, 3, 0), Blocks.SEA_LANTERN);
+		}
+		// The control panel, sloping out towards whoever is standing there.
+		BlockState panel = Blocks.POLISHED_BLACKSTONE_STAIRS.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
+						Direction.NORTH);
+		for (int dx = -1; dx <= 1; dx++) {
+			level.setBlockAndUpdate(pos.offset(dx, 0, 1), panel);
+		}
 	}
 
 	/**
@@ -424,7 +450,8 @@ public final class Ship {
 			ShipLifeMod.LOGGER.info("Moved the lifts to the near corner.");
 		}
 		// The arcade came after the first worlds were built.
-		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
+		if (!level.getBlockState(Places.PACMAN.above(3)).is(Blocks.SEA_LANTERN)
+				|| !level.getBlockState(Places.PACMAN).is(Blocks.POLISHED_BLACKSTONE)) {
 			furnishArcade(level);
 		furnishPool(level);
 		furnishBuffet(level);
