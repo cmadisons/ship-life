@@ -83,7 +83,7 @@ public final class Places {
 	public static final int FLOOR_HEIGHT = 8;
 
 	/** The top floor the ship has. */
-	public static final int TOP_FLOOR = 14;
+	public static final int TOP_FLOOR = 15;
 
 	/** The y of a floor's own floor. */
 	public static int floorY(int floor) {
@@ -125,6 +125,9 @@ public final class Places {
 	public static BlockPos onShip(BlockPos pos, int ship) {
 		return ship == 2 ? pos.offset(SHIP_TWO_OFFSET, 0, 0) : pos;
 	}
+
+	/** Ben's door on floor 15. He is the first friend you make. */
+	public static final BlockPos BEN = new BlockPos(SHIP_X, floorY(15) + 1, SHIP_Z - 8);
 
 	/** The desk on floor 14 that upgrades your passport. */
 	public static final BlockPos PASSPORT_DESK =

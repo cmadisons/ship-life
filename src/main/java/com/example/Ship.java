@@ -120,6 +120,7 @@ public final class Ship {
 		furnishFighting(level);
 		furnishEvents(level);
 		furnishShops(level);
+		furnishBensRoom(level);
 		furnishYourRoom(level);
 	}
 
@@ -378,6 +379,19 @@ public final class Ship {
 				pos.getX() + 3, pos.getY() - 1, pos.getZ(), Blocks.POLISHED_ANDESITE);
 	}
 
+	/** Floor 15: Ben's, and it looks lived in rather than fitted out. */
+	private static void furnishBensRoom(ServerLevel level) {
+		int y = Places.floorY(15);
+		set(level, Places.BEN, Blocks.OAK_DOOR);
+		door(level, Places.BEN);
+		set(level, Places.BEN.above(2), Blocks.SEA_LANTERN);
+		fill(level, Places.SHIP_X - 6, y, Places.SHIP_Z - 6,
+				Places.SHIP_X + 6, y, Places.SHIP_Z + 6, Blocks.OAK_PLANKS);
+		bed(level, new BlockPos(Places.SHIP_X - 4, y + 1, Places.SHIP_Z + 4));
+		set(level, new BlockPos(Places.SHIP_X + 4, y + 1, Places.SHIP_Z + 4), Blocks.BOOKSHELF);
+		set(level, new BlockPos(Places.SHIP_X + 4, y + 2, Places.SHIP_Z + 4), Blocks.FLOWER_POT);
+	}
+
 	/** Floor 7 is mostly an empty hall with a board on the wall. */
 	private static void furnishEvents(ServerLevel level) {
 		set(level, Places.EVENT_BOARD, Blocks.CHISELED_BOOKSHELF);
@@ -442,6 +456,7 @@ public final class Ship {
 			furnishFighting(level);
 			furnishEvents(level);
 			furnishShops(level);
+		furnishBensRoom(level);
 			furnishYourRoom(level);
 			ShipLifeMod.LOGGER.info("Repainted the ship's walls black.");
 		}
@@ -474,6 +489,7 @@ public final class Ship {
 		furnishFighting(level);
 		furnishEvents(level);
 		furnishShops(level);
+		furnishBensRoom(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}
 		// The pool used to be a glass tank standing on the floor.

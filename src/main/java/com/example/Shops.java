@@ -398,11 +398,17 @@ public final class Shops {
 			return;
 		}
 		player.setAttached(State.SHIPS, 2);
+		// Floor 15 comes with the upgrade rather than being bought: the first
+		// thing a better passport gets you is somebody to knock on.
+		State.unlock(player, 15);
 		Ship.buildSecond(level);
 		player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
 		player.sendSystemMessage(Component.literal(
 				"Your passport is upgraded: Ship 2, alongside this one. "
 				+ "The lift asks which ship now.").withStyle(ChatFormatting.LIGHT_PURPLE));
+		player.sendSystemMessage(Component.literal(
+				"Floor 15 came with it -- somebody called Ben lives up there.")
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	// ------------------------------------------------------------------ bits

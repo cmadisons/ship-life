@@ -36,7 +36,7 @@ public final class Elevator {
 	private static final String[] NAMES = {
 			"", "Lobby", "Arcade", "Swimming Pool", "Buffet", "Your Room",
 			"Race Track", "Events", "Store", "Fight Room", "Boss Room",
-			"Rewards", "Pet Store", "The Keg", "?"
+			"Rewards", "Pet Store", "The Keg", "Passports", "Ben's Room"
 	};
 
 	/** How long the ride takes, in ticks. */
