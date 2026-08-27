@@ -181,6 +181,23 @@ public final class Places {
 	/** How wide the pool is either side of the middle. */
 	public static final int POOL_HALF_WIDTH = 3;
 
+	/** How deep the pool is cut into floor 3's deck. */
+	public static final int POOL_DEPTH = 2;
+
+	/**
+	 * Are you in the pool?
+	 *
+	 * The water is sunk below the deck, so {@link #floorAt} reads the floor
+	 * below once you are actually swimming in it. Anything watching the pool
+	 * has to ask this instead.
+	 */
+	public static boolean inPool(double x, double y, double z) {
+		double lx = localX(x);
+		return y >= floorY(3) - POOL_DEPTH && y <= floorY(3) + 2
+				&& lx >= POOL_START - 1 && lx <= POOL_END + 1
+				&& z >= SHIP_Z - POOL_HALF_WIDTH - 1 && z <= SHIP_Z + POOL_HALF_WIDTH + 1;
+	}
+
 	/** The record board on the wall of floor 3. */
 	public static final BlockPos POOL_BOARD =
 			new BlockPos(SHIP_X - 11, floorY(3) + 1, SHIP_Z + 8);
@@ -188,6 +205,22 @@ public final class Places {
 	/** Where you get in the car, on floor 6. */
 	public static final BlockPos RACE_CAR =
 			new BlockPos(SHIP_X, floorY(6) + 1, SHIP_Z - 8);
+
+	// ----------------------------------------------------- the buffet, floor 4
+
+	/** The cook, behind the counter on floor 4. */
+	public static final BlockPos BUFFET_COOK =
+			new BlockPos(SHIP_X, floorY(4) + 1, SHIP_Z - 9);
+
+	/** How many tables the buffet is laid with. */
+	public static final int TABLES = 4;
+
+	/** A table, and the chair either side of it faces along z. */
+	public static BlockPos table(int index) {
+		int x = SHIP_X - 6 + (index % 2) * 12;
+		int z = SHIP_Z + (index / 2) * 7 - 1;
+		return new BlockPos(x, floorY(4) + 1, z);
+	}
 
 	/** The button on floor 9 that calls in a wave. */
 	public static final BlockPos FIGHT_BUTTON =

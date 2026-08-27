@@ -98,14 +98,15 @@ public final class Arcade {
 					"Click to buy."));
 		}
 
-		boolean ready = State.hasFloor(player, 8) && State.hasFloor(player, 9)
-				&& State.hasFloor(player, 10);
+		// The pool of 250 is worth buying from long before floors 8, 9 and 10
+		// are yours -- waiting for all three only kept the counter shut.
+		boolean ready = true;
 		page.setItem(25, Book.entry(net.minecraft.world.item.Items.WRITTEN_BOOK,
 				"The Next 3 Quests", ready ? ChatFormatting.YELLOW : ChatFormatting.DARK_GRAY,
 				"Three quests, drawn at random",
 				"from a pool of 250.",
 				"25 arcade tickets",
-				ready ? "Click to buy." : "Needs floors 8, 9 and 10 first.",
+				"Click to buy.",
 				"You are carrying " + QuestPool.carrying(player) + "."));
 
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",

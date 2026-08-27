@@ -32,6 +32,7 @@ public final class Kit {
 	public static final String WHACKER = "Weed Whacker";
 	public static final String PLUNGER = "Plunger";
 	public static final String MOP = "Mop";
+	public static final String MEAL = "Buffet Plate";
 	public static final String PENNY = "Penny";
 
 	public static ItemStack make(Item item, String name, ChatFormatting colour, String... lore) {
@@ -63,6 +64,15 @@ public final class Kit {
 						|| is(stack, "Dirty " + SPONGE) || is(stack, "Dirty " + TOWEL)
 						|| is(stack, MOWER) || is(stack, WHACKER),
 				-1, player.inventoryMenu.getCraftSlots());
+	}
+
+	/** A plate from the buffet. Three helpings, because it is a buffet. */
+	public static ItemStack meal() {
+		ItemStack plate = make(Items.COOKED_BEEF, MEAL, ChatFormatting.GOLD,
+				"From the buffet on floor 4.",
+				"Eat it and your hearts come back.");
+		plate.setCount(3);
+		return plate;
 	}
 
 	public static ItemStack questBook() {

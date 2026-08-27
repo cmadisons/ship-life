@@ -231,6 +231,15 @@ public final class Pets {
 		});
 	}
 
+	/** Is anything making you faster in the water right now? */
+	public static boolean swimBoosted(ServerPlayer player) {
+		int dogs = owned(player, Kind.DOG);
+		if (dolphinToday() == Kind.DOG) {
+			dogs += owned(player, Kind.DOLPHIN);
+		}
+		return dogs > 0 || Shops.running(player, "swim");
+	}
+
 	private static void boosts(ServerPlayer player) {
 		int lions = owned(player, Kind.LION) + owned(player, Kind.SKELETON);
 		int dogs = owned(player, Kind.DOG);

@@ -115,6 +115,7 @@ public final class Ship {
 		furnishLobby(level);
 		furnishArcade(level);
 		furnishPool(level);
+		furnishBuffet(level);
 		furnishRace(level);
 		furnishFighting(level);
 		furnishEvents(level);
@@ -202,32 +203,90 @@ public final class Ship {
 	}
 
 	/**
-	 * The pool: a glass tank standing on floor 3.
+	 * The pool, sunk into the floor of floor 3.
 	 *
-	 * It is built up rather than dug down, because two blocks of digging would
-	 * come out through the ceiling of the arcade below.
+	 * Two blocks of water with the surface flush with the deck, so you step
+	 * down into it the way you step into a real pool rather than climbing into
+	 * a glass tank.
+	 *
+	 * Digging two blocks takes the bottom through what was the arcade's
+	 * ceiling, so the pool lays its own floor a block lower and seals itself.
+	 * The arcade below loses one block of headroom under the pool footprint
+	 * and nothing else.
 	 */
 	private static void furnishPool(ServerLevel level) {
 		int y = Places.floorY(3);
 		int half = Places.POOL_HALF_WIDTH;
-		// The glass sides, two high, all the way round.
+
+		// The hole, its own sealed bottom, and the water in it.
+		for (int x = Places.POOL_START; x <= Places.POOL_END; x++) {
+			for (int z = Places.SHIP_Z - half; z <= Places.SHIP_Z + half; z++) {
+				set(level, new BlockPos(x, y - Places.POOL_DEPTH - 1, z), Blocks.PRISMARINE);
+				for (int dy = Places.POOL_DEPTH; dy >= 0; dy--) {
+					set(level, new BlockPos(x, y - dy, z), Blocks.WATER);
+				}
+			}
+		}
+
+		// A line of colour at each end, on the bottom, so a turn is visible.
+		for (int z = Places.SHIP_Z - half; z <= Places.SHIP_Z + half; z++) {
+			set(level, new BlockPos(Places.POOL_START, y - Places.POOL_DEPTH - 1, z),
+					Blocks.LIME_CONCRETE);
+			set(level, new BlockPos(Places.POOL_END, y - Places.POOL_DEPTH - 1, z),
+					Blocks.RED_CONCRETE);
+		}
+
+		// A tiled lip round the edge, so the deck reads as poolside.
 		for (int x = Places.POOL_START - 1; x <= Places.POOL_END + 1; x++) {
 			for (int z = Places.SHIP_Z - half - 1; z <= Places.SHIP_Z + half + 1; z++) {
 				boolean edge = x == Places.POOL_START - 1 || x == Places.POOL_END + 1
 						|| z == Places.SHIP_Z - half - 1 || z == Places.SHIP_Z + half + 1;
-				for (int dy = 1; dy <= 2; dy++) {
-					set(level, new BlockPos(x, y + dy, z),
-							edge ? Blocks.GLASS : Blocks.WATER);
+				if (edge) {
+					set(level, new BlockPos(x, y, z), Blocks.PRISMARINE_BRICKS);
 				}
 			}
 		}
-		// A line of colour at each end, so you can see where a lap turns.
-		for (int z = Places.SHIP_Z - half; z <= Places.SHIP_Z + half; z++) {
-			set(level, new BlockPos(Places.POOL_START, y, z), Blocks.LIME_CONCRETE);
-			set(level, new BlockPos(Places.POOL_END, y, z), Blocks.RED_CONCRETE);
-		}
+
 		set(level, Places.POOL_BOARD, Blocks.CHISELED_QUARTZ_BLOCK);
 		set(level, Places.POOL_BOARD.above(), Blocks.SEA_LANTERN);
+	}
+
+	/**
+	 * Floor 4: the buffet -- a counter with a cook behind it, and four tables.
+	 *
+	 * The tables are laid for two and are real furniture rather than scenery:
+	 * a post with a top on it and a chair pulled up either side, so a room you
+	 * are told is a restaurant looks like one.
+	 */
+	private static void furnishBuffet(ServerLevel level) {
+		int y = Places.floorY(4);
+
+		// The counter, and the cook standing behind it.
+		for (int dx = -4; dx <= 4; dx++) {
+			set(level, new BlockPos(Places.SHIP_X + dx, y + 1, Places.SHIP_Z - 8),
+					Blocks.SMOOTH_QUARTZ_STAIRS);
+		}
+		set(level, Places.BUFFET_COOK, Blocks.SMOKER);
+		set(level, Places.BUFFET_COOK.above(), Blocks.LANTERN);
+
+		// The food along the counter, under glass the way a buffet keeps it.
+		for (int dx = -3; dx <= 3; dx += 3) {
+			set(level, new BlockPos(Places.SHIP_X + dx, y + 2, Places.SHIP_Z - 8), Blocks.GLASS);
+		}
+
+		for (int i = 0; i < Places.TABLES; i++) {
+			table(level, Places.table(i));
+		}
+	}
+
+	/** A table for two: a post, a top, and a chair pulled up either side. */
+	private static void table(ServerLevel level, BlockPos pos) {
+		for (int dx = 0; dx <= 1; dx++) {
+			set(level, pos.offset(dx, 0, 0), Blocks.SPRUCE_FENCE);
+			set(level, pos.offset(dx, 1, 0), Blocks.SPRUCE_PRESSURE_PLATE);
+			set(level, pos.offset(dx, 0, -1), Blocks.SPRUCE_STAIRS);
+			set(level, pos.offset(dx, 0, 1), Blocks.SPRUCE_STAIRS);
+		}
 	}
 
 	/** Floor 6: a strip of track and a car to get into. */
@@ -344,11 +403,23 @@ public final class Ship {
 		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
 			furnishArcade(level);
 		furnishPool(level);
+		furnishBuffet(level);
 		furnishRace(level);
 		furnishFighting(level);
 		furnishEvents(level);
 		furnishShops(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
+		}
+		// The pool used to be a glass tank standing on the floor.
+		if (!level.getBlockState(new BlockPos(Places.SHIP_X, Places.floorY(3), Places.SHIP_Z))
+				.is(Blocks.WATER)) {
+			furnishPool(level);
+			ShipLifeMod.LOGGER.info("Sank the pool into the floor of floor 3.");
+		}
+		// Floor 4 was an empty room until the buffet was built into it.
+		if (!level.getBlockState(Places.BUFFET_COOK).is(Blocks.SMOKER)) {
+			furnishBuffet(level);
+			ShipLifeMod.LOGGER.info("Laid the buffet out on floor 4.");
 		}
 		int replaced = 0;
 		for (int i = 0; i < 5; i++) {

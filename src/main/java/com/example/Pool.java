@@ -32,8 +32,8 @@ public final class Pool {
 	private Pool() {
 	}
 
-	/** A lap in thirty seconds is what opens floor 9. */
-	public static final int TARGET_TICKS = 600;
+	/** Beat your own best by this much, unboosted, and floor 9 opens. */
+	public static final int BETTER_BY = 60;
 
 	/** Where in a lap someone is. */
 	private record Swim(int leg, long started) {
@@ -69,7 +69,8 @@ public final class Pool {
 	}
 
 	private static void swim(ServerPlayer player) {
-		if (Places.floorAt(player.getY()) != 3 || !player.isInWater()) {
+		if (!Places.inPool(player.getX(), player.getY(), player.getZ())
+				|| !player.isInWater()) {
 			SWIMMING.remove(player.getUUID());
 			return;
 		}
@@ -110,25 +111,53 @@ public final class Pool {
 				SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.8f, 1.4f);
 
 		State.add(player, State.LAPS, 1);
-		int best = State.bestLap(player);
+		int best = State.bestLap(player);            // your best before this one
 		boolean record = best == 0 || ticks < best;
-		if (record) {
-			State.bestLap(player, ticks);
-		}
+		boolean boosted = Pets.swimBoosted(player);
+
 		player.sendSystemMessage(Component.literal("Lap: " + time(ticks)
 				+ (record ? "  --  a new record." : "  --  your best is " + time(best) + "."))
 				.withStyle(record ? ChatFormatting.GREEN : ChatFormatting.GRAY));
 
-		if (ticks <= TARGET_TICKS && !State.hasFloor(player, 9)) {
-			State.unlock(player, 9);
-			player.sendSystemMessage(Component.literal(
-					"Under thirty seconds. Floor 9 -- the fight room -- is open.")
-					.withStyle(ChatFormatting.AQUA));
-		} else if (ticks > TARGET_TICKS && !State.hasFloor(player, 9)) {
-			player.sendSystemMessage(Component.literal(
-					"Thirty seconds opens floor 9. A dog helps -- that is what it is for.")
-					.withStyle(ChatFormatting.GRAY));
+		if (!State.hasFloor(player, 9)) {
+			floorNine(player, ticks, best, boosted);
 		}
+		if (record) {
+			State.bestLap(player, ticks);
+		}
+	}
+
+	/**
+	 * Floor 9 is not a time on a board, it is three seconds off your own.
+	 *
+	 * A flat thirty seconds is either free or impossible depending on how you
+	 * swim, so the bar is set where you actually are: beat your own best by
+	 * three, and do it on your own. The dog is worth more than three seconds,
+	 * so a boosted lap says so and does not count.
+	 */
+	private static void floorNine(ServerPlayer player, int ticks, int best, boolean boosted) {
+		if (best == 0) {
+			player.sendSystemMessage(Component.literal("That is the time to beat. "
+					+ time(BETTER_BY) + " off it, with no boost, opens floor 9.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		if (ticks > best - BETTER_BY) {
+			player.sendSystemMessage(Component.literal("Floor 9 wants "
+					+ time(best - BETTER_BY) + " or better, with no boost.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		if (boosted) {
+			player.sendSystemMessage(Component.literal(
+					"Fast enough, but you had help. Floor 9 wants that lap on your own.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		State.unlock(player, 9);
+		player.sendSystemMessage(Component.literal(time(BETTER_BY)
+				+ " off your best, and no boost. Floor 9 -- the fight room -- is open.")
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	/** The record board on the wall. */
@@ -139,9 +168,9 @@ public final class Pool {
 				+ (best == 0 ? "you have not done a lap yet."
 						: "your best lap is " + time(best) + "."))
 				.withStyle(ChatFormatting.AQUA));
-		player.sendSystemMessage(Component.literal(
-				"A lap is the length of the pool and back. Thirty seconds opens floor 9.")
-				.withStyle(ChatFormatting.GRAY));
+		player.sendSystemMessage(Component.literal("A lap is the length of the pool"
+				+ " and back. Take " + time(BETTER_BY) + " off your best, with no boost,"
+				+ " and floor 9 opens.").withStyle(ChatFormatting.GRAY));
 	}
 
 	/** Ticks as a stopwatch reads them. */

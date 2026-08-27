@@ -64,6 +64,7 @@ public class ShipLifeMod implements ModInitializer {
 		Pool.register();
 		Fight.register();
 		Shops.register();
+		Buffet.register();
 		Skip.register();
 
 		// Right-clicking the book in mid-air, rather than at a block.
