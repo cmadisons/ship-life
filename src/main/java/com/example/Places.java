@@ -96,6 +96,40 @@ public final class Places {
 		return floor >= 1 && floor <= TOP_FLOOR ? floor : 0;
 	}
 
+	/**
+	 * How far east the second ship stands.
+	 *
+	 * Ship 2 is the same ship again, floor for floor, so rather than a second
+	 * set of coordinates for everything it is built at an offset and anything
+	 * that happens over there is shifted back here before it is read. One
+	 * arcade, one pool, one set of positions -- see {@link #local}.
+	 */
+	public static final int SHIP_TWO_OFFSET = 200;
+
+	/** Which ship a position is on, 1 or 2. */
+	public static int shipOf(double x) {
+		return x > SHIP_X + SHIP_TWO_OFFSET - ROOM - 4 ? 2 : 1;
+	}
+
+	/** The same spot, as ship 1 would number it. */
+	public static BlockPos local(BlockPos pos) {
+		return shipOf(pos.getX()) == 2 ? pos.offset(-SHIP_TWO_OFFSET, 0, 0) : pos;
+	}
+
+	/** The same x, as ship 1 would number it. */
+	public static double localX(double x) {
+		return shipOf(x) == 2 ? x - SHIP_TWO_OFFSET : x;
+	}
+
+	/** A ship-1 spot, moved to whichever ship you mean. */
+	public static BlockPos onShip(BlockPos pos, int ship) {
+		return ship == 2 ? pos.offset(SHIP_TWO_OFFSET, 0, 0) : pos;
+	}
+
+	/** The desk on floor 14 that upgrades your passport. */
+	public static final BlockPos PASSPORT_DESK =
+			new BlockPos(SHIP_X, floorY(14) + 1, SHIP_Z - 8);
+
 	/** The panel you press to call the lift, on each floor. */
 	public static BlockPos panel(int floor) {
 		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z);

@@ -70,6 +70,9 @@ public final class State {
 	/** Side quests you are carrying, as "stat:target:tickets" separated by commas. */
 	public static final AttachmentType<String> SIDE = of("side_quests", "", Codec.STRING);
 
+	/** How many ships your passport is good for. One until it is upgraded. */
+	public static final AttachmentType<Integer> SHIPS = of("ships", 1, Codec.INT);
+
 	/** The in-game month you last took the floor 11 reward in. Zero for never. */
 	public static final AttachmentType<Integer> REWARD_MONTH = of("reward_month", 0, Codec.INT);
 

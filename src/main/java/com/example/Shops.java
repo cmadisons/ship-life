@@ -47,13 +47,16 @@ public final class Shops {
 	public static final int SHADOW_COST = 250;
 	public static final int KEG_COST = 25;
 
+	/** What the passport upgrade costs on floor 14. */
+	public static final int PASSPORT_COST = 250;
+
 	public static void register() {
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (!(player instanceof ServerPlayer who) || !(world instanceof ServerLevel level)
 					|| !ShipLifeMod.isShipLife(level)) {
 				return InteractionResult.PASS;
 			}
-			BlockPos pos = hit.getBlockPos();
+			BlockPos pos = Places.local(hit.getBlockPos());
 			if (at(pos, Places.STORE)) {
 				store(who);
 				return InteractionResult.SUCCESS;
@@ -72,6 +75,10 @@ public final class Shops {
 			}
 			if (at(pos, Places.KEG)) {
 				keg(who);
+				return InteractionResult.SUCCESS;
+			}
+			if (at(pos, Places.PASSPORT_DESK)) {
+				upgradePassport(who, level);
 				return InteractionResult.SUCCESS;
 			}
 			return InteractionResult.PASS;
@@ -369,6 +376,33 @@ public final class Shops {
 			}
 		}
 		return false;
+	}
+
+	// ------------------------------------------- floor 14: the passport desk
+
+	/**
+	 * Two hundred and fifty tickets puts a ship number on your passport.
+	 *
+	 * Ship 2 is this ship again, floor for floor, and the lift grows a ship
+	 * number beside the floor number. What is above floor 14 over there is
+	 * not built yet.
+	 */
+	private static void upgradePassport(ServerPlayer player, ServerLevel level) {
+		if (State.tally(player, State.SHIPS) > 1) {
+			player.sendSystemMessage(Component.literal(
+					"Your passport already has Ship 2 on it. Pick the ship in the lift.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		if (!spend(player, PASSPORT_COST)) {
+			return;
+		}
+		player.setAttached(State.SHIPS, 2);
+		Ship.buildSecond(level);
+		player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
+		player.sendSystemMessage(Component.literal(
+				"Your passport is upgraded: Ship 2, alongside this one. "
+				+ "The lift asks which ship now.").withStyle(ChatFormatting.LIGHT_PURPLE));
 	}
 
 	// ------------------------------------------------------------------ bits

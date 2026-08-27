@@ -45,8 +45,8 @@ public final class Pool {
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (player instanceof ServerPlayer who && world instanceof ServerLevel level
 					&& ShipLifeMod.isShipLife(level)
-					&& (hit.getBlockPos().equals(Places.POOL_BOARD)
-							|| hit.getBlockPos().equals(Places.POOL_BOARD.above()))) {
+					&& (Places.local(hit.getBlockPos()).equals(Places.POOL_BOARD)
+							|| Places.local(hit.getBlockPos()).equals(Places.POOL_BOARD.above()))) {
 				records(who);
 				return InteractionResult.SUCCESS;
 			}
@@ -73,7 +73,7 @@ public final class Pool {
 			SWIMMING.remove(player.getUUID());
 			return;
 		}
-		int x = (int) Math.round(player.getX());
+		int x = (int) Math.round(Places.localX(player.getX()));
 		boolean nearEnd = x <= Places.POOL_START + 1;
 		boolean farEnd = x >= Places.POOL_END - 1;
 		long now = player.level().getGameTime();

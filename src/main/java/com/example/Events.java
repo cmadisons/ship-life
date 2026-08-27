@@ -49,8 +49,8 @@ public final class Events {
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (player instanceof ServerPlayer who && world instanceof ServerLevel level
 					&& ShipLifeMod.isShipLife(level)
-					&& (hit.getBlockPos().equals(Places.EVENT_BOARD)
-							|| hit.getBlockPos().equals(Places.EVENT_BOARD.above()))) {
+					&& (Places.local(hit.getBlockPos()).equals(Places.EVENT_BOARD)
+							|| Places.local(hit.getBlockPos()).equals(Places.EVENT_BOARD.above()))) {
 				board(who);
 				return InteractionResult.SUCCESS;
 			}

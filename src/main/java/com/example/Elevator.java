@@ -52,6 +52,7 @@ public final class Elevator {
 		}
 
 		int on = Places.floorAt(player.getY());
+		int ship = Places.shipOf(player.getX());
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int slot = 10 + ((floor - 1) / 7) * 9 + ((floor - 1) % 7);
 			if (State.hasFloor(player, floor)) {
@@ -68,11 +69,24 @@ public final class Elevator {
 			}
 		}
 
+		// The ship number, once the passport has one.
+		if (State.tally(player, State.SHIPS) > 1) {
+			for (int which = 1; which <= 2; which++) {
+				page.setItem(37 + which, Book.entry(
+						which == ship ? Items.LIME_CONCRETE : Items.WHITE_CONCRETE,
+						"Ship " + which, ChatFormatting.LIGHT_PURPLE,
+						which == ship ? "You are on this one."
+								: "Click to cross to it, same floor.",
+						which == 2 ? "Floors 1 to 14, the same again."
+								: "The first ship."));
+			}
+		}
+
 		page.setItem(49, Book.entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
 
 		player.openMenu(new SimpleMenuProvider(
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page, Elevator::click),
-				Component.literal("Elevator")));
+				Component.literal("Elevator  ·  Ship " + ship)));
 	}
 
 	/** The one locked floor worth showing, because a quest is opening it. */
@@ -88,6 +102,14 @@ public final class Elevator {
 			player.closeContainer();
 			return;
 		}
+		// Crossing between the ships, at whatever floor you are on.
+		if ((slot == 38 || slot == 39) && State.tally(player, State.SHIPS) > 1) {
+			int ship = slot - 37;
+			int floor = Math.max(1, Places.floorAt(player.getY()));
+			player.closeContainer();
+			ride(player, floor, ship);
+			return;
+		}
 		int row = slot / 9;
 		int column = slot % 9;
 		if (row < 1 || row > 2 || column < 1 || column > 7) {
@@ -98,29 +120,29 @@ public final class Elevator {
 			return;
 		}
 		player.closeContainer();
-		ride(player, floor);
+		ride(player, floor, Places.shipOf(player.getX()));
 	}
 
 	/** Doors close, the car moves, doors open. */
-	public static void ride(ServerPlayer player, int floor) {
+	public static void ride(ServerPlayer player, int floor, int ship) {
 		ServerLevel level = (ServerLevel) player.level();
 		BlockPos from = player.blockPosition();
 
 		level.playSound(null, from, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 0.8f, 1.0f);
 		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, RIDE + 10, 0, true, false, false));
 		Hud.busy(player, RIDE + 10);
-		player.sendOverlayMessage(Component.literal("▲  Floor " + floor + " -- " + NAMES[floor])
-				.withStyle(ChatFormatting.AQUA));
+		player.sendOverlayMessage(Component.literal("▲  Ship " + ship + ", floor " + floor
+				+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
 
 		// The whirr while it moves, then the doors at the far end.
 		Ticker.after(20, () -> level.playSound(null, from,
 				SoundEvents.ELYTRA_FLYING, SoundSource.BLOCKS, 0.5f, 0.8f));
 		Ticker.after(RIDE, () -> {
-			BlockPos to = Places.lift(floor);
+			BlockPos to = Places.onShip(Places.lift(floor), ship);
 			player.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
 			level.playSound(null, to, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8f, 1.0f);
-			player.sendOverlayMessage(Component.literal("Floor " + floor + " -- " + NAMES[floor])
-					.withStyle(ChatFormatting.AQUA));
+			player.sendOverlayMessage(Component.literal("Ship " + ship + ", floor " + floor
+					+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
 
 			// Quest 3: pressing the button for floor 5 is the whole part.
 			if (floor == 5 && Quests.on(player, 2, 1)) {

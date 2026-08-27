@@ -58,7 +58,7 @@ public final class Chores {
 					|| !ShipLifeMod.isShipLife(level)) {
 				return InteractionResult.PASS;
 			}
-			return rightClick(who, level, hit.getBlockPos(), who.getItemInHand(hand));
+			return rightClick(who, level, Places.local(hit.getBlockPos()), who.getItemInHand(hand));
 		});
 
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, side) -> {

@@ -27,7 +27,7 @@ public final class Arcade {
 					|| !ShipLifeMod.isShipLife(level)) {
 				return InteractionResult.PASS;
 			}
-			BlockPos pos = hit.getBlockPos();
+			BlockPos pos = Places.local(hit.getBlockPos());
 			BlockPos base = level.getBlockState(pos.below()).isAir() ? pos : pos.below();
 
 			if (matches(pos, base, Places.SNAKE)) {

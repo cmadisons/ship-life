@@ -91,6 +91,23 @@ public final class Ship {
 
 	// ------------------------------------------------------------------- ship
 
+	/**
+	 * The second ship: the same fourteen floors again, two hundred blocks east.
+	 *
+	 * It is built the moment it is bought rather than with the first ship,
+	 * because most worlds will never buy it and a second empty tower is a lot
+	 * of blocks to lay down on the chance.
+	 */
+	public static void buildSecond(ServerLevel level) {
+		if (level.getBlockState(Places.onShip(Places.panel(1), 2)).is(Blocks.LODESTONE)) {
+			return;
+		}
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			buildFloor(level, floor, 2);
+		}
+		ShipLifeMod.LOGGER.info("Built ship 2.");
+	}
+
 	private static void buildShip(ServerLevel level) {
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			buildFloor(level, floor);
@@ -106,8 +123,12 @@ public final class Ship {
 	}
 
 	private static void buildFloor(ServerLevel level, int floor) {
+		buildFloor(level, floor, 1);
+	}
+
+	private static void buildFloor(ServerLevel level, int floor, int ship) {
 		int y = Places.floorY(floor);
-		int x = Places.SHIP_X;
+		int x = Places.SHIP_X + (ship == 2 ? Places.SHIP_TWO_OFFSET : 0);
 		int z = Places.SHIP_Z;
 		int r = Places.ROOM;
 
@@ -134,15 +155,15 @@ public final class Ship {
 			}
 		}
 		// The lift: a panel to press, and a lit alcove to stand in.
-		set(level, Places.panel(floor), Blocks.LODESTONE);
-		set(level, Places.panel(floor).above(), Blocks.REDSTONE_LAMP);
-		set(level, Places.lift(floor), Blocks.AIR);
-		set(level, Places.lift(floor).above(), Blocks.AIR);
+		set(level, Places.onShip(Places.panel(floor), ship), Blocks.LODESTONE);
+		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
+		set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
+		set(level, Places.onShip(Places.lift(floor), ship).above(), Blocks.AIR);
 
 		// A sign of sorts: the floor number spelled out in the floor itself.
 		set(level, new BlockPos(x - r + 2, y, z), Blocks.LIGHT_BLUE_CONCRETE);
 
-		if (floor == 1) {
+		if (floor == 1 && ship == 1) {
 			// The way in from the walkway.
 			set(level, new BlockPos(x - r, y + 1, z), Blocks.AIR);
 			set(level, new BlockPos(x - r, y + 2, z), Blocks.AIR);
@@ -243,6 +264,7 @@ public final class Ship {
 		counter(level, Places.REWARD_DESK, Blocks.CHEST);
 		counter(level, Places.PET_STORE, Blocks.HAY_BLOCK);
 		counter(level, Places.KEG, Blocks.BARREL);
+		counter(level, Places.PASSPORT_DESK, Blocks.LECTERN);
 	}
 
 	/** A shop counter: something to click, lit so you can find it. */

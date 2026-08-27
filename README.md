@@ -26,8 +26,12 @@ what is built so far is listed under [What works today](#what-works-today).
 - **The shops** — floor 8 gives a free quest at a time from a pool of 250, all of them things the game can watch you do; floor 11 hands out one reward a month on the 70 / 25 / 4.9 / 0.1 table; floor 12 sells pet food (x1.1 a time, stopping at x2), the Skeleton and the Shadow; floor 13 is The Keg, three dishes at 25 tickets that last a day each; and the event ticket counter on floor 7 sells floors 11 to 13 together, the Go To Event Star and the x2.5.
 - A **drawn heads-up display** — the star is out in the world where the quest is, through walls and through the floors of the ship, pinned to the edge of the screen with an arrow when it is behind you; the ship's clock, the date, your money and your tickets sit in the top-right corner.
 
-Still to build: passport upgrades, friends, chapters past 4, and whatever is on
-floor 14.
+Ship 2 stands two hundred blocks east and is the same fourteen floors again. The
+lift grows a ship number once your passport has one, and crossing between them is
+a ride like any other.
+
+Still to build: whatever is above floor 15 on ship 2, the friends system, and
+chapters past 4.
 
 ### Build it
 
@@ -75,7 +79,7 @@ Pick any of those alongside it and you still play **survival**.
 | 11 | 🎁 A free reward every month you play | 1000 event tickets (buys 11, 12 and 13) |
 | 12 | 🐾 Pet store | " |
 | 13 | 🍽️ The Keg — a fancy restaurant | " |
-| 14 | ❓ | 4.9% roll on floor 11 |
+| 14 | 🛂 Passport upgrade -- 250 event tickets buys Ship 2 | 4.9% roll on floor 11 |
 
 ## The story
 

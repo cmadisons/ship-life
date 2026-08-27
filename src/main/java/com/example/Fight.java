@@ -52,7 +52,7 @@ public final class Fight {
 					|| !ShipLifeMod.isShipLife(level)) {
 				return InteractionResult.PASS;
 			}
-			BlockPos pos = hit.getBlockPos();
+			BlockPos pos = Places.local(hit.getBlockPos());
 			if (pos.equals(Places.FIGHT_BUTTON) || pos.equals(Places.FIGHT_BUTTON.above())) {
 				wave(who, level);
 				return InteractionResult.SUCCESS;

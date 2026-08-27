@@ -64,7 +64,8 @@ public final class Kit {
 
 	public static ItemStack passport() {
 		return make(Items.PAPER, PASSPORT, ChatFormatting.AQUA,
-				"Opens the floors you are allowed on.");
+				"Opens the floors you are allowed on.",
+				"Upgrade it on floor 14 for a second ship.");
 	}
 
 	public static ItemStack sponge() {
