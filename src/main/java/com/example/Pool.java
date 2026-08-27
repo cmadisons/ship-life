@@ -18,11 +18,10 @@ import net.minecraft.world.InteractionResult;
 /**
  * Floor 3: the swimming pool.
  *
- * A lap is the length of the pool and back, and it is timed from the moment
- * you push off. Thirty seconds is the number that matters -- do a lap in
- * thirty and floor 9 opens, and the dog's swimming boost is what turns a
- * thirty-five second lap into a thirty second one. That is the point of the
- * dog: the quest is set just out of reach without it.
+ * A lap is the length of the pool and back, timed from the moment you push
+ * off. Fifteen seconds is the number that matters, and a bare lap is nowhere
+ * near it -- the dog's swimming boost is not a way round that time, it is the
+ * way to it. That is what the dog was always for.
  *
  * The clock is kept where the swimming happens rather than in a stopwatch you
  * carry: touch the near end to start, touch the far end to turn, touch the
@@ -32,12 +31,13 @@ public final class Pool {
 	private Pool() {
 	}
 
-	/** Beat your own best by this much, unboosted, and floor 9 opens. */
-	public static final int BETTER_BY = 60;
 
 	/** Where in a lap someone is. */
 	private record Swim(int leg, long started) {
 	}
+
+	/** A lap in fifteen seconds is what opens floor 9. */
+	public static final int TARGET_TICKS = 300;
 
 	private static final Map<UUID, Swim> SWIMMING = new HashMap<>();
 
@@ -120,7 +120,7 @@ public final class Pool {
 				.withStyle(record ? ChatFormatting.GREEN : ChatFormatting.GRAY));
 
 		if (!State.hasFloor(player, 9)) {
-			floorNine(player, ticks, best, boosted);
+			floorNine(player, ticks);
 		}
 		if (record) {
 			State.bestLap(player, ticks);
@@ -128,36 +128,22 @@ public final class Pool {
 	}
 
 	/**
-	 * Floor 9 is not a time on a board, it is three seconds off your own.
+	 * Floor 9 is a flat fifteen seconds, and the dog is allowed.
 	 *
-	 * A flat thirty seconds is either free or impossible depending on how you
-	 * swim, so the bar is set where you actually are: beat your own best by
-	 * three, and do it on your own. The dog is worth more than three seconds,
-	 * so a boosted lap says so and does not count.
+	 * A bare lap is nowhere near it, so the swimming boost is not a way round
+	 * the time -- it is the way to it, which is what the dog was always for.
 	 */
-	private static void floorNine(ServerPlayer player, int ticks, int best, boolean boosted) {
-		if (best == 0) {
-			player.sendSystemMessage(Component.literal("That is the time to beat. "
-					+ time(BETTER_BY) + " off it, with no boost, opens floor 9.")
-					.withStyle(ChatFormatting.GRAY));
-			return;
-		}
-		if (ticks > best - BETTER_BY) {
-			player.sendSystemMessage(Component.literal("Floor 9 wants "
-					+ time(best - BETTER_BY) + " or better, with no boost.")
-					.withStyle(ChatFormatting.GRAY));
-			return;
-		}
-		if (boosted) {
-			player.sendSystemMessage(Component.literal(
-					"Fast enough, but you had help. Floor 9 wants that lap on your own.")
+	private static void floorNine(ServerPlayer player, int ticks) {
+		if (ticks > TARGET_TICKS) {
+			player.sendSystemMessage(Component.literal("Floor 9 wants a lap in "
+					+ time(TARGET_TICKS) + ". You will need a dog for that.")
 					.withStyle(ChatFormatting.GRAY));
 			return;
 		}
 		State.unlock(player, 9);
-		player.sendSystemMessage(Component.literal(time(BETTER_BY)
-				+ " off your best, and no boost. Floor 9 -- the fight room -- is open.")
-				.withStyle(ChatFormatting.AQUA));
+		player.sendSystemMessage(Component.literal("A lap in " + time(ticks)
+				+ ". Floor 9 -- the fight room -- is open, and it is in your lift"
+				+ " from now on.").withStyle(ChatFormatting.AQUA));
 	}
 
 	/** The record board on the wall. */
@@ -169,8 +155,8 @@ public final class Pool {
 						: "your best lap is " + time(best) + "."))
 				.withStyle(ChatFormatting.AQUA));
 		player.sendSystemMessage(Component.literal("A lap is the length of the pool"
-				+ " and back. Take " + time(BETTER_BY) + " off your best, with no boost,"
-				+ " and floor 9 opens.").withStyle(ChatFormatting.GRAY));
+				+ " and back. Fifteen seconds opens floor 9.")
+				.withStyle(ChatFormatting.GRAY));
 	}
 
 	/** Ticks as a stopwatch reads them. */

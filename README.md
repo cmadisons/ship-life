@@ -19,7 +19,7 @@ what is built so far is listed under [What works today](#what-works-today).
 - The **elevator** — locked floors don't show, a floor your quest is opening shows with a lock, and the doors close, the car whirs and the doors open.
 - The **arcade on floor 2** — Snake, Pac-Man and Galaga, played properly on their own screens with the arrow keys or WASD. Pac-Man has the maze, the power pellets at 200-400-800-1600 and four ghosts who each hunt you differently; Galaga has the formation, the dives worth double, and two shots on screen at a time. A ticket a food, five a stage, five for a new record.
 - The **prize counter** — pets for 10 tickets each: lion, dog, cat and dolphin, all following you at once, two of a kind doubling the boost, and the cat opening floor 6 for good.
-- **Floor 3, the pool** — a lap is the length and back, timed; thirty seconds opens floor 9, which a bare lap does not quite manage without a dog.
+- **Floor 3, the pool** — a lap is the length and back, timed; fifteen seconds opens floor 9, which no bare lap manages -- that is what the dog is for.
 - **Floor 6, the race track** — three lanes, 250 gas, boost for double speed, cars that slow you when you hit them. Five laps in two minutes opens floor 7.
 - **Floor 7, the events** — a board saying what is on today. Spooky Shooter and Christmas (a crowd of 100 and a photograph), Quest Day (four quests, 500 tickets for all four), May the Fourth (lightsaber fights, 25 a fight and 100 a win), and Summer Break, which needs no screen because it doubles what the arcade pays.
 - **Floor 9 and floor 10** — waves that get bigger and pay when you clear them, and a door each for Arachnes and the dragon.

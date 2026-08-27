@@ -38,7 +38,7 @@ public final class Floors {
 			case 6 -> "buy a cat, 10 arcade tickets";
 			case 7 -> "own one of every pet";
 			case 8 -> "earn 50 arcade tickets";
-			case 9 -> "swim a lap in 30 seconds";
+			case 9 -> "swim a lap in 15 seconds";
 			case 10 -> "do an event";
 			case 11, 12, 13 -> "1000 event tickets, all three";
 			case 14 -> "the 4.9% reward on floor 11";
