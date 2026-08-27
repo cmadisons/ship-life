@@ -69,22 +69,22 @@ public final class Kit {
 	}
 
 	public static ItemStack sponge() {
-		return make(Items.SPONGE, SPONGE, ChatFormatting.YELLOW,
+		return make(Made.sponge, SPONGE, ChatFormatting.YELLOW,
 				"Hold left-click on a dish to wash it.");
 	}
 
 	public static ItemStack towel() {
-		return make(Items.WHITE_WOOL, TOWEL, ChatFormatting.WHITE,
+		return make(Made.towel, TOWEL, ChatFormatting.WHITE,
 				"Hold right-click on a dish to dry it.");
 	}
 
 	public static ItemStack mower() {
-		return make(Items.SHEARS, MOWER, ChatFormatting.GREEN,
+		return make(Made.lawnMower, MOWER, ChatFormatting.GREEN,
 				"Right-click every square of grass.");
 	}
 
 	public static ItemStack whacker() {
-		return make(Items.IRON_HOE, WHACKER, ChatFormatting.GREEN,
+		return make(Made.weedWhacker, WHACKER, ChatFormatting.GREEN,
 				"Right-click a weed to take it out.");
 	}
 

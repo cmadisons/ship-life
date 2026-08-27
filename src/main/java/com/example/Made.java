@@ -1,0 +1,81 @@
+package com.example;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+
+/**
+ * The things Ship Life adds that Minecraft does not have.
+ *
+ * Everything you actually handle is here: the sponge and the towel, the weed
+ * whacker and the lawn mower, the dish on the counter and the button you press
+ * to call the lift. They were vanilla items wearing a name to begin with,
+ * which reads well enough in a list and badly in your hand -- a towel is not a
+ * block of wool, and a dish is not a flower pot.
+ *
+ * The pictures are drawn by tools/make_textures.py, sixteen pixels square, one
+ * character of string art a pixel. Change the picture there, not here, and
+ * never the PNGs.
+ */
+public final class Made {
+	private Made() {
+	}
+
+	public static final Map<String, Item> ITEMS = new LinkedHashMap<>();
+	public static final Map<String, Block> BLOCKS = new LinkedHashMap<>();
+
+	public static Item sponge;
+	public static Item towel;
+	public static Item weedWhacker;
+	public static Item lawnMower;
+	public static Block dish;
+	public static Block elevatorButton;
+
+	/** Called once at start-up, before any world exists. */
+	public static void register() {
+		sponge = item("sponge");
+		towel = item("towel");
+		weedWhacker = item("weed_whacker");
+		lawnMower = item("lawn_mower");
+
+		// The dish is china: it breaks by hand and it is not worth a tool.
+		dish = block("dish", 0.4f, SoundType.GLASS);
+		elevatorButton = block("elevator_button", 1.5f, SoundType.METAL);
+
+		ShipLifeMod.LOGGER.info("Ship Life added {} items and {} blocks.",
+				ITEMS.size(), BLOCKS.size());
+	}
+
+	private static Item item(String id) {
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, ShipLifeMod.id(id));
+		Item made = Registry.register(BuiltInRegistries.ITEM, key,
+				new Item(new Item.Properties().setId(key).stacksTo(1)));
+		ITEMS.put(id, made);
+		return made;
+	}
+
+	private static Block block(String id, float hardness, SoundType sound) {
+		ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, ShipLifeMod.id(id));
+		Block made = Registry.register(BuiltInRegistries.BLOCK, blockKey,
+				new Block(BlockBehaviour.Properties.of()
+						.strength(hardness)
+						.sound(sound)
+						.setId(blockKey)));
+		BLOCKS.put(id, made);
+
+		ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, ShipLifeMod.id(id));
+		Registry.register(BuiltInRegistries.ITEM, itemKey,
+				new BlockItem(made, new Item.Properties().setId(itemKey)
+						.useBlockDescriptionPrefix()));
+		return made;
+	}
+}

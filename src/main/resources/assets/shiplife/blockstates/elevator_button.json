@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "shiplife:block/elevator_button"
+    }
+  }
+}

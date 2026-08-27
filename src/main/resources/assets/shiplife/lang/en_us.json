@@ -1,3 +1,9 @@
 {
-  "generator.shiplife.ship_life": "Ship Life"
+  "block.shiplife.dish": "Dish",
+  "block.shiplife.elevator_button": "Elevator Button",
+  "generator.shiplife.ship_life": "Ship Life",
+  "item.shiplife.lawn_mower": "Lawn Mower",
+  "item.shiplife.sponge": "Sponge",
+  "item.shiplife.towel": "Towel",
+  "item.shiplife.weed_whacker": "Weed Whacker"
 }

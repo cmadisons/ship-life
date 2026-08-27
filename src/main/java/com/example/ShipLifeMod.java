@@ -51,6 +51,7 @@ public class ShipLifeMod implements ModInitializer {
 	public void onInitialize() {
 		// First, before a world can be loaded: everything the game remembers.
 		State.register();
+		Made.register();
 		Ticker.register();
 		Slots.register();
 		Hud.register();
@@ -231,8 +232,7 @@ public class ShipLifeMod implements ModInitializer {
 
 	/** A world we built earlier, coming back after a restart. */
 	private static boolean isShipBuilt(ServerLevel level) {
-		return level.getBlockState(Places.panel(1)).is(
-				net.minecraft.world.level.block.Blocks.LODESTONE);
+		return level.getBlockState(Places.panel(1)).is(Made.elevatorButton);
 	}
 
 	public static Identifier id(String path) {

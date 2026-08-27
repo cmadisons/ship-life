@@ -48,7 +48,7 @@ public final class Ship {
 		for (int i = 0; i < 10; i++) {
 			BlockPos dish = Places.dish(i);
 			set(level, dish.below(), Blocks.SMOOTH_QUARTZ);
-			set(level, dish, Blocks.FLOWER_POT);
+			set(level, dish, Made.dish);
 		}
 		set(level, Places.GARBAGE.below(), Blocks.SMOOTH_QUARTZ);
 		set(level, Places.GARBAGE, Blocks.COMPOSTER);
@@ -99,7 +99,7 @@ public final class Ship {
 	 * of blocks to lay down on the chance.
 	 */
 	public static void buildSecond(ServerLevel level) {
-		if (level.getBlockState(Places.onShip(Places.panel(1), 2)).is(Blocks.LODESTONE)) {
+		if (level.getBlockState(Places.onShip(Places.panel(1), 2)).is(Made.elevatorButton)) {
 			return;
 		}
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
@@ -155,7 +155,7 @@ public final class Ship {
 			}
 		}
 		// The lift: a panel to press, and a lit alcove to stand in.
-		set(level, Places.onShip(Places.panel(floor), ship), Blocks.LODESTONE);
+		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
 		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
 		set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
 		set(level, Places.onShip(Places.lift(floor), ship).above(), Blocks.AIR);

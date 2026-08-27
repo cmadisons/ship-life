@@ -472,9 +472,9 @@ public final class Chores {
 		player.getInventory().clearOrCountMatchingItems(
 				stack -> Kit.is(stack, Kit.SPONGE) || Kit.is(stack, Kit.TOWEL),
 				-1, player.inventoryMenu.getCraftSlots());
-		player.getInventory().add(Kit.make(net.minecraft.world.item.Items.SPONGE,
+		player.getInventory().add(Kit.make(Made.sponge,
 				"Dirty " + Kit.SPONGE, ChatFormatting.DARK_GRAY, "Bin it."));
-		player.getInventory().add(Kit.make(net.minecraft.world.item.Items.BROWN_WOOL,
+		player.getInventory().add(Kit.make(Made.towel,
 				"Dirty " + Kit.TOWEL, ChatFormatting.DARK_GRAY, "Bin it."));
 	}
 

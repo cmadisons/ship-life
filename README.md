@@ -33,6 +33,17 @@ a ride like any other.
 Still to build: whatever is above floor 15 on ship 2, the friends system, and
 chapters past 4.
 
+### The pictures
+
+The sponge, the towel, the weed whacker, the lawn mower, the dish and the
+elevator button are real items and blocks with their own textures, drawn by
+`tools/make_textures.py` as sixteen-pixel string art -- one character a pixel.
+Change the picture in the script and run it; never edit the PNGs.
+
+```bash
+python3 tools/make_textures.py
+```
+
 ### Build it
 
 ```bash
