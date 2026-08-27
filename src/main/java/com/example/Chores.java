@@ -40,8 +40,14 @@ public final class Chores {
 	/** A meter someone has running, and the tick it started on. */
 	private static final Map<UUID, Long> METER = new HashMap<>();
 
-	/** Who has a mess on the floor to mop up. */
-	private static final Map<UUID, Integer> MESS = new HashMap<>();
+	/** Which piece of the mess someone is wiping, and the tick they started. */
+	private record Wipe(net.minecraft.world.entity.item.ItemEntity piece, long started) {
+	}
+
+	private static final Map<UUID, Wipe> WIPING = new HashMap<>();
+
+	/** Three seconds a spot. */
+	private static final int WIPE_TICKS = 60;
 
 	/** The food actually lying on the floor, so it can be swept up later. */
 	private static final Map<UUID, java.util.List<net.minecraft.world.entity.item.ItemEntity>>
@@ -132,7 +138,15 @@ public final class Chores {
 		}
 
 		if (mopping(player)) {
-			say(player, "Clean the mess up first -- hold the mop and walk over it.");
+			if (Kit.is(held, Kit.MOP)) {
+				if (startWipe(player, pos)) {
+					say(player, "Hold it there.");
+				} else {
+					say(player, "Aim at the mess on the floor.");
+				}
+			} else {
+				say(player, "Clean it up first -- right-click each spot with the mop.");
+			}
 			return InteractionResult.SUCCESS;
 		}
 
@@ -355,7 +369,6 @@ public final class Chores {
 		player.sendSystemMessage(Component.literal(fridge
 				? "The food fell on the floor. Mop it up."
 				: "It exploded. Mop it up.").withStyle(ChatFormatting.RED));
-		MESS.put(player.getUUID(), 60);
 		spill(player, fridge);
 	}
 
@@ -397,30 +410,76 @@ public final class Chores {
 	}
 
 	private static boolean mopping(ServerPlayer player) {
-		return MESS.getOrDefault(player.getUUID(), 0) > 0;
+		java.util.List<net.minecraft.world.entity.item.ItemEntity> mess =
+				SPILLED.get(player.getUUID());
+		if (mess == null) {
+			return false;
+		}
+		mess.removeIf(piece -> !piece.isAlive());
+		if (mess.isEmpty()) {
+			SPILLED.remove(player.getUUID());
+			return false;
+		}
+		return true;
 	}
 
-	/** Mopping: hold the mop and walk about, and the mess comes up. */
+	/**
+	 * Mopping: hold right-click on a spot for three seconds and it is gone.
+	 *
+	 * One spot at a time, five spots to a mess. Walk off in the middle of one
+	 * and it stops where it stopped -- the mop has to be over the thing you
+	 * are mopping.
+	 */
 	private static void tickMop(ServerPlayer player) {
-		int left = MESS.getOrDefault(player.getUUID(), 0);
-		if (left <= 0) {
+		Wipe wipe = WIPING.get(player.getUUID());
+		if (wipe == null) {
 			return;
 		}
-		boolean holding = Kit.is(player.getMainHandItem(), Kit.MOP);
-		boolean moving = player.getDeltaMovement().horizontalDistanceSqr() > 0.002;
-		if (holding && moving) {
-			left--;
-			MESS.put(player.getUUID(), left);
+		if (!wipe.piece().isAlive() || !Kit.is(player.getMainHandItem(), Kit.MOP)
+				|| player.distanceToSqr(wipe.piece()) > 9.0) {
+			WIPING.remove(player.getUUID());
+			return;
+		}
+		long held = player.level().getGameTime() - wipe.started();
+		if (held < WIPE_TICKS) {
 			Hud.busy(player, 5);
-			player.sendOverlayMessage(Component.literal("Mopping -- " + left + " to go")
+			player.sendOverlayMessage(Component.literal("Mopping  " + wiped(held))
 					.withStyle(ChatFormatting.GRAY));
-			if (left <= 0) {
-				MESS.remove(player.getUUID());
-				sweepUp(player);
-				player.sendSystemMessage(Component.literal("All clean. Try again.")
-						.withStyle(ChatFormatting.GREEN));
+			return;
+		}
+		WIPING.remove(player.getUUID());
+		wipe.piece().discard();
+		player.level().playSound(null, player.blockPosition(),
+				SoundEvents.BUCKET_EMPTY, SoundSource.PLAYERS, 0.5f, 1.4f);
+		if (!mopping(player)) {
+			player.sendSystemMessage(Component.literal("All clean. Try again.")
+					.withStyle(ChatFormatting.GREEN));
+		} else {
+			say(player, SPILLED.get(player.getUUID()).size() + " spots left.");
+		}
+	}
+
+	/** A bar that fills over the three seconds. */
+	private static String wiped(long held) {
+		int cells = 10;
+		int done = (int) (held * cells / WIPE_TICKS);
+		return "|".repeat(Math.max(0, done)) + ".".repeat(Math.max(0, cells - done));
+	}
+
+	/** Start on whichever piece of the mess is under where you clicked. */
+	private static boolean startWipe(ServerPlayer player, BlockPos pos) {
+		java.util.List<net.minecraft.world.entity.item.ItemEntity> mess =
+				SPILLED.get(player.getUUID());
+		if (mess == null) {
+			return false;
+		}
+		for (net.minecraft.world.entity.item.ItemEntity piece : mess) {
+			if (piece.isAlive() && piece.blockPosition().closerThan(pos, 2.0)) {
+				WIPING.put(player.getUUID(), new Wipe(piece, player.level().getGameTime()));
+				return true;
 			}
 		}
+		return false;
 	}
 
 	/** The mop got it: take the food off the floor. */

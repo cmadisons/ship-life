@@ -102,6 +102,6 @@ public final class Kit {
 
 	public static ItemStack mop() {
 		return make(Items.BRUSH, MOP, ChatFormatting.GRAY,
-				"Hold it and walk over the mess.");
+				"Right-click each spot, 3 seconds.");
 	}
 }
