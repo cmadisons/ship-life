@@ -130,14 +130,24 @@ public final class Places {
 	public static final BlockPos PASSPORT_DESK =
 			new BlockPos(SHIP_X, floorY(14) + 1, SHIP_Z - 8);
 
-	/** The panel you press to call the lift, on each floor. */
+	/**
+	 * The panel you press to call the lift, on each floor.
+	 *
+	 * It sits in the near left corner -- the corner closest to the town, so
+	 * you meet it on the way in rather than crossing the room to find it.
+	 */
 	public static BlockPos panel(int floor) {
-		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z);
+		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z - ROOM + 1);
 	}
 
-	/** Where the lift puts you down on a floor. */
+	/** Where the lift puts you down on a floor: the square beside the panel. */
 	public static BlockPos lift(int floor) {
-		return new BlockPos(SHIP_X - ROOM + 3, floorY(floor) + 1, SHIP_Z);
+		return new BlockPos(SHIP_X - ROOM + 2, floorY(floor) + 1, SHIP_Z - ROOM + 2);
+	}
+
+	/** Where the lift used to be, which is a door now. */
+	public static BlockPos oldLift(int floor) {
+		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z);
 	}
 
 	/** The way in, at the bottom of the gangway. */

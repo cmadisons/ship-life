@@ -154,6 +154,9 @@ public final class Ship {
 				set(level, new BlockPos(x + dx, y + 6, z + dz), Blocks.SEA_LANTERN);
 			}
 		}
+		// A door where the lift used to be, in the middle of the near wall.
+		door(level, Places.onShip(Places.oldLift(floor), ship));
+
 		// The lift: a panel to press, and a lit alcove to stand in.
 		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
 		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
@@ -318,6 +321,25 @@ public final class Ship {
 	 * gets its bushes back rather than needing to be started again.
 	 */
 	public static void repair(ServerLevel level) {
+		// The lift moved to the near left corner, and left a door behind.
+		if (!level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				for (int ship = 1; ship <= 2; ship++) {
+					BlockPos was = Places.onShip(Places.oldLift(floor), ship);
+					if (!level.getBlockState(was.offset(2, 0, 0)).isAir()
+							&& ship == 2) {
+						continue;             // ship 2 was never built here
+					}
+					set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
+					set(level, Places.onShip(Places.panel(floor), ship).above(),
+							Blocks.REDSTONE_LAMP);
+					set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
+					set(level, Places.onShip(Places.lift(floor), ship).above(), Blocks.AIR);
+					door(level, was);
+				}
+			}
+			ShipLifeMod.LOGGER.info("Moved the lifts to the near corner.");
+		}
 		// The arcade came after the first worlds were built.
 		if (!level.getBlockState(Places.PACMAN).is(Blocks.YELLOW_CONCRETE)) {
 			furnishArcade(level);
@@ -339,6 +361,24 @@ public final class Ship {
 		if (replaced > 0) {
 			ShipLifeMod.LOGGER.info("Put {} bush(es) back at house three.", replaced);
 		}
+	}
+
+	/**
+	 * A door, which like a bed is two blocks that have to agree.
+	 *
+	 * The square in front of it is cleared as well, so the doorway is a
+	 * doorway rather than a door with a wall behind it.
+	 */
+	private static void door(ServerLevel level, BlockPos bottom) {
+		BlockState base = Blocks.OAK_DOOR.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
+						Direction.EAST);
+		level.setBlockAndUpdate(bottom, base.setValue(
+				net.minecraft.world.level.block.DoorBlock.HALF,
+				net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER));
+		level.setBlockAndUpdate(bottom.above(), base.setValue(
+				net.minecraft.world.level.block.DoorBlock.HALF,
+				net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
 	}
 
 	/** A bed is two blocks that have to agree which way round they are. */
