@@ -182,7 +182,7 @@ public final class Places {
 	public static final int POOL_HALF_WIDTH = 3;
 
 	/** How deep the pool is cut into floor 3's deck. */
-	public static final int POOL_DEPTH = 2;
+	public static final int POOL_DEPTH = 4;
 
 	/**
 	 * Are you in the pool?

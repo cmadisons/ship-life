@@ -244,10 +244,13 @@ public final class Ship {
 		int y = Places.floorY(3);
 		int half = Places.POOL_HALF_WIDTH;
 
-		// The hole, its own sealed bottom, and the water in it.
+		// The hole, its own sealed bottom, and the water in it. Under the
+		// bottom the casing carries on down to the arcade's own floor.
 		for (int x = Places.POOL_START; x <= Places.POOL_END; x++) {
 			for (int z = Places.SHIP_Z - half; z <= Places.SHIP_Z + half; z++) {
-				set(level, new BlockPos(x, y - Places.POOL_DEPTH - 1, z), Blocks.PRISMARINE);
+				for (int dy = Places.POOL_DEPTH + 1; dy <= Places.FLOOR_HEIGHT; dy++) {
+					set(level, new BlockPos(x, y - dy, z), Blocks.PRISMARINE);
+				}
 				for (int dy = Places.POOL_DEPTH; dy >= 0; dy--) {
 					set(level, new BlockPos(x, y - dy, z), Blocks.WATER);
 				}
@@ -276,7 +279,10 @@ public final class Ship {
 					continue;
 				}
 				set(level, new BlockPos(x, y, z), Blocks.PRISMARINE_BRICKS);
-				for (int dy = 1; dy <= Places.POOL_DEPTH + 1; dy++) {
+				// A full storey of casing, not just enough to hold the water.
+				// The pool hangs into the arcade either way, so it may as well
+				// be a solid column that nothing can ever get through.
+				for (int dy = 1; dy <= Places.FLOOR_HEIGHT; dy++) {
 					set(level, new BlockPos(x, y - dy, z), Blocks.PRISMARINE_BRICKS);
 				}
 			}
