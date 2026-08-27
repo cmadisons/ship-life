@@ -134,7 +134,7 @@ public final class Ship {
 		int z = Places.SHIP_Z;
 		int r = Places.ROOM;
 
-		fill(level, x - r, y, z - r, x + r, y, z + r, Blocks.SMOOTH_QUARTZ);
+		fill(level, x - r, y, z - r, x + r, y, z + r, Blocks.BLACK_CONCRETE);
 		fill(level, x - r, y + 7, z - r, x + r, y + 7, z + r, Blocks.GRAY_CONCRETE);
 		// Walls, hollow inside.
 		for (int dx = -r; dx <= r; dx++) {
@@ -440,8 +440,10 @@ public final class Ship {
 		// afterwards anyway, so nothing is lost either way.
 		BlockPos wall = new BlockPos(Places.SHIP_X, Places.floorY(1) + 3,
 				Places.SHIP_Z - Places.ROOM);
-		if (!level.getBlockState(wall).is(Blocks.BLACK_CONCRETE)
-				&& !level.getBlockState(wall).is(Blocks.GLASS)) {
+		BlockPos deck = new BlockPos(Places.SHIP_X + 6, Places.floorY(1), Places.SHIP_Z + 6);
+		if ((!level.getBlockState(wall).is(Blocks.BLACK_CONCRETE)
+				&& !level.getBlockState(wall).is(Blocks.GLASS))
+				|| !level.getBlockState(deck).is(Blocks.BLACK_CONCRETE)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				buildFloor(level, floor);
 				if (level.getBlockState(Places.onShip(Places.panel(floor), 2))
