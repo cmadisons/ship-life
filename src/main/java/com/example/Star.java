@@ -32,7 +32,7 @@ public final class Star {
 	}
 
 	/** Where the five events sit in the picker. */
-	private static final int FIRST = 10;
+	private static final int FIRST = 20;
 
 	public static void register() {
 		UseItemCallback.EVENT.register((player, world, hand) -> {
@@ -60,9 +60,10 @@ public final class Star {
 
 	/** The five events, and what happens if you pick one. */
 	private static void pick(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(27);
+		// Six rows: the menu this opens in is a chest, and a chest is 54.
+		SimpleContainer page = new SimpleContainer(54);
 		ItemStack filler = Game.cell(Items.GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 27; slot++) {
+		for (int slot = 0; slot < 54; slot++) {
 			page.setItem(slot, filler.copy());
 		}
 
@@ -83,7 +84,7 @@ public final class Star {
 					"Click to go."));
 		}
 
-		page.setItem(22, Book.entry(Items.BARRIER, "Keep it", ChatFormatting.RED,
+		page.setItem(49, Book.entry(Items.BARRIER, "Keep it", ChatFormatting.RED,
 				"Close without using the star."));
 
 		player.openMenu(new SimpleMenuProvider(
@@ -92,7 +93,7 @@ public final class Star {
 	}
 
 	private static void chosen(ServerPlayer player, int slot) {
-		if (slot == 22) {
+		if (slot == 49) {
 			player.closeContainer();
 			return;
 		}

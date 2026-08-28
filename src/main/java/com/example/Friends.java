@@ -100,14 +100,15 @@ public final class Friends {
 
 	/** Ben's counter: three more bombs, and nothing else. */
 	private static void counter(ServerPlayer player) {
-		net.minecraft.world.SimpleContainer page = new net.minecraft.world.SimpleContainer(27);
+		// Six rows, because the menu it opens in is a chest.
+		net.minecraft.world.SimpleContainer page = new net.minecraft.world.SimpleContainer(54);
 		net.minecraft.world.item.ItemStack filler = Game.cell(
 				net.minecraft.world.item.Items.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 27; slot++) {
+		for (int slot = 0; slot < 54; slot++) {
 			page.setItem(slot, filler.copy());
 		}
 		boolean afford = State.event(player) >= BOMBS_COST;
-		page.setItem(13, Book.entry(Made.bomb, "3 of Ben's Bombs",
+		page.setItem(22, Book.entry(Made.bomb, "3 of Ben's Bombs",
 				afford ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
 				"Green gas: 10 a second off every",
 				"enemy standing in it.",
@@ -116,7 +117,7 @@ public final class Friends {
 				BOMBS_COST + " event tickets",
 				"You have " + State.event(player) + ".",
 				afford ? "Click to buy." : "Not enough yet."));
-		page.setItem(22, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
+		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));
 		player.openMenu(new net.minecraft.world.SimpleMenuProvider(
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page, Friends::buy),
@@ -124,11 +125,11 @@ public final class Friends {
 	}
 
 	private static void buy(ServerPlayer player, int slot) {
-		if (slot == 22) {
+		if (slot == 49) {
 			player.closeContainer();
 			return;
 		}
-		if (slot != 13) {
+		if (slot != 22) {
 			return;
 		}
 		if (State.event(player) < BOMBS_COST) {
