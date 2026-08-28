@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * The commands: /shiplife and /11reward.
+ * The commands: /shiplife, /11reward and /skipsidequest.
  *
  * /shiplife starts you at the ship instead of at the sink.
  *
@@ -42,6 +42,9 @@ public final class Skip {
 			// you want it.
 			dispatcher.register(Commands.literal("11reward")
 					.executes(context -> extraReward(context.getSource())));
+			// Every side quest you are carrying, finished and paid for.
+			dispatcher.register(Commands.literal("skipsidequest")
+					.executes(context -> skipSide(context.getSource())));
 		});
 	}
 
@@ -53,6 +56,24 @@ public final class Skip {
 			return 0;
 		}
 		Shops.reward(player);
+		return 1;
+	}
+
+	/** /skipsidequest -- clear the lot, and pay what they were worth. */
+	private static int skipSide(CommandSourceStack source) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Only a player can use /skipsidequest."));
+			return 0;
+		}
+		int done = QuestPool.skip(player);
+		if (done == 0) {
+			source.sendFailure(Component.literal("You are not carrying any side quests."));
+			return 0;
+		}
+		player.sendSystemMessage(Component.literal(done + " side quest"
+				+ (done == 1 ? "" : "s") + " skipped and paid.")
+				.withStyle(ChatFormatting.YELLOW));
 		return 1;
 	}
 

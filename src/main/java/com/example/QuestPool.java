@@ -113,6 +113,27 @@ public final class QuestPool {
 		State.side(player, String.join(",", left));
 	}
 
+	/**
+	 * Finish the lot where they stand, and pay for them.
+	 *
+	 * What /skipsidequest does. They pay because a skipped quest you got
+	 * nothing for would only be a way of losing quests.
+	 */
+	public static int skip(ServerPlayer player) {
+		String side = State.side(player);
+		if (side.isEmpty()) {
+			return 0;
+		}
+		int done = 0;
+		for (String part : side.split(",")) {
+			String[] bits = part.split(":");
+			Events.payTickets(player, Integer.parseInt(bits[2]), "a side quest skipped");
+			done++;
+		}
+		State.side(player, "");
+		return done;
+	}
+
 	/** What you are carrying, in words, for the book to show. */
 	public static List<String> lines(ServerPlayer player) {
 		List<String> lines = new ArrayList<>();

@@ -40,6 +40,8 @@ that -- and chapters past 4.
 `/shiplife` skips chapter 1 -- it pays the hundred dollars, takes the chore
 tools back and stands you in the lobby. `/11reward` rolls another floor 11
 reward with the once-a-month wait taken off, as many times as you like.
+`/skipsidequest` finishes every side quest you are carrying and pays what they
+were worth.
 
 ### The pictures
 
