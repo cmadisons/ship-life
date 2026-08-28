@@ -342,17 +342,48 @@ public final class Ship {
 		}
 	}
 
-	/** Floor 6: a strip of track and a car to get into. */
+	/**
+	 * Floor 6: a loop of rail, with powered rail keeping it turning.
+	 *
+	 * The track is the whole floor rather than a strip, because a lap has to
+	 * be a lap. Powered rail every fifth block on both straights, each with a
+	 * redstone block let into the floor under it, means a kart left alone goes
+	 * round for ever -- so the five that are not yours are always moving.
+	 */
 	private static void furnishRace(ServerLevel level) {
 		int y = Places.floorY(6);
-		fill(level, Places.SHIP_X - 9, y, Places.SHIP_Z - 6,
-				Places.SHIP_X + 9, y, Places.SHIP_Z + 6, Blocks.BLACK_CONCRETE);
-		for (int x = Places.SHIP_X - 9; x <= Places.SHIP_X + 9; x += 2) {
-			set(level, new BlockPos(x, y, Places.SHIP_Z), Blocks.WHITE_CONCRETE);
+		int w = Places.KART_HALF_WIDTH;
+		int d = Places.KART_HALF_DEPTH;
+
+		// Tarmac inside the loop, so the track reads as a track.
+		fill(level, Places.SHIP_X - w, y, Places.SHIP_Z - d,
+				Places.SHIP_X + w, y, Places.SHIP_Z + d, Blocks.BLACK_CONCRETE);
+
+		// The loop itself, laid corners last so the curves settle right.
+		for (int x = Places.SHIP_X - w; x <= Places.SHIP_X + w; x++) {
+			rail(level, new BlockPos(x, Places.KART_Y, Places.SHIP_Z - d), x % 5 == 0);
+			rail(level, new BlockPos(x, Places.KART_Y, Places.SHIP_Z + d), x % 5 == 0);
 		}
+		for (int z = Places.SHIP_Z - d + 1; z <= Places.SHIP_Z + d - 1; z++) {
+			rail(level, new BlockPos(Places.SHIP_X - w, Places.KART_Y, z), z % 5 == 0);
+			rail(level, new BlockPos(Places.SHIP_X + w, Places.KART_Y, z), z % 5 == 0);
+		}
+
+		// The line, and the pits behind it.
+		set(level, new BlockPos(Places.SHIP_X, y, Places.SHIP_Z - d - 1), Blocks.WHITE_CONCRETE);
 		set(level, Places.RACE_CAR, Blocks.RED_CONCRETE);
 		set(level, Places.RACE_CAR.above(), Blocks.BLACK_CONCRETE);
 		set(level, Places.RACE_CAR.above(2), Blocks.SEA_LANTERN);
+	}
+
+	/** One piece of track: rail, and powered rail with a battery under it. */
+	private static void rail(ServerLevel level, BlockPos pos, boolean powered) {
+		if (powered) {
+			set(level, pos.below(), Blocks.REDSTONE_BLOCK);
+			level.setBlockAndUpdate(pos, Blocks.POWERED_RAIL.defaultBlockState());
+		} else {
+			level.setBlockAndUpdate(pos, Blocks.RAIL.defaultBlockState());
+		}
 	}
 
 	/** Floors 9 and 10: an empty room with a button, and one with two doors. */
@@ -526,6 +557,12 @@ public final class Ship {
 				.is(Blocks.WATER)) {
 			furnishPool(level);
 			ShipLifeMod.LOGGER.info("Sank the pool into the floor of floor 3.");
+		}
+		// Floor 6 was a strip of concrete before the karts had a loop to run.
+		if (!level.getBlockState(Places.KART_LINE).is(Blocks.RAIL)
+				&& !level.getBlockState(Places.KART_LINE).is(Blocks.POWERED_RAIL)) {
+			furnishRace(level);
+			ShipLifeMod.LOGGER.info("Laid the kart track round floor 6.");
 		}
 		// Floor 4 was an empty room until the buffet was built into it.
 		if (!level.getBlockState(Places.BUFFET_COOK).is(Blocks.SMOKER)) {

@@ -69,6 +69,7 @@ public class ShipLifeMod implements ModInitializer {
 		Gear.register();
 		Star.register();
 		Buffet.register();
+		Kart.register();
 		Skip.register();
 
 		// Right-clicking the book in mid-air, rather than at a block.

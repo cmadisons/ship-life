@@ -208,9 +208,25 @@ public final class Places {
 	public static final BlockPos POOL_BOARD =
 			new BlockPos(SHIP_X - 11, floorY(3) + 1, SHIP_Z + 8);
 
-	/** Where you get in the car, on floor 6. */
+	/** Where you get in the kart, in the pits on floor 6. */
 	public static final BlockPos RACE_CAR =
-			new BlockPos(SHIP_X, floorY(6) + 1, SHIP_Z - 8);
+			new BlockPos(SHIP_X, floorY(6) + 1, SHIP_Z - 9);
+
+	/** How far the track reaches from the middle of floor 6. */
+	public static final int KART_HALF_WIDTH = 9;
+	public static final int KART_HALF_DEPTH = 6;
+
+	/** The rails sit on top of the floor. */
+	public static final int KART_Y = floorY(6) + 1;
+
+	/** The start and finish line, in the middle of the near straight. */
+	public static final BlockPos KART_LINE =
+			new BlockPos(SHIP_X, KART_Y, SHIP_Z - KART_HALF_DEPTH);
+
+	/** Where the other karts start from, spread along the near straight. */
+	public static BlockPos kartGrid(int index) {
+		return new BlockPos(SHIP_X - 6 + index * 3, KART_Y, SHIP_Z - KART_HALF_DEPTH);
+	}
 
 	// ----------------------------------------------------- the buffet, floor 4
 

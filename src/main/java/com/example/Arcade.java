@@ -43,7 +43,7 @@ public final class Arcade {
 				return InteractionResult.SUCCESS;
 			}
 			if (matches(pos, base, Places.RACE_CAR)) {
-				new Race(who).open();
+				Kart.getIn(who);
 				return InteractionResult.SUCCESS;
 			}
 			if (matches(pos, base, Places.PRIZES)) {
