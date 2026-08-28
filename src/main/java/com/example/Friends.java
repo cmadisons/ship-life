@@ -48,6 +48,25 @@ public final class Friends {
 	}
 
 	public static void register() {
+		// Clicking the person themselves, which is what anybody would do.
+		net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.register(
+				(player, world, hand, entity, hit) -> {
+					if (!(player instanceof ServerPlayer who) || !(world instanceof ServerLevel level)
+							|| !(entity instanceof Person) || entity.getCustomName() == null) {
+						return InteractionResult.PASS;
+					}
+					switch (entity.getCustomName().getString()) {
+						case Person.BEN -> ben(who, level);
+						case Person.IZZY -> izzy(who, level);
+						case Person.CHARLIE -> Chores.charlie(who);
+						case Person.DESK, Person.LOBBY -> Chores.security(who);
+						default -> {
+							return InteractionResult.PASS;
+						}
+					}
+					return InteractionResult.SUCCESS;
+				});
+
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (!(player instanceof ServerPlayer who) || !(world instanceof ServerLevel level)
 					|| !ShipLifeMod.isShipLife(level)) {

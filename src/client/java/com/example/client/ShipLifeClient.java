@@ -40,6 +40,10 @@ public class ShipLifeClient implements ClientModInitializer {
 					}
 				}));
 
+		// The people: Charlie, the front desk, Ben and Izzy.
+		net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+				com.example.Person.TYPE, PersonRenderer::new);
+
 		HudElementRegistry.addLast(ShipLifeMod.id("hud"), Screen::draw);
 	}
 }

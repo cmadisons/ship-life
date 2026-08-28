@@ -232,31 +232,11 @@ public final class Chores {
 
 		// --- the security desk and Charlie's table ----------------------------
 		if (pos.equals(Places.DESK) || pos.equals(Places.DESK.above())) {
-			if (Quests.on(player, 1, 1)) {
-				player.sendSystemMessage(Component.literal(
-						"Security: \"Here is your passport. It opens floor 1 and floor 5 "
-						+ "-- floor 5 is yours.\"").withStyle(ChatFormatting.WHITE));
-				Quests.finishPart(player);
-			} else {
-				player.sendSystemMessage(Component.literal("Security: \"Enjoy your stay.\"")
-						.withStyle(ChatFormatting.GRAY));
-			}
+			security(player);
 			return InteractionResult.SUCCESS;
 		}
 		if (pos.equals(Places.TABLE) || pos.equals(Places.TABLE.above())) {
-			if (Quests.on(player, 3, 1)) {
-				player.sendSystemMessage(Component.literal(
-						"Charlie: \"Hi, I am Charlie the manager. I will give you quests to "
-						+ "unlock floors, upgrade your passport, get new friends and do "
-						+ "activities. I have a quest for you.\"")
-						.withStyle(ChatFormatting.WHITE));
-				Quests.finishPart(player);
-				player.getInventory().add(Kit.plunger());
-				player.getInventory().add(Kit.mop());
-			} else {
-				player.sendSystemMessage(Component.literal("Charlie: \"Keep at it.\"")
-						.withStyle(ChatFormatting.GRAY));
-			}
+			charlie(player);
 			return InteractionResult.SUCCESS;
 		}
 
@@ -592,6 +572,36 @@ public final class Chores {
 				"Dirty " + Kit.SPONGE, ChatFormatting.DARK_GRAY, "Bin it."));
 		player.getInventory().add(Kit.make(Made.towel,
 				"Dirty " + Kit.TOWEL, ChatFormatting.DARK_GRAY, "Bin it."));
+	}
+
+	/** The front desk: your passport, and then good manners. */
+	public static void security(ServerPlayer player) {
+		if (Quests.on(player, 1, 1)) {
+			player.sendSystemMessage(Component.literal(
+					"Security: \"Here is your passport. It opens floor 1 and floor 5 "
+					+ "-- floor 5 is yours.\"").withStyle(ChatFormatting.WHITE));
+			Quests.finishPart(player);
+		} else {
+			player.sendSystemMessage(Component.literal("Security: \"Enjoy your stay.\"")
+					.withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	/** Charlie at the table: chapter 4, and the tools that go with it. */
+	public static void charlie(ServerPlayer player) {
+		if (Quests.on(player, 3, 1)) {
+			player.sendSystemMessage(Component.literal(
+					"Charlie: \"Hi, I am Charlie the manager. I will give you quests to "
+					+ "unlock floors, upgrade your passport, get new friends and do "
+					+ "activities. I have a quest for you.\"")
+					.withStyle(ChatFormatting.WHITE));
+			Quests.finishPart(player);
+			player.getInventory().add(Kit.plunger());
+			player.getInventory().add(Kit.mop());
+		} else {
+			player.sendSystemMessage(Component.literal("Charlie: \"Keep at it.\"")
+					.withStyle(ChatFormatting.GRAY));
+		}
 	}
 
 	private static void say(ServerPlayer player, String text) {

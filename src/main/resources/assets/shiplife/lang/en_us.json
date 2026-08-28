@@ -1,6 +1,7 @@
 {
   "block.shiplife.dish": "Dish",
   "block.shiplife.elevator_button": "Elevator Button",
+  "entity.shiplife.person": "Person",
   "generator.shiplife.ship_life": "Ship Life",
   "item.shiplife.ben_armour": "Ben Armour",
   "item.shiplife.ben_boots": "Ben Boots",

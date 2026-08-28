@@ -50,6 +50,15 @@ reward with the once-a-month wait taken off, as many times as you like.
 `/skipsidequest` finishes every side quest you are carrying and pays what they
 were worth.
 
+### The people
+
+Charlie, the two on the front desk, Ben and Izzy are people you can see: built
+the way you are -- a head, a body, two arms and two legs on the same model the
+player hangs on -- and told apart by their skin, which is what a person looks
+like. Right-click one and they talk. The skins are drawn by
+`tools/make_skins.py`, one 64x64 each, and picked out by the name over their
+head.
+
 ### The pictures
 
 The sponge, the towel, the weed whacker, the lawn mower, the dish and the

@@ -51,6 +51,7 @@ public class ShipLifeMod implements ModInitializer {
 	public void onInitialize() {
 		// First, before a world can be loaded: everything the game remembers.
 		State.register();
+		Person.register();
 		Made.register();
 		Ticker.register();
 		Slots.register();
@@ -154,6 +155,8 @@ public class ShipLifeMod implements ModInitializer {
 		boolean building = player.gameMode.getGameModeForPlayer() == GameType.CREATIVE;
 		if (!building) {
 			Ship.repair(level);
+			// The people who live here, put back if they are not about.
+			Person.everyone(level);
 		}
 
 		// Where the world puts people who have not chosen a bed. Set on every
