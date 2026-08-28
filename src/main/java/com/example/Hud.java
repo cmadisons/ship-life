@@ -124,7 +124,7 @@ public final class Hud {
 			blocks = (int) Math.round(Math.sqrt(player.distanceToSqr(
 					x + 0.5, y, z + 0.5)));
 		}
-		String event = Cal.eventToday();
+		String event = Events.running(player);
 		return String.join("|",
 				quest == null ? "" : quest.name(),
 				todo,

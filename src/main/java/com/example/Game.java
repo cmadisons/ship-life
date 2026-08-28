@@ -117,7 +117,7 @@ public abstract class Game {
 	 * event -- there is nothing to play, you just come in that weekend.
 	 */
 	protected void win(int tickets, String why) {
-		if ("Summer Break".equals(Cal.eventToday())) {
+		if ("Summer Break".equals(Events.running(player))) {
 			tickets *= 2;
 			why = why + ", doubled for Summer Break";
 		}

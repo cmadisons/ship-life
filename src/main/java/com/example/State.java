@@ -40,7 +40,7 @@ public final class State {
 	 */
 	public static void register() {
 		// Touching the class is the point; this line is just proof it happened.
-		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 24);
+		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 26);
 	}
 
 	private static <T> AttachmentType<T> of(String name, T start, Codec<T> codec) {
@@ -109,6 +109,9 @@ public final class State {
 
 	/** The four quests running today, as "stat:target:amount" four times over. */
 	public static final AttachmentType<String> QUEST_DAY = of("quest_day", "", Codec.STRING);
+
+	/** The event a Go To Event Star put on, as "name:day". Empty for none. */
+	public static final AttachmentType<String> STAR_EVENT = of("star_event", "", Codec.STRING);
 
 	/** Which floors your passport opens, one bit per floor. */
 	public static final AttachmentType<Integer> FLOORS = of("floors", 0, Codec.INT);
@@ -196,6 +199,14 @@ public final class State {
 
 	public static void questDay(ServerPlayer player, String set) {
 		player.setAttached(QUEST_DAY, set);
+	}
+
+	public static String starEvent(ServerPlayer player) {
+		return player.getAttachedOrCreate(STAR_EVENT);
+	}
+
+	public static void starEvent(ServerPlayer player, String set) {
+		player.setAttached(STAR_EVENT, set);
 	}
 
 	public static int quest(ServerPlayer player) {

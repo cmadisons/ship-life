@@ -48,9 +48,7 @@ public final class Book {
 				State.event(player) + " event tickets",
 				"",
 				Cal.date(),
-				Cal.eventToday() == null
-						? "No event today."
-						: "Today: " + Cal.eventToday()));
+				"Today: " + Events.running(player)));
 
 		// One quest per slot along the middle two rows.
 		for (int index = 0; index < Quests.ALL.length && index < 14; index++) {

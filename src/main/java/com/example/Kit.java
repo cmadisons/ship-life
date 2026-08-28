@@ -35,6 +35,7 @@ public final class Kit {
 	public static final String MEAL = "Buffet Plate";
 	public static final String ARMOUR = "Ben's Armour";
 	public static final String BOMB = "Ben's Bomb";
+	public static final String STAR = "Go To Event Star";
 	public static final String PENNY = "Penny";
 
 	public static ItemStack make(Item item, String name, ChatFormatting colour, String... lore) {
@@ -145,6 +146,14 @@ public final class Kit {
 		return make(Items.GOLD_NUGGET, PENNY, ChatFormatting.GOLD,
 				"One cent.",
 				"The last of your hundred dollars.");
+	}
+
+	/** The one-use star off floor 7. {@link Star} is what it does. */
+	public static ItemStack star() {
+		return make(Items.NETHER_STAR, STAR, ChatFormatting.AQUA,
+				"Right-click to pick an event.",
+				"It is on for the rest of the day.",
+				"One use.");
 	}
 
 	public static ItemStack mop() {

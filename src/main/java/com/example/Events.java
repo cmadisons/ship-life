@@ -103,7 +103,7 @@ public final class Events {
 			page.setItem(slot, filler.copy());
 		}
 
-		String today = Cal.eventToday();
+		String today = running(player);
 		page.setItem(4, Book.entry(Items.CLOCK, Cal.date(), ChatFormatting.AQUA,
 				today == null ? "No event today." : "Today: " + today,
 				"A day is 20 real minutes.",
@@ -131,26 +131,48 @@ public final class Events {
 				Component.literal("Events -- " + Cal.weekday())));
 	}
 
-	/** Is there something to walk into, or does the event just happen to you? */
-	private static boolean playable(String name) {
-		return !name.equals("Summer Break");
+	/**
+	 * What is on for this player.
+	 *
+	 * Normally that is whatever day it is, but a Go To Event Star puts an
+	 * event of your choosing on for the rest of the day -- and it has to be
+	 * the rest of the day rather than the one visit, because Summer Break is
+	 * not something you visit at all.
+	 */
+	public static String running(ServerPlayer player) {
+		String set = State.starEvent(player);
+		if (!set.isEmpty()) {
+			int mark = set.lastIndexOf(':');
+			if (mark > 0 && parse(set.substring(mark + 1)) == Cal.dayNumber()) {
+				return set.substring(0, mark);
+			}
+			// Yesterday's star. It has had its day.
+			State.starEvent(player, "");
+		}
+		return Cal.eventToday();
 	}
 
-	private static void click(ServerPlayer player, int slot) {
-		if (slot == 49) {
-			player.closeContainer();
-			return;
+	private static long parse(String number) {
+		try {
+			return Long.parseLong(number);
+		} catch (NumberFormatException wrong) {
+			return -1;
 		}
-		int index = slot - 20;
-		if (index < 0 || index >= ALL.length) {
-			return;
-		}
-		String name = ALL[index].name();
-		if (!name.equals(Cal.eventToday())) {
-			player.sendSystemMessage(Component.literal(name + " is not on today. "
-					+ ALL[index].when() + ".").withStyle(ChatFormatting.GRAY));
-			return;
-		}
+	}
+
+	/** Put an event on for the rest of today. What the star buys. */
+	public static void put(ServerPlayer player, String name) {
+		State.starEvent(player, name + ":" + Cal.dayNumber());
+	}
+
+	/**
+	 * Go in to whatever is on.
+	 *
+	 * The board and the star both end up here, so an event started with a
+	 * star is the same event in every way that matters -- it pays the same and
+	 * it opens floor 10 the same.
+	 */
+	public static void start(ServerPlayer player, String name) {
 		// Turning up is enough at every event but Quest Day. That one is on
 		// most days, so walking in and walking out again would hand you floor
 		// 10 for nothing -- there you have to finish one of the four.
@@ -169,6 +191,29 @@ public final class Events {
 					name + " is on, but it is not built yet.")
 					.withStyle(ChatFormatting.GRAY));
 		}
+	}
+
+	/** Is there something to walk into, or does the event just happen to you? */
+	private static boolean playable(String name) {
+		return !name.equals("Summer Break");
+	}
+
+	private static void click(ServerPlayer player, int slot) {
+		if (slot == 49) {
+			player.closeContainer();
+			return;
+		}
+		int index = slot - 20;
+		if (index < 0 || index >= ALL.length) {
+			return;
+		}
+		String name = ALL[index].name();
+		if (!name.equals(running(player))) {
+			player.sendSystemMessage(Component.literal(name + " is not on today. "
+					+ ALL[index].when() + ".").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		start(player, name);
 	}
 
 	private static net.minecraft.world.item.Item icon(String name) {

@@ -102,7 +102,7 @@ public final class ArcadePackets {
 
 	/** Pay arcade tickets, doubled if it is Summer Break. */
 	private static void pay(ServerPlayer player, int tickets, String why) {
-		if ("Summer Break".equals(Cal.eventToday())) {
+		if ("Summer Break".equals(Events.running(player))) {
 			tickets *= 2;
 			why = why + ", doubled for Summer Break";
 			// Summer Break is an event you attend by turning up at the arcade.

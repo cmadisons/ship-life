@@ -135,7 +135,8 @@ public final class Shops {
 				hasFloors ? "Already yours." : "Click to buy."));
 		page.setItem(22, Book.entry(Items.NETHER_STAR, "Go To Event Star",
 				ChatFormatting.AQUA,
-				"One use. Skip straight to any event you pick.",
+				"One use. Right-click it and pick any event --",
+				"it is then on for the rest of the day.",
 				STAR_COST + " event tickets",
 				"Click to buy."));
 		page.setItem(24, Book.entry(Items.EXPERIENCE_BOTTLE, "x2.5 Tickets",
@@ -167,9 +168,10 @@ public final class Shops {
 			}
 			case 22 -> {
 				if (spend(player, STAR_COST)) {
-					player.getInventory().add(Kit.make(Items.NETHER_STAR,
-							"Go To Event Star", ChatFormatting.AQUA,
-							"One use. Right-click to pick an event."));
+					player.getInventory().add(Kit.star());
+					player.sendSystemMessage(Component.literal(
+							"Right-click the star to pick an event.")
+							.withStyle(ChatFormatting.AQUA));
 					player.closeContainer();
 				}
 			}
