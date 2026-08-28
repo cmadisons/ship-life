@@ -44,7 +44,7 @@ public final class Floors {
 			case 11, 12, 13 -> "1000 event tickets, all three";
 			case 14 -> "the 4.9% reward on floor 11";
 			case 15 -> "upgrade your passport on floor 14";
-			default -> "clear wave 2 and a boss, or clear wave 3";
+			default -> "1500 event tickets paid, 6 bombs used, wave 3 and a boss";
 		};
 	}
 }

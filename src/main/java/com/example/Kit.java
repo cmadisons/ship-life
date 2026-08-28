@@ -36,6 +36,9 @@ public final class Kit {
 	public static final String ARMOUR = "Ben's Armour";
 	public static final String BOMB = "Ben's Bomb";
 	public static final String STAR = "Go To Event Star";
+	public static final String BOOTS = "Izzy's Boots";
+	public static final String HELMET = "Izzy's Helmet";
+	public static final String LEGGINGS = "Izzy's Leggings";
 	public static final String PENNY = "Penny";
 
 	public static ItemStack make(Item item, String name, ChatFormatting colour, String... lore) {
@@ -146,6 +149,34 @@ public final class Kit {
 		return make(Items.GOLD_NUGGET, PENNY, ChatFormatting.GOLD,
 				"One cent.",
 				"The last of your hundred dollars.");
+	}
+
+	/**
+	 * The rest of the set, from Izzy on floor 16.
+	 *
+	 * Same leaves as Ben's coat and the same job: every piece you are wearing
+	 * keeps a tenth of the hit off you and banks it, so the whole set stops
+	 * four tenths of everything and hands it all to your next swing.
+	 */
+	public static ItemStack boots() {
+		return piece(Made.benBoots, BOOTS);
+	}
+
+	public static ItemStack helmet() {
+		return piece(Made.benHelmet, HELMET);
+	}
+
+	public static ItemStack leggings() {
+		return piece(Made.benLeggings, LEGGINGS);
+	}
+
+	private static ItemStack piece(net.minecraft.world.item.Item item, String name) {
+		ItemStack made = make(item, name, ChatFormatting.GREEN,
+				"A tenth of every hit does not land.",
+				"What it stops goes onto your next swing.",
+				"From Izzy, on floor 16.");
+		made.set(DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
+		return made;
 	}
 
 	/** The one-use star off floor 7. {@link Star} is what it does. */

@@ -154,24 +154,43 @@ public final class Fight {
 		return false;
 	}
 
+	/** What floor 16 asks for, all four of them. */
+	public static final int SIXTEEN_TICKETS = 1500;
+	public static final int SIXTEEN_BOMBS = 6;
+	public static final int SIXTEEN_WAVES = 3;
+
 	/**
-	 * Floor 16 opens on the fighting, two ways round.
+	 * Floor 16 opens on four things at once.
 	 *
-	 * Two waves and a boss, or three waves and no boss at all -- so the room
-	 * is reachable whether you took to the bosses or stuck to the button on
-	 * floor 9.
+	 * Fifteen hundred event tickets paid out, six of Ben's bombs used, wave
+	 * three cleared and a boss put down -- so it is the floor you get to by
+	 * having played all of it, not by grinding one thing.
+	 *
+	 * Called from everywhere any of the four can change, because the one that
+	 * finishes the set is as likely to be a purchase as a kill.
 	 */
-	private static void openSixteen(ServerPlayer player) {
+	public static void openSixteen(ServerPlayer player) {
 		if (State.hasFloor(player, 16)) {
 			return;
 		}
-		int waves = State.tally(player, State.WAVES);
-		int bosses = State.tally(player, State.BOSSES);
-		if (waves >= 3 || (waves >= 2 && bosses >= 1)) {
-			State.unlock(player, 16);
-			player.sendSystemMessage(Component.literal(
-					"Floor 16 is open.").withStyle(ChatFormatting.AQUA));
+		if (State.tally(player, State.WAVES) < SIXTEEN_WAVES
+				|| State.tally(player, State.BOSSES) < 1
+				|| State.tally(player, State.EVENT_SPENT) < SIXTEEN_TICKETS
+				|| State.tally(player, State.BOMBS_USED) < SIXTEEN_BOMBS) {
+			return;
 		}
+		State.unlock(player, 16);
+		player.sendSystemMessage(Component.literal(
+				"Floor 16 is open. Izzy lives up there.")
+				.withStyle(ChatFormatting.AQUA));
+	}
+
+	/** How far off floor 16 you are, in words, for the book to show. */
+	public static String sixteenLeft(ServerPlayer player) {
+		return State.tally(player, State.EVENT_SPENT) + "/" + SIXTEEN_TICKETS + " tickets paid, "
+				+ State.tally(player, State.BOMBS_USED) + "/" + SIXTEEN_BOMBS + " bombs used, "
+				+ State.tally(player, State.WAVES) + "/" + SIXTEEN_WAVES + " waves, "
+				+ State.tally(player, State.BOSSES) + "/1 boss";
 	}
 
 	/** One wave on floor 9, harder each time. */

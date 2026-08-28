@@ -40,6 +40,9 @@ public final class Made {
 	public static Item plunger;
 	public static Item bomb;
 	public static Item benArmour;
+	public static Item benBoots;
+	public static Item benHelmet;
+	public static Item benLeggings;
 
 	/**
 	 * The picture the game uses for Ben's armour once it is on you.
@@ -57,7 +60,11 @@ public final class Made {
 	private static final net.minecraft.world.item.equipment.ArmorMaterial LEAF =
 			new net.minecraft.world.item.equipment.ArmorMaterial(
 					15,
-					java.util.Map.of(net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 6),
+					java.util.Map.of(
+							net.minecraft.world.item.equipment.ArmorType.HELMET, 3,
+							net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 6,
+							net.minecraft.world.item.equipment.ArmorType.LEGGINGS, 5,
+							net.minecraft.world.item.equipment.ArmorType.BOOTS, 3),
 					9,
 					net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_LEATHER,
 					1.0f,
@@ -76,7 +83,12 @@ public final class Made {
 		plunger = item("plunger");
 		// Ben hands you three at once, so this one has to stack.
 		bomb = item("bomb", 8);
-		benArmour = armour("ben_armour");
+		benArmour = armour("ben_armour",
+				net.minecraft.world.item.equipment.ArmorType.CHESTPLATE);
+		benBoots = armour("ben_boots", net.minecraft.world.item.equipment.ArmorType.BOOTS);
+		benHelmet = armour("ben_helmet", net.minecraft.world.item.equipment.ArmorType.HELMET);
+		benLeggings = armour("ben_leggings",
+				net.minecraft.world.item.equipment.ArmorType.LEGGINGS);
 
 		// The dish is china: it breaks by hand and it is not worth a tool.
 		dish = block("dish", 0.4f, SoundType.GLASS);
@@ -99,12 +111,11 @@ public final class Made {
 	}
 
 	/** A chestplate you can actually wear, with its own worn picture. */
-	private static Item armour(String id) {
+	private static Item armour(String id, net.minecraft.world.item.equipment.ArmorType type) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, ShipLifeMod.id(id));
 		Item made = Registry.register(BuiltInRegistries.ITEM, key,
 				new Item(new Item.Properties().setId(key)
-						.humanoidArmor(LEAF,
-								net.minecraft.world.item.equipment.ArmorType.CHESTPLATE)));
+						.humanoidArmor(LEAF, type)));
 		ITEMS.put(id, made);
 		return made;
 	}

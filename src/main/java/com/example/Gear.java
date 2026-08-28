@@ -91,9 +91,27 @@ public final class Gear {
 
 	// ----------------------------------------------------------------- armour
 
-	/** Are they wearing Ben's armour? */
-	public static boolean wearing(ServerPlayer player) {
-		return Kit.is(player.getItemBySlot(EquipmentSlot.CHEST), Kit.ARMOUR);
+	/**
+	 * How many pieces of the set they have on.
+	 *
+	 * Each one keeps a tenth of the hit off you, so the coat on its own stops
+	 * a tenth and the whole set stops four.
+	 */
+	public static int wearing(ServerPlayer player) {
+		int pieces = 0;
+		if (Kit.is(player.getItemBySlot(EquipmentSlot.CHEST), Kit.ARMOUR)) {
+			pieces++;
+		}
+		if (Kit.is(player.getItemBySlot(EquipmentSlot.FEET), Kit.BOOTS)) {
+			pieces++;
+		}
+		if (Kit.is(player.getItemBySlot(EquipmentSlot.HEAD), Kit.HELMET)) {
+			pieces++;
+		}
+		if (Kit.is(player.getItemBySlot(EquipmentSlot.LEGS), Kit.LEGGINGS)) {
+			pieces++;
+		}
+		return pieces;
 	}
 
 	public static float charge(ServerPlayer player) {
@@ -118,9 +136,9 @@ public final class Gear {
 			return;
 		}
 
-		// A hit on you: the armour keeps a tenth of it off and remembers it.
-		if (hurt instanceof ServerPlayer player && wearing(player)) {
-			float stopped = taken * STOPS;
+		// A hit on you: every piece keeps a tenth of it off and remembers it.
+		if (hurt instanceof ServerPlayer player && wearing(player) > 0) {
+			float stopped = taken * STOPS * wearing(player);
 			player.heal(stopped);
 			bank(player, stopped);
 			return;
@@ -173,6 +191,7 @@ public final class Gear {
 			}
 			drop(who, level);
 			player.getItemInHand(hand).shrink(1);
+			used(who);
 			return InteractionResult.SUCCESS;
 		});
 
@@ -189,6 +208,7 @@ public final class Gear {
 					who.getUUID(), level.getGameTime()));
 			player.getItemInHand(hand).shrink(1);
 			announce(who, level, Vec3.atCenterOf(hit.getBlockPos().above()));
+			used(who);
 			return InteractionResult.SUCCESS;
 		});
 	}
@@ -198,6 +218,12 @@ public final class Gear {
 		Vec3 where = player.position();
 		CLOUDS.add(new Cloud(level, where, player.getUUID(), level.getGameTime()));
 		announce(player, level, where);
+	}
+
+	/** A bomb has gone down. Six of them is one of floor 16's four conditions. */
+	private static void used(ServerPlayer player) {
+		State.add(player, State.BOMBS_USED, 1);
+		Fight.openSixteen(player);
 	}
 
 	private static void announce(ServerPlayer player, ServerLevel level, Vec3 where) {

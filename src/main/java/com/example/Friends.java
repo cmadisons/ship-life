@@ -88,12 +88,16 @@ public final class Friends {
 		return true;
 	}
 
+	/** What the rest of Ben's set costs off Izzy. */
+	public static final int SET_COST = 100;
+
 	/**
 	 * Izzy, on floor 16.
 	 *
-	 * The second friend, and the floor you fight your way to rather than pay
-	 * for. What she is actually for has not been decided yet, so for now she
-	 * knows who you are and how the fighting has been going.
+	 * Ben has the coat; Izzy has the boots that go with it, and she hands
+	 * those over the first time you knock. The helmet and the leggings that
+	 * finish the set are a hundred event tickets, which is what her counter
+	 * is for.
 	 */
 	private static void izzy(ServerPlayer player, ServerLevel level) {
 		level.playSound(null, Places.IZZY, SoundEvents.NOTE_BLOCK_BELL.value(),
@@ -107,6 +111,19 @@ public final class Friends {
 					.withStyle(ChatFormatting.WHITE));
 			player.sendSystemMessage(Component.literal("Izzy is your second friend.")
 					.withStyle(ChatFormatting.LIGHT_PURPLE));
+			bootsFor(player);
+			return;
+		}
+
+		// Anyone who met her before she had anything to give still gets them.
+		if (bootsFor(player)) {
+			return;
+		}
+
+		// The rest of the set, if they have not got it yet.
+		if (!Kit.is(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD),
+				Kit.HELMET)) {
+			counter(player, true);
 			return;
 		}
 
@@ -125,6 +142,22 @@ public final class Friends {
 				.withStyle(ChatFormatting.WHITE));
 	}
 
+	/** The boots, handed over once. */
+	private static boolean bootsFor(ServerPlayer player) {
+		if (!State.firstTime(player, 3)) {
+			return false;
+		}
+		player.sendSystemMessage(Component.literal(
+				"Izzy: \"Ben gave you the coat, did he. These go with it -- "
+				+ "same leaves, same trick. The hat and the legs I want "
+				+ SET_COST + " event tickets for.\"")
+				.withStyle(ChatFormatting.WHITE));
+		give(player, Kit.boots());
+		player.sendSystemMessage(Component.literal("Izzy gave you the boots.")
+				.withStyle(ChatFormatting.LIGHT_PURPLE));
+		return true;
+	}
+
 	/** What three more of his bombs cost. */
 	public static final int BOMBS_COST = 250;
 
@@ -140,8 +173,12 @@ public final class Friends {
 		return found;
 	}
 
-	/** Ben's counter: three more bombs, and nothing else. */
 	private static void counter(ServerPlayer player) {
+		counter(player, false);
+	}
+
+	/** Ben's counter, or Izzy's -- three more bombs, or the rest of the set. */
+	private static void counter(ServerPlayer player, boolean izzy) {
 		// Six rows, because the menu it opens in is a chest.
 		net.minecraft.world.SimpleContainer page = new net.minecraft.world.SimpleContainer(54);
 		net.minecraft.world.item.ItemStack filler = Game.cell(
@@ -149,21 +186,33 @@ public final class Friends {
 		for (int slot = 0; slot < 54; slot++) {
 			page.setItem(slot, filler.copy());
 		}
-		boolean afford = State.event(player) >= BOMBS_COST;
-		page.setItem(22, Book.entry(Made.bomb, "3 of Ben's Bombs",
-				afford ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
-				"Green gas: 10 a second off every",
-				"enemy standing in it.",
-				"It stays until they are all dead.",
-				"",
-				BOMBS_COST + " event tickets",
-				"You have " + State.event(player) + ".",
-				afford ? "Click to buy." : "Not enough yet."));
+		int cost = izzy ? SET_COST : BOMBS_COST;
+		boolean afford = State.event(player) >= cost;
+		page.setItem(22, izzy
+				? Book.entry(Made.benHelmet, "The Rest of the Set",
+						afford ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+						"The helmet and the leggings.",
+						"Every piece you wear stops another",
+						"tenth of the hit and banks it.",
+						"",
+						cost + " event tickets",
+						"You have " + State.event(player) + ".",
+						afford ? "Click to buy." : "Not enough yet.")
+				: Book.entry(Made.bomb, "3 of Ben's Bombs",
+						afford ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+						"Green gas: 10 a second off every",
+						"enemy standing in it.",
+						"It stays until they are all dead.",
+						"",
+						cost + " event tickets",
+						"You have " + State.event(player) + ".",
+						afford ? "Click to buy." : "Not enough yet."));
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));
 		player.openMenu(new net.minecraft.world.SimpleMenuProvider(
-				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page, Friends::buy),
-				Component.literal("Ben's Bombs")));
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
+						izzy ? Friends::buySet : Friends::buy),
+				Component.literal(izzy ? "Izzy's Armoury" : "Ben's Bombs")));
 	}
 
 	private static void buy(ServerPlayer player, int slot) {
@@ -180,9 +229,32 @@ public final class Friends {
 					.withStyle(ChatFormatting.RED));
 			return;
 		}
-		State.event(player, -BOMBS_COST);
+		State.spendEvent(player, BOMBS_COST);
 		give(player, Kit.bomb(3));
 		player.sendSystemMessage(Component.literal("Ben: \"Three more. Stand back this time.\"")
+				.withStyle(ChatFormatting.WHITE));
+		player.closeContainer();
+	}
+
+	private static void buySet(ServerPlayer player, int slot) {
+		if (slot == 49) {
+			player.closeContainer();
+			return;
+		}
+		if (slot != 22) {
+			return;
+		}
+		if (State.event(player) < SET_COST) {
+			player.sendSystemMessage(Component.literal("That is " + SET_COST
+					+ " event tickets and you have " + State.event(player) + ".")
+					.withStyle(ChatFormatting.RED));
+			return;
+		}
+		State.spendEvent(player, SET_COST);
+		give(player, Kit.helmet());
+		give(player, Kit.leggings());
+		player.sendSystemMessage(Component.literal(
+				"Izzy: \"That is the lot. Wear all four and nothing much gets through.\"")
 				.withStyle(ChatFormatting.WHITE));
 		player.closeContainer();
 	}

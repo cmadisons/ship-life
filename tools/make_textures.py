@@ -206,6 +206,63 @@ ARMOUR = [
     "................",
 ]
 
+BOOTS = [
+    "................",
+    "................",
+    "................",
+    "................",
+    "..cvvc....cvvc..",
+    ".cveevc..cveevc.",
+    ".cvvvvc..cvvvvc.",
+    ".cvevvc..cvvevc.",
+    ".cvvvvc..cvvvvc.",
+    "ccvvvvcc.cvvvvcc",
+    "cvvvvvvccvvvvvvc",
+    "cevvvvvccevvvvvc",
+    "cccccccc.ccccccc",
+    "................",
+    "................",
+    "................",
+]
+
+HELMET = [
+    "................",
+    "................",
+    "....cccccccc....",
+    "..ccveevvevcc...",
+    ".ccvvvvvvvvvcc..",
+    ".cvvevvvvvevvc..",
+    ".cvvvvvvvvvvvc..",
+    ".cvevvvvvvvvec..",
+    ".cvvvvvvvvvvvc..",
+    ".cvvc.cccc.cvc..",
+    ".cvvc......cvc..",
+    ".cevc......cec..",
+    ".ccc........cc..",
+    "................",
+    "................",
+    "................",
+]
+
+LEGGINGS = [
+    "................",
+    "................",
+    "..cccccccccccc..",
+    ".cveevvvvvveevc.",
+    ".cvvvvvvvvvvvvc.",
+    ".cvvevvvvvvevvc.",
+    ".cvvvvvvvvvvvvc.",
+    ".cvvvvcccvvvvvc.",
+    ".cvvvc...cvvvvc.",
+    ".cevvc...cvvevc.",
+    ".cvvvc...cvvvvc.",
+    ".cvvvc...cvvvvc.",
+    ".ccecc...ccecc..",
+    "................",
+    "................",
+    "................",
+]
+
 BUTTON = [
     "................",
     "................",
@@ -241,6 +298,9 @@ ITEMS = {
     "plunger": PLUNGER,
     "bomb": BOMB,
     "ben_armour": ARMOUR,
+    "ben_boots": BOOTS,
+    "ben_helmet": HELMET,
+    "ben_leggings": LEGGINGS,
 }
 
 BLOCKS = {

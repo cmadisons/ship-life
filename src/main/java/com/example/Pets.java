@@ -228,7 +228,7 @@ public final class Pets {
 					+ State.event(player) + ".").withStyle(ChatFormatting.RED));
 			return;
 		}
-		State.event(player, -Shops.PET_FOOD_COST);
+		State.spendEvent(player, Shops.PET_FOOD_COST);
 
 		int now = fed(player, kind) + 1;
 		java.util.List<String> parts = new java.util.ArrayList<>();

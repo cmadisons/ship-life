@@ -40,7 +40,7 @@ public final class State {
 	 */
 	public static void register() {
 		// Touching the class is the point; this line is just proof it happened.
-		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 26);
+		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 28);
 	}
 
 	private static <T> AttachmentType<T> of(String name, T start, Codec<T> codec) {
@@ -110,6 +110,10 @@ public final class State {
 	/** The four quests running today, as "stat:target:amount" four times over. */
 	public static final AttachmentType<String> QUEST_DAY = of("quest_day", "", Codec.STRING);
 
+	/** Event tickets you have paid out over the whole game, and bombs used. */
+	public static final AttachmentType<Integer> EVENT_SPENT = of("event_spent", 0, Codec.INT);
+	public static final AttachmentType<Integer> BOMBS_USED = of("bombs_used", 0, Codec.INT);
+
 	/** The event a Go To Event Star put on, as "name:day". Empty for none. */
 	public static final AttachmentType<String> STAR_EVENT = of("star_event", "", Codec.STRING);
 
@@ -143,6 +147,19 @@ public final class State {
 
 	public static void event(ServerPlayer player, int change) {
 		player.setAttached(EVENT, event(player) + change);
+	}
+
+	/**
+	 * Pay event tickets for something.
+	 *
+	 * Losing them at the Spooky Shooter is not paying, so that still goes
+	 * through {@link #event}; this is for things you buy, and the running
+	 * total is one of the four things floor 16 asks for.
+	 */
+	public static void spendEvent(ServerPlayer player, int tickets) {
+		event(player, -tickets);
+		add(player, EVENT_SPENT, tickets);
+		Fight.openSixteen(player);
 	}
 
 	public static int best(ServerPlayer player) {

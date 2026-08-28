@@ -432,7 +432,7 @@ public final class Shops {
 					.withStyle(ChatFormatting.RED));
 			return false;
 		}
-		State.event(player, -tickets);
+		State.spendEvent(player, tickets);
 		return true;
 	}
 
