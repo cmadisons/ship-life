@@ -157,9 +157,13 @@ public class ShipLifeMod implements ModInitializer {
 		boolean building = player.gameMode.getGameModeForPlayer() == GameType.CREATIVE;
 		if (!building) {
 			Ship.repair(level);
-			// The people who live here, put back if they are not about.
-			Person.everyone(level);
 		}
+
+		// Everything new since this world was made, in every world -- creative
+		// too, because a world you are building in still wants the floors and
+		// the people the mod has grown since. This one only ever adds.
+		Ship.catchUp(level);
+		Person.everyone(level);
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this

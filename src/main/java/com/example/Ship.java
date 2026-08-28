@@ -561,6 +561,53 @@ public final class Ship {
 	 * Run on every join, so a world made before the bushes were persistent
 	 * gets its bushes back rather than needing to be started again.
 	 */
+	/**
+	 * Bring a world built by an older Ship Life up to this one.
+	 *
+	 * This runs on every join in every world, creative included, and it only
+	 * ever adds: a floor whose shell was never laid gets laid, a room whose
+	 * fittings are not there gets them, ship 2 comes down, and the people are
+	 * put back. Nothing that is already there is touched, so a wall you moved
+	 * in creative stays moved and a world from before floor 16 existed gets
+	 * floor 16 rather than needing to be started again.
+	 */
+	public static void catchUp(ServerLevel level) {
+		// Any floor that was never built at all. The centre of a floor's own
+		// floor is concrete in every room there is, so air there means the
+		// storey does not exist yet.
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			BlockPos middle = new BlockPos(Places.SHIP_X, Places.floorY(floor), Places.SHIP_Z);
+			if (level.getBlockState(middle).isAir()) {
+				buildFloor(level, floor);
+				ShipLifeMod.LOGGER.info("Built floor {} into an older world.", floor);
+			}
+		}
+
+		// Rooms whose fittings came after the world did. Each one is asked
+		// for by a block that only that room has.
+		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {
+			furnishBensRoom(level);
+		}
+		if (!level.getBlockState(Places.IZZY).is(Blocks.BIRCH_DOOR)) {
+			furnishIzzysRoom(level);
+		}
+		if (!level.getBlockState(Places.FIGHT_BUTTON).is(Blocks.REDSTONE_BLOCK)) {
+			furnishFighting(level);
+		}
+		if (!level.getBlockState(Places.PASSPORT_DESK).is(Blocks.LECTERN)) {
+			furnishShops(level);
+		}
+		if (!level.getBlockState(Places.panel(Places.TOP_FLOOR)).is(Made.elevatorButton)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				set(level, Places.panel(floor), Made.elevatorButton);
+				set(level, Places.panel(floor).above(), Blocks.REDSTONE_LAMP);
+			}
+		}
+
+		// Ship 2 came out of the lift, so it comes out of the world.
+		clearSecond(level);
+	}
+
 	public static void repair(ServerLevel level) {
 		// Ship 2 came out of the lift, so it comes out of the world.
 		clearSecond(level);

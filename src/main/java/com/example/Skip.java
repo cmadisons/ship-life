@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * The commands: /shiplife, /11reward and /skipsidequest.
+ * The commands: /shiplife, /11reward, /skipsidequest and /allfloors.
  *
  * /shiplife starts you at the ship instead of at the sink.
  *
@@ -52,6 +52,9 @@ public final class Skip {
 			// Enough of both to see what every counter on the ship sells.
 			dispatcher.register(Commands.literal("10000tickets")
 					.executes(context -> tickets(context.getSource())));
+			// The same as /shiplife allfloors, typed the way you would guess.
+			dispatcher.register(Commands.literal("allfloors")
+					.executes(context -> allFloors(context.getSource())));
 		});
 	}
 
@@ -112,6 +115,9 @@ public final class Skip {
 		if (!Kit.is(player.getInventory().getItem(Slots.PASSPORT_SLOT), Kit.PASSPORT)) {
 			player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
 		}
+		// Floor 15 is meant to come with the passport upgrade, so a passport
+		// that does not know about it would leave that floor half open.
+		player.setAttached(State.SHIPS, 2);
 
 		if (opened == 0) {
 			source.sendFailure(Component.literal("Every floor is already open."));
