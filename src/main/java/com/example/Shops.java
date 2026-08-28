@@ -392,17 +392,19 @@ public final class Shops {
 	// ------------------------------------------- floor 14: the passport desk
 
 	/**
-	 * Two hundred and fifty tickets puts a ship number on your passport.
+	 * Two hundred and fifty tickets upgrades your passport, and floor 15
+	 * comes with it.
 	 *
-	 * Ship 2 is this ship again, floor for floor, and the lift grows a ship
-	 * number beside the floor number. What is above floor 14 over there is
-	 * not built yet.
+	 * It used to put a second ship in the lift as well. That ship was this
+	 * one again floor for floor with nothing new on it, so the lift does not
+	 * offer it any more -- the upgrade is worth having for Ben.
 	 */
 	private static void upgradePassport(ServerPlayer player, ServerLevel level) {
 		if (State.tally(player, State.SHIPS) > 1) {
 			player.sendSystemMessage(Component.literal(
-					"Your passport already has Ship 2 on it. Pick the ship in the lift.")
+					"Your passport is already upgraded. Floor 15 is yours.")
 					.withStyle(ChatFormatting.GRAY));
+			State.unlock(player, 15);
 			return;
 		}
 		if (!spend(player, PASSPORT_COST)) {
@@ -414,9 +416,8 @@ public final class Shops {
 		State.unlock(player, 15);
 		Ship.buildSecond(level);
 		player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
-		player.sendSystemMessage(Component.literal(
-				"Your passport is upgraded: Ship 2, alongside this one. "
-				+ "The lift asks which ship now.").withStyle(ChatFormatting.LIGHT_PURPLE));
+		player.sendSystemMessage(Component.literal("Your passport is upgraded.")
+				.withStyle(ChatFormatting.LIGHT_PURPLE));
 		player.sendSystemMessage(Component.literal(
 				"Floor 15 came with it -- somebody called Ben lives up there.")
 				.withStyle(ChatFormatting.AQUA));

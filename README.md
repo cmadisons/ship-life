@@ -27,11 +27,11 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Ben, on floor 15** — the first friend, and the only one who hands you anything: his armour keeps a tenth of every hit off you and saves it for the next swing you land, and his three bombs put green gas on the floor that takes ten a second off everything hostile standing in it and does not lift until they are all dead. What the gas takes goes into the same bank the armour fills. Both are covered in plants -- the armour has its own worn picture, drawn like everything else by tools/make_textures.py. Run out of bombs and Ben sells you three more for 250 event tickets.
 - A **drawn heads-up display** — the star is out in the world where the quest is, through walls and through the floors of the ship, pinned to the edge of the screen with an arrow when it is behind you; the ship's clock, the date, your money and your tickets sit in the top-right corner.
 
-Ship 2 stands two hundred blocks east and is the same fourteen floors again. The
-lift grows a ship number once your passport has one, and crossing between them is
-a ride like any other.
+The lift does not offer a second ship any more. Ship 2 was this ship again floor
+for floor with nothing new on it, so the floor 14 upgrade buys floor 15 -- Ben --
+and nothing else.
 
-Still to build: whatever is above floor 15 on ship 2, the rest of the friends
+Still to build: the rest of the friends
 system -- Ben gives you his gear, but nobody has said what a friend is for after
 that -- and chapters past 4.
 
