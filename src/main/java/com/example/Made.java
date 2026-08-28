@@ -39,6 +39,31 @@ public final class Made {
 	public static Item lawnMower;
 	public static Item plunger;
 	public static Item bomb;
+	public static Item benArmour;
+
+	/**
+	 * The picture the game uses for Ben's armour once it is on you.
+	 *
+	 * Held in your hand an item is its own 16x16 picture, but worn it is a
+	 * separate sheet drawn over the body -- this is the name the game looks
+	 * that sheet up by, and assets/shiplife/equipment/ben_armour.json is what
+	 * it finds.
+	 */
+	private static final ResourceKey<net.minecraft.world.item.equipment.EquipmentAsset> LEAF_ASSET =
+			ResourceKey.create(net.minecraft.world.item.equipment.EquipmentAssets.ROOT_ID,
+					ShipLifeMod.id("ben_armour"));
+
+	/** Leaves and cloth: about as tough as iron, because Ben means it. */
+	private static final net.minecraft.world.item.equipment.ArmorMaterial LEAF =
+			new net.minecraft.world.item.equipment.ArmorMaterial(
+					15,
+					java.util.Map.of(net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 6),
+					9,
+					net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_LEATHER,
+					1.0f,
+					0.0f,
+					net.minecraft.tags.ItemTags.REPAIRS_LEATHER_ARMOR,
+					LEAF_ASSET);
 	public static Block dish;
 	public static Block elevatorButton;
 
@@ -51,6 +76,7 @@ public final class Made {
 		plunger = item("plunger");
 		// Ben hands you three at once, so this one has to stack.
 		bomb = item("bomb", 8);
+		benArmour = armour("ben_armour");
 
 		// The dish is china: it breaks by hand and it is not worth a tool.
 		dish = block("dish", 0.4f, SoundType.GLASS);
@@ -68,6 +94,17 @@ public final class Made {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, ShipLifeMod.id(id));
 		Item made = Registry.register(BuiltInRegistries.ITEM, key,
 				new Item(new Item.Properties().setId(key).stacksTo(stack)));
+		ITEMS.put(id, made);
+		return made;
+	}
+
+	/** A chestplate you can actually wear, with its own worn picture. */
+	private static Item armour(String id) {
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, ShipLifeMod.id(id));
+		Item made = Registry.register(BuiltInRegistries.ITEM, key,
+				new Item(new Item.Properties().setId(key)
+						.humanoidArmor(LEAF,
+								net.minecraft.world.item.equipment.ArmorType.CHESTPLATE)));
 		ITEMS.put(id, made);
 		return made;
 	}

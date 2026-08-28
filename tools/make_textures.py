@@ -49,6 +49,7 @@ STEEL = (176, 182, 196)
 STEEL_DK = (110, 116, 132)
 BLACK = (34, 36, 44)
 LIME = (140, 230, 110)
+LEAF_CLOTH = (74, 126, 62)
 
 # ---------------------------------------------------------------- the pictures
 
@@ -172,16 +173,36 @@ BOMB = [
     ".........e.e....",
     "..........ee....",
     ".........t......",
-    "........t.......",
-    "....nnnnn.......",
-    "...nnnnnnn......",
-    "..nnknnnnnn.....",
-    "..nknnnnnnn.....",
-    "..nnnnnnnnn.....",
-    "..cnnnnnnnc.....",
-    "...nnnnnnn......",
-    "....ccccc.......",
+    "....ccc.t.......",
+    "...cnnnce.......",
+    "..cnncnnnc......",
+    "..neknnncnn.....",
+    "..nknnecnnn.....",
+    "..cnnnnnncn.....",
+    "..cnennnnce.....",
+    "...cnnnncn......",
+    "....ccecc.......",
     "................",
+    "................",
+]
+
+
+ARMOUR = [
+    "................",
+    "..cc........cc..",
+    ".ceecccccccceec.",
+    ".cevvvvvvvvvvec.",
+    "cccvevvvvvevvccc",
+    "cevvvvvevvvvvvec",
+    "ceevvvvvvvvevvec",
+    "cccvvevvvvvvvccc",
+    ".cevvvvvevvvvec.",
+    ".cvvevvvvvvevc..",
+    ".cvvvvvvevvvvc..",
+    ".ceevvvvvvveec..",
+    "..cvvvvvvvvvc...",
+    "..cceccccceecc..",
+    "...cc.....cc....",
     "................",
 ]
 
@@ -209,7 +230,7 @@ PALETTE = {
     "w": WHITE, "d": WHITE_DK, "b": BLUE,
     "g": GREY, "s": GREY_LT, "k": GREY_DK,
     "l": STEEL, "t": WOOD, "r": RED, "a": LIME,
-    "x": RED_DK, "n": BLACK, "e": LIME, "c": GREEN,
+    "x": RED_DK, "n": BLACK, "e": LIME, "c": GREEN, "v": GREEN_DK,
 }
 
 ITEMS = {
@@ -219,12 +240,44 @@ ITEMS = {
     "lawn_mower": MOWER,
     "plunger": PLUNGER,
     "bomb": BOMB,
+    "ben_armour": ARMOUR,
 }
 
 BLOCKS = {
     "dish": DISH,
     "elevator_button": BUTTON,
 }
+
+
+def leafy(width, height):
+    """The armour as it looks on you: green cloth with leaves growing over it.
+
+    A worn armour layer is 64x32 and laid out like a skin, and only the parts
+    the model uses are ever seen -- so rather than pick those out by hand the
+    whole sheet is covered and the model takes what it needs. The leaves are
+    scattered by a fixed sum of the coordinates rather than at random, so the
+    picture comes out the same every time this is run.
+    """
+    grid = pixel.blank(width, height)
+    for y in range(height):
+        for x in range(width):
+            speck = (x * 73 + y * 151 + (x * y) % 17) % 23
+            if speck < 3:
+                colour = LIME
+            elif speck < 8:
+                colour = GREEN
+            elif speck < 12:
+                colour = GREEN_DK
+            else:
+                colour = LEAF_CLOTH
+            pixel.px(grid, x, y, colour)
+    # Vines running down it, so it reads as growing rather than as noise.
+    for y in range(height):
+        for x in ((y * 5) % width, (y * 11 + 7) % width):
+            pixel.px(grid, x, y, GREEN_DK)
+            if y % 3 == 0:
+                pixel.px(grid, x + 1, y, LIME)
+    return grid
 
 
 def draw(rows):
@@ -278,6 +331,20 @@ def main():
             }],
         })
         names["block.shiplife.%s" % name] = title(name)
+
+    # Ben's armour as it looks worn, plus the file that points the game at it.
+    pixel.write_png(
+        os.path.join(ASSETS, "textures/entity/equipment/humanoid/ben_armour.png"),
+        leafy(64, 32))
+    pixel.write_png(
+        os.path.join(ASSETS, "textures/entity/equipment/humanoid_leggings/ben_armour.png"),
+        leafy(64, 32))
+    write(os.path.join(ASSETS, "equipment/ben_armour.json"), {
+        "layers": {
+            "humanoid": [{"texture": "shiplife:ben_armour"}],
+            "humanoid_leggings": [{"texture": "shiplife:ben_armour"}],
+        },
+    })
 
     lang = os.path.join(ASSETS, "lang/en_us.json")
     existing = {}

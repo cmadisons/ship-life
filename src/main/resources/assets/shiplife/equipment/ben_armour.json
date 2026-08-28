@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "shiplife:ben_armour"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "shiplife:ben_armour"
+      }
+    ]
+  }
+}

@@ -83,6 +83,67 @@ public final class Friends {
 		return true;
 	}
 
+	/** What three more of his bombs cost. */
+	public static final int BOMBS_COST = 250;
+
+	/** How many of his bombs you are carrying. */
+	private static int bombsOn(ServerPlayer player) {
+		int found = 0;
+		for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+			net.minecraft.world.item.ItemStack stack = player.getInventory().getItem(slot);
+			if (Kit.is(stack, Kit.BOMB)) {
+				found += stack.getCount();
+			}
+		}
+		return found;
+	}
+
+	/** Ben's counter: three more bombs, and nothing else. */
+	private static void counter(ServerPlayer player) {
+		net.minecraft.world.SimpleContainer page = new net.minecraft.world.SimpleContainer(27);
+		net.minecraft.world.item.ItemStack filler = Game.cell(
+				net.minecraft.world.item.Items.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
+		for (int slot = 0; slot < 27; slot++) {
+			page.setItem(slot, filler.copy());
+		}
+		boolean afford = State.event(player) >= BOMBS_COST;
+		page.setItem(13, Book.entry(Made.bomb, "3 of Ben's Bombs",
+				afford ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+				"Green gas: 10 a second off every",
+				"enemy standing in it.",
+				"It stays until they are all dead.",
+				"",
+				BOMBS_COST + " event tickets",
+				"You have " + State.event(player) + ".",
+				afford ? "Click to buy." : "Not enough yet."));
+		page.setItem(22, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
+				ChatFormatting.RED, "Press Escape."));
+		player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page, Friends::buy),
+				Component.literal("Ben's Bombs")));
+	}
+
+	private static void buy(ServerPlayer player, int slot) {
+		if (slot == 22) {
+			player.closeContainer();
+			return;
+		}
+		if (slot != 13) {
+			return;
+		}
+		if (State.event(player) < BOMBS_COST) {
+			player.sendSystemMessage(Component.literal("That is " + BOMBS_COST
+					+ " event tickets and you have " + State.event(player) + ".")
+					.withStyle(ChatFormatting.RED));
+			return;
+		}
+		State.event(player, -BOMBS_COST);
+		give(player, Kit.bomb(3));
+		player.sendSystemMessage(Component.literal("Ben: \"Three more. Stand back this time.\"")
+				.withStyle(ChatFormatting.WHITE));
+		player.closeContainer();
+	}
+
 	/** Into the pack, or on the floor if there is no room for it. */
 	private static void give(ServerPlayer player, net.minecraft.world.item.ItemStack stack) {
 		if (!player.getInventory().add(stack)) {
@@ -108,6 +169,16 @@ public final class Friends {
 
 		// Anyone who met him before he had anything to give still gets it.
 		if (gift(player)) {
+			return;
+		}
+
+		// Out of bombs? Then that is what he is for today.
+		if (bombsOn(player) == 0) {
+			player.sendSystemMessage(Component.literal(
+					"Ben: \"Used them all, then. I can do you three more for "
+					+ BOMBS_COST + " event tickets.\"")
+					.withStyle(ChatFormatting.WHITE));
+			counter(player);
 			return;
 		}
 

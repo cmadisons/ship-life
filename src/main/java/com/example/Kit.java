@@ -117,17 +117,16 @@ public final class Kit {
 	}
 
 	/**
-	 * Ben's armour. Leather because leather takes a colour, and Ben's is green.
+	 * Ben's armour: a coat with plants growing all over it.
 	 *
 	 * What it does is not in the item at all -- {@link Gear} watches for it on
 	 * your chest and does the work.
 	 */
 	public static ItemStack armour() {
-		ItemStack coat = make(Items.LEATHER_CHESTPLATE, ARMOUR, ChatFormatting.GREEN,
+		ItemStack coat = make(Made.benArmour, ARMOUR, ChatFormatting.GREEN,
 				"A tenth of every hit does not land.",
 				"What it stops goes onto your next swing.",
 				"From Ben, on floor 15.");
-		coat.set(DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x4CAF50));
 		coat.set(DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
 		return coat;
 	}
