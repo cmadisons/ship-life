@@ -31,7 +31,10 @@ The lift does not offer a second ship any more. Ship 2 was this ship again floor
 for floor with nothing new on it, so the floor 14 upgrade buys floor 15 -- Ben --
 and nothing else.
 
-Still to build: the rest of the friends
+Floor 16 opens once you clear two waves and a boss, or three waves on their
+own. The room itself is an empty shell -- nobody has said what goes in it yet.
+
+Still to build: what goes on floor 16, the rest of the friends
 system -- Ben gives you his gear, but nobody has said what a friend is for after
 that -- and chapters past 4.
 

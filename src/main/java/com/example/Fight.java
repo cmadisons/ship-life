@@ -123,11 +123,54 @@ public final class Fight {
 		});
 	}
 
+	/**
+	 * Is there a fight in the way?
+	 *
+	 * Only if it is one you could walk to. A wave abandoned on floor 9 used
+	 * to lock the boss doors on floor 10 for the rest of the world's life,
+	 * which read as the bosses being broken -- so anything left in another
+	 * room is cleared out and the new fight starts.
+	 */
+	private static boolean inTheWay(ServerPlayer player) {
+		busy();
+		if (SPAWNED.isEmpty()) {
+			return false;
+		}
+		int floor = Places.floorAt(player.getY());
+		for (Mob mob : SPAWNED) {
+			if (Places.floorAt(mob.getY()) == floor) {
+				player.sendSystemMessage(Component.literal("Finish what is already in here first -- "
+						+ SPAWNED.size() + " left.").withStyle(ChatFormatting.GRAY));
+				return true;
+			}
+		}
+		clear();
+		return false;
+	}
+
+	/**
+	 * Floor 16 opens on the fighting, two ways round.
+	 *
+	 * Two waves and a boss, or three waves and no boss at all -- so the room
+	 * is reachable whether you took to the bosses or stuck to the button on
+	 * floor 9.
+	 */
+	private static void openSixteen(ServerPlayer player) {
+		if (State.hasFloor(player, 16)) {
+			return;
+		}
+		int waves = State.tally(player, State.WAVES);
+		int bosses = State.tally(player, State.BOSSES);
+		if (waves >= 3 || (waves >= 2 && bosses >= 1)) {
+			State.unlock(player, 16);
+			player.sendSystemMessage(Component.literal(
+					"Floor 16 is open.").withStyle(ChatFormatting.AQUA));
+		}
+	}
+
 	/** One wave on floor 9, harder each time. */
 	private static void wave(ServerPlayer player, ServerLevel level) {
-		if (!SPAWNED.isEmpty()) {
-			player.sendSystemMessage(Component.literal("Finish what is already in here first.")
-					.withStyle(ChatFormatting.GRAY));
+		if (inTheWay(player)) {
 			return;
 		}
 		int number = State.tally(player, State.WAVES) + 1;
@@ -151,9 +194,7 @@ public final class Fight {
 
 	/** Arachnes, or the dragon. */
 	private static void boss(ServerPlayer player, ServerLevel level, boolean arachnes) {
-		if (!SPAWNED.isEmpty()) {
-			player.sendSystemMessage(Component.literal("There is already a fight going on.")
-					.withStyle(ChatFormatting.GRAY));
+		if (inTheWay(player)) {
 			return;
 		}
 		if (arachnes) {
@@ -179,7 +220,14 @@ public final class Fight {
 			BlockPos where, double toughness, String name) {
 		Mob mob = kind.spawn(level, where, EntitySpawnReason.EVENT);
 		if (mob == null) {
+			ShipLifeMod.LOGGER.warn("Ship Life could not put a {} at {}.", kind, where);
 			return;
+		}
+		// A wither spends its first ten seconds untouchable and then blows a
+		// hole in the room. Neither is any use as a boss fight, so it comes in
+		// awake and ready to be hit.
+		if (mob instanceof net.minecraft.world.entity.boss.wither.WitherBoss wither) {
+			wither.setInvulnerableTicks(0);
 		}
 		if (toughness != 1.0 && mob.getAttribute(Attributes.MAX_HEALTH) != null) {
 			double health = mob.getAttribute(Attributes.MAX_HEALTH).getBaseValue() * toughness;

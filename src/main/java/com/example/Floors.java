@@ -27,7 +27,8 @@ public final class Floors {
 			case 12 -> "Pet Store";
 			case 13 -> "The Keg";
 			case 14 -> "Passports";
-			default -> "Ben's Room";
+			case 15 -> "Ben's Room";
+			default -> "Floor 16";
 		};
 	}
 
@@ -42,7 +43,8 @@ public final class Floors {
 			case 10 -> "do an event -- Quest Day counts once you finish one of its four";
 			case 11, 12, 13 -> "1000 event tickets, all three";
 			case 14 -> "the 4.9% reward on floor 11";
-			default -> "upgrade your passport on floor 14";
+			case 15 -> "upgrade your passport on floor 14";
+			default -> "clear wave 2 and a boss, or clear wave 3";
 		};
 	}
 }
