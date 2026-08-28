@@ -44,6 +44,54 @@ public final class Elevator {
 	private static final int RIDE = 40;
 
 	/** Open the floor panel. */
+	/** Who is stood on a plate, so it fires once rather than every tick. */
+	private static final java.util.Map<java.util.UUID, Long> ON_PLATE =
+			new java.util.HashMap<>();
+
+	/**
+	 * The plates each side of the two doors.
+	 *
+	 * A plate that reopened the lift every tick you stood on it would be
+	 * unusable, so one press is one opening: you have to step off and back on.
+	 */
+	public static void register() {
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % 4 != 0) {
+				return;
+			}
+			for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				for (ServerPlayer player : level.players()) {
+					standing(player);
+				}
+			}
+		});
+	}
+
+	private static void standing(ServerPlayer player) {
+		int floor = Places.floorAt(player.getY());
+		net.minecraft.core.BlockPos feet = Places.local(player.blockPosition());
+		boolean on = false;
+		if (floor >= 1 && floor <= Places.TOP_FLOOR) {
+			for (net.minecraft.core.BlockPos plate : Places.liftPlates(floor)) {
+				if (plate.equals(feet)) {
+					on = true;
+					break;
+				}
+			}
+		}
+		if (!on) {
+			ON_PLATE.remove(player.getUUID());
+			return;
+		}
+		if (ON_PLATE.put(player.getUUID(), player.level().getGameTime()) == null) {
+			open(player);
+		}
+	}
+
 	public static void open(ServerPlayer player) {
 		SimpleContainer page = new SimpleContainer(54);
 		ItemStack filler = new ItemStack(Items.GRAY_STAINED_GLASS_PANE);

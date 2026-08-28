@@ -69,6 +69,7 @@ public class ShipLifeMod implements ModInitializer {
 		Gear.register();
 		Star.register();
 		Buffet.register();
+		Elevator.register();
 		Kart.register();
 		Skip.register();
 

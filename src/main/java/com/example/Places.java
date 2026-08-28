@@ -143,12 +143,46 @@ public final class Places {
 	 * you meet it on the way in rather than crossing the room to find it.
 	 */
 	public static BlockPos panel(int floor) {
-		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z - ROOM + 1);
+		return new BlockPos(LIFT_X + 2, floorY(floor) + 1, LIFT_Z);
 	}
 
-	/** Where the lift puts you down on a floor: the square beside the panel. */
+	/** Where the lift puts you down: the middle of the car. */
 	public static BlockPos lift(int floor) {
-		return new BlockPos(SHIP_X - ROOM + 2, floorY(floor) + 1, SHIP_Z - ROOM + 2);
+		return new BlockPos(LIFT_X + 2, floorY(floor) + 1, LIFT_Z + 2);
+	}
+
+	// ------------------------------------------------------------ the lift car
+
+	/** The near left corner of the car, which is the corner of the room. */
+	public static final int LIFT_X = SHIP_X - ROOM + 1;
+	public static final int LIFT_Z = SHIP_Z - ROOM + 1;
+
+	/** The car is five by five by five, walls included. */
+	public static final int LIFT_SIZE = 5;
+
+	/** The two ways out: one facing along the room, one facing across it. */
+	public static BlockPos liftDoorEast(int floor) {
+		return new BlockPos(LIFT_X + LIFT_SIZE - 1, floorY(floor) + 1, LIFT_Z + 2);
+	}
+
+	public static BlockPos liftDoorSouth(int floor) {
+		return new BlockPos(LIFT_X + 2, floorY(floor) + 1, LIFT_Z + LIFT_SIZE - 1);
+	}
+
+	/** The plate each side of each door: step on one and the lift opens. */
+	public static BlockPos[] liftPlates(int floor) {
+		int y = floorY(floor) + 1;
+		return new BlockPos[] {
+			new BlockPos(LIFT_X + LIFT_SIZE, y, LIFT_Z + 2),        // outside east
+			new BlockPos(LIFT_X + LIFT_SIZE - 2, y, LIFT_Z + 2),    // inside east
+			new BlockPos(LIFT_X + 2, y, LIFT_Z + LIFT_SIZE),        // outside south
+			new BlockPos(LIFT_X + 2, y, LIFT_Z + LIFT_SIZE - 2),    // inside south
+		};
+	}
+
+	/** Where the button used to be, before the car was built round it. */
+	public static BlockPos oldPanel(int floor) {
+		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z - ROOM + 1);
 	}
 
 	/** Where the lift used to be, which is a door now. */

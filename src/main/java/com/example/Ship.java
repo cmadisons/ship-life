@@ -173,11 +173,7 @@ public final class Ship {
 		// A door where the lift used to be, in the middle of the near wall.
 		door(level, Places.onShip(Places.oldLift(floor), ship));
 
-		// The lift: a panel to press, and a lit alcove to stand in.
-		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
-		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
-		set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
-		set(level, Places.onShip(Places.lift(floor), ship).above(), Blocks.AIR);
+		liftCar(level, floor, ship);
 
 		// A sign of sorts: the floor number spelled out in the floor itself.
 		set(level, new BlockPos(x - r + 2, y, z), Blocks.LIGHT_BLUE_CONCRETE);
@@ -332,6 +328,57 @@ public final class Ship {
 
 		for (int i = 0; i < Places.TABLES; i++) {
 			table(level, Places.table(i));
+		}
+	}
+
+	/**
+	 * The lift car: five by five by five, standing in the corner of the floor.
+	 *
+	 * It was a button on a wall and an alcove to stand in, which is a lift the
+	 * way a bus stop is a bus. This is a room you walk into: quartz walls, a
+	 * glass front so you can see out of it, the button inside where you can
+	 * reach it, and two doors -- one facing along the floor and one across it,
+	 * so you are never walking round the car to get in.
+	 *
+	 * A pressure plate sits each side of both doors. The button still works;
+	 * the plates are for when your hands are full.
+	 */
+	private static void liftCar(ServerLevel level, int floor, int ship) {
+		int y = Places.floorY(floor);
+		int n = Places.LIFT_SIZE;
+		int x0 = Places.LIFT_X + (ship == 2 ? Places.SHIP_TWO_OFFSET : 0);
+		int z0 = Places.LIFT_Z;
+
+		for (int dx = 0; dx < n; dx++) {
+			for (int dz = 0; dz < n; dz++) {
+				boolean edge = dx == 0 || dx == n - 1 || dz == 0 || dz == n - 1;
+				for (int dy = 1; dy <= n; dy++) {
+					BlockPos pos = new BlockPos(x0 + dx, y + dy, z0 + dz);
+					if (dy == n) {
+						set(level, pos, Blocks.GRAY_CONCRETE);        // the roof
+					} else if (!edge) {
+						set(level, pos, Blocks.AIR);                  // stand in here
+					} else {
+						// Glass at eye level on the two open sides.
+						boolean front = dx == n - 1 || dz == n - 1;
+						set(level, pos, front && dy >= 2 && dy <= 3
+								? Blocks.GLASS : Blocks.QUARTZ_BLOCK);
+					}
+				}
+			}
+		}
+
+		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
+		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
+		set(level, new BlockPos(x0 + 2, y + n - 1, z0 + 2), Blocks.SEA_LANTERN);
+
+		door(level, Places.onShip(Places.liftDoorEast(floor), ship), Direction.EAST);
+		door(level, Places.onShip(Places.liftDoorSouth(floor), ship), Direction.SOUTH);
+
+		for (BlockPos plate : Places.liftPlates(floor)) {
+			BlockPos at = Places.onShip(plate, ship);
+			set(level, at.below(), Blocks.POLISHED_ANDESITE);
+			set(level, at, Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE);
 		}
 	}
 
@@ -581,6 +628,15 @@ public final class Ship {
 			furnishPool(level);
 			ShipLifeMod.LOGGER.info("Sank the pool into the floor of floor 3.");
 		}
+		// The lift was a button on a wall before it was a car you walk into.
+		if (!level.getBlockState(Places.liftDoorEast(1)).is(Blocks.OAK_DOOR)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				liftCar(level, floor, 1);
+				set(level, Places.oldPanel(floor), Blocks.AIR);
+				set(level, Places.oldPanel(floor).above(), Blocks.AIR);
+			}
+			ShipLifeMod.LOGGER.info("Built a lift car on all {} floors.", Places.TOP_FLOOR);
+		}
 		// Floor 6 was a strip of concrete before the karts had a loop to run.
 		// A corner that is not a curve means the loop was laid before the
 		// shapes were spelled out, and is a ring of disconnected sleepers.
@@ -616,9 +672,13 @@ public final class Ship {
 	 * doorway rather than a door with a wall behind it.
 	 */
 	private static void door(ServerLevel level, BlockPos bottom) {
+		door(level, bottom, Direction.EAST);
+	}
+
+	private static void door(ServerLevel level, BlockPos bottom, Direction facing) {
 		BlockState base = Blocks.OAK_DOOR.defaultBlockState()
 				.setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
-						Direction.EAST);
+						facing);
 		level.setBlockAndUpdate(bottom, base.setValue(
 				net.minecraft.world.level.block.DoorBlock.HALF,
 				net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER));
