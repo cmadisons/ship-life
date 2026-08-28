@@ -265,9 +265,28 @@ public class ShipLifeMod implements ModInitializer {
 		return true;
 	}
 
-	/** A world we built earlier, coming back after a restart. */
+	/**
+	 * A world we built earlier, coming back after a restart.
+	 *
+	 * This used to ask whether there was a lift button at panel(1), and then
+	 * the lift moved: a world built before the move has its button at the old
+	 * corner, so the question came back no, the world stopped being a Ship
+	 * Life world, and every last thing in the mod switched itself off in it.
+	 *
+	 * So the question is now about the ship rather than about one block of
+	 * it. Floor one's deck is laid before anything else is and never moves,
+	 * and no ordinary world has a concrete floor at these coordinates.
+	 */
 	private static boolean isShipBuilt(ServerLevel level) {
-		return level.getBlockState(Places.panel(1)).is(Made.elevatorButton);
+		if (level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
+			return true;
+		}
+		net.minecraft.world.level.block.state.BlockState deck =
+				level.getBlockState(new BlockPos(Places.SHIP_X, Places.floorY(1), Places.SHIP_Z));
+		return deck.is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE)
+				|| deck.is(net.minecraft.world.level.block.Blocks.WHITE_CONCRETE)
+				|| deck.is(net.minecraft.world.level.block.Blocks.GRAY_CONCRETE)
+				|| deck.is(net.minecraft.world.level.block.Blocks.QUARTZ_BLOCK);
 	}
 
 	public static Identifier id(String path) {
