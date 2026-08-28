@@ -110,9 +110,12 @@ public final class Elevator {
 			ride(player, floor, ship);
 			return;
 		}
+		// Seven floors to a row, so fifteen floors is three rows -- and the
+		// third one has to be clickable or floor 15 is a button that does
+		// nothing.
 		int row = slot / 9;
 		int column = slot % 9;
-		if (row < 1 || row > 2 || column < 1 || column > 7) {
+		if (row < 1 || row > 3 || column < 1 || column > 7) {
 			return;
 		}
 		int floor = (row - 1) * 7 + column;
