@@ -36,7 +36,11 @@ public final class Skip {
 	public static void register() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
 			dispatcher.register(Commands.literal("shiplife")
-					.executes(context -> run(context.getSource())));
+					.executes(context -> run(context.getSource()))
+					// Every floor at once, for looking at the ones you have not
+					// earned yet.
+					.then(Commands.literal("allfloors")
+							.executes(context -> allFloors(context.getSource()))));
 			// Floor 11 hands out one a month, and a month is ten real hours.
 			// This is the same roll with the wait taken off, as many times as
 			// you want it.
@@ -74,6 +78,45 @@ public final class Skip {
 		player.sendSystemMessage(Component.literal(done + " side quest"
 				+ (done == 1 ? "" : "s") + " skipped and paid.")
 				.withStyle(ChatFormatting.YELLOW));
+		return 1;
+	}
+
+	/**
+	 * /shiplife allfloors -- open the whole ship at once.
+	 *
+	 * The lift reads your passport rather than a list, so opening the floors
+	 * without one in your pocket would leave the buttons dark. It hands one
+	 * over if you have not been given yours yet.
+	 */
+	private static int allFloors(CommandSourceStack source) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Only a player can use /shiplife allfloors."));
+			return 0;
+		}
+		if (!(player.level() instanceof ServerLevel level) || !ShipLifeMod.isShipLife(level)) {
+			source.sendFailure(Component.literal("This is not a Ship Life world."));
+			return 0;
+		}
+
+		int opened = 0;
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			if (!State.hasFloor(player, floor)) {
+				State.unlock(player, floor);
+				opened++;
+			}
+		}
+		if (!Kit.is(player.getInventory().getItem(Slots.PASSPORT_SLOT), Kit.PASSPORT)) {
+			player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
+		}
+
+		if (opened == 0) {
+			source.sendFailure(Component.literal("Every floor is already open."));
+			return 0;
+		}
+		player.sendSystemMessage(Component.literal(opened + " floor"
+				+ (opened == 1 ? "" : "s") + " opened -- all " + Places.TOP_FLOOR
+				+ " of them are yours.").withStyle(ChatFormatting.AQUA));
 		return 1;
 	}
 
