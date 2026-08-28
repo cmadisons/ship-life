@@ -190,6 +190,11 @@ public final class Ship {
 		set(level, Places.DESK.above(), Blocks.LANTERN);
 		set(level, Places.TABLE, Blocks.OAK_PLANKS);
 		set(level, Places.TABLE.above(), Blocks.FLOWER_POT);
+
+		// Charlie's chair: a wool seat with a wool back, facing the table.
+		set(level, Places.CHAIR, Blocks.RED_WOOL);
+		set(level, Places.CHAIR.south(), Blocks.RED_WOOL);
+		set(level, Places.CHAIR.south().above(), Blocks.RED_WOOL);
 		fill(level, Places.SHIP_X + 2, Places.GROUND, Places.SHIP_Z - 6,
 				Places.SHIP_X + 6, Places.GROUND, Places.SHIP_Z + 6, Blocks.POLISHED_ANDESITE);
 	}
@@ -585,6 +590,9 @@ public final class Ship {
 
 		// Rooms whose fittings came after the world did. Each one is asked
 		// for by a block that only that room has.
+		if (!level.getBlockState(Places.CHAIR).is(Blocks.RED_WOOL)) {
+			furnishLobby(level);
+		}
 		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {
 			furnishBensRoom(level);
 		}

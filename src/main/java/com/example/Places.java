@@ -197,6 +197,9 @@ public final class Places {
 	public static final BlockPos DESK = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z - 3);
 
 	/** Charlie's table in the lobby. */
+	/** Charlie's chair, across the table from you. */
+	public static final BlockPos CHAIR = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 5);
+
 	public static final BlockPos TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 3);
 
 	// ----------------------------------------------------- the arcade, floor 2

@@ -95,12 +95,59 @@ public class Person extends PathfinderMob {
 	 * left alone, so this can be called as often as it likes.
 	 */
 	public static void everyone(ServerLevel level) {
-		place(level, Places.TABLE.north(), CHARLIE, ChatFormatting.YELLOW);
+		place(level, Places.CHAIR, CHARLIE, ChatFormatting.YELLOW);
+		sit(level, Places.CHAIR, CHARLIE);
 		place(level, Places.DESK.north(), DESK, ChatFormatting.WHITE);
 		place(level, Places.DOOR.east(2), LOBBY, ChatFormatting.WHITE);
 		place(level, Places.BEN.south(), BEN, ChatFormatting.AQUA);
 		place(level, Places.IZZY.south(), IZZY, ChatFormatting.AQUA);
 		place(level, Places.BUFFET_COOK.east(), COOK, ChatFormatting.GOLD);
+	}
+
+	/**
+	 * Sit somebody down on the chair they are standing at.
+	 *
+	 * Minecraft has no such thing as a chair, so sitting is riding: an
+	 * invisible stand at seat height that nothing can see, hurt or hear, with
+	 * the person on it. Riding is what bends a person's legs, so once he
+	 * is on it he is sitting rather than standing in the furniture.
+	 */
+	public static void sit(ServerLevel level, BlockPos chair, String name) {
+		Person person = null;
+		for (Person each : level.getEntitiesOfClass(Person.class,
+				new net.minecraft.world.phys.AABB(chair).inflate(3.0))) {
+			if (each.getCustomName() != null
+					&& each.getCustomName().getString().equals(name)) {
+				person = each;
+			}
+		}
+		if (person == null || person.isPassenger()) {
+			return;
+		}
+
+		net.minecraft.world.entity.decoration.ArmorStand seat = null;
+		for (net.minecraft.world.entity.decoration.ArmorStand each
+				: level.getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class,
+						new net.minecraft.world.phys.AABB(chair).inflate(1.0))) {
+			if (each.isInvisible() && each.isNoGravity()) {
+				seat = each;
+			}
+		}
+		if (seat == null) {
+			seat = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(
+					level, EntitySpawnReason.COMMAND);
+			if (seat == null) {
+				return;
+			}
+			seat.snapTo(chair.getX() + 0.5, chair.getY() + 0.2, chair.getZ() + 0.5, 180.0f, 0.0f);
+			seat.setInvisible(true);
+			seat.setNoGravity(true);
+			seat.setInvulnerable(true);
+			seat.setSilent(true);
+			level.addFreshEntity(seat);
+		}
+		person.snapTo(chair.getX() + 0.5, chair.getY() + 0.2, chair.getZ() + 0.5, 180.0f, 0.0f);
+		person.startRiding(seat, true, true);
 	}
 
 	/**
