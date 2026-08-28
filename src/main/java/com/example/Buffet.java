@@ -95,10 +95,12 @@ public final class Buffet {
 				.withStyle(ChatFormatting.GREEN));
 	}
 
-	private static void serve(ServerPlayer player) {
+	public static void serve(ServerPlayer player) {
+		// The wait is there so a buffet is not a free stack of beef. It is not
+		// there to send you away hungry, so an empty pocket goes to the front.
 		long now = player.level().getGameTime();
 		Long last = SERVED.get(player.getUUID());
-		if (last != null && now - last < WAIT) {
+		if (last != null && now - last < WAIT && carrying(player)) {
 			say(player, "\"Finish what you have got and come back.\"");
 			return;
 		}
@@ -108,6 +110,16 @@ public final class Buffet {
 		player.level().playSound(null, player.blockPosition(),
 				SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 0.7f, 1.2f);
 		say(player, "\"There you go -- sit down and eat it.\"");
+	}
+
+	/** Have you still got a plate on you? */
+	private static boolean carrying(ServerPlayer player) {
+		for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+			if (Kit.is(player.getInventory().getItem(slot), Kit.MEAL)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void say(ServerPlayer player, String text) {

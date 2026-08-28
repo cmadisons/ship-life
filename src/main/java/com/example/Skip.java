@@ -49,6 +49,9 @@ public final class Skip {
 			// Every side quest you are carrying, finished and paid for.
 			dispatcher.register(Commands.literal("skipsidequest")
 					.executes(context -> skipSide(context.getSource())));
+			// Enough of both to see what every counter on the ship sells.
+			dispatcher.register(Commands.literal("10000tickets")
+					.executes(context -> tickets(context.getSource())));
 		});
 	}
 
@@ -117,6 +120,21 @@ public final class Skip {
 		player.sendSystemMessage(Component.literal(opened + " floor"
 				+ (opened == 1 ? "" : "s") + " opened -- all " + Places.TOP_FLOOR
 				+ " of them are yours.").withStyle(ChatFormatting.AQUA));
+		return 1;
+	}
+
+	/** /10000tickets -- ten thousand arcade tickets and ten thousand event ones. */
+	private static int tickets(CommandSourceStack source) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Only a player can use /10000tickets."));
+			return 0;
+		}
+		State.arcade(player, 10_000);
+		State.event(player, 10_000);
+		player.sendSystemMessage(Component.literal("10,000 arcade tickets and 10,000 event"
+				+ " tickets. You have " + State.arcade(player) + " and "
+				+ State.event(player) + ".").withStyle(ChatFormatting.AQUA));
 		return 1;
 	}
 

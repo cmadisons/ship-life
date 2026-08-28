@@ -86,6 +86,7 @@ public class Person extends PathfinderMob {
 	public static final String IZZY = "Izzy";
 	public static final String DESK = "Maria";
 	public static final String LOBBY = "Sam";
+	public static final String COOK = "Gus";
 
 	/**
 	 * Everyone, in their place.
@@ -99,6 +100,7 @@ public class Person extends PathfinderMob {
 		place(level, Places.DOOR.east(2), LOBBY, ChatFormatting.WHITE);
 		place(level, Places.BEN.south(), BEN, ChatFormatting.AQUA);
 		place(level, Places.IZZY.south(), IZZY, ChatFormatting.AQUA);
+		place(level, Places.BUFFET_COOK.east(), COOK, ChatFormatting.GOLD);
 	}
 
 	/**

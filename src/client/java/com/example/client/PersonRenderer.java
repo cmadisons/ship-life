@@ -43,6 +43,7 @@ public class PersonRenderer extends HumanoidMobRenderer<Person, HumanoidRenderSt
 			case "ben" -> "ben";
 			case "izzy" -> "izzy";
 			case "maria" -> "staff_one";
+			case "gus" -> "cook";
 			default -> "staff_two";
 		};
 		return Identifier.fromNamespaceAndPath("shiplife", FOLDER + skin + ".png");

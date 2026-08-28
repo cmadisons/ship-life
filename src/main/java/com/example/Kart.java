@@ -18,6 +18,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.vehicle.minecart.Minecart;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 
 /**
@@ -45,6 +46,24 @@ public final class Kart {
 
 	/** How many karts are out there without you. */
 	private static final int RIVALS = 5;
+
+	/** The colours the rival karts come in, so no two beside you match. */
+	private static final net.minecraft.world.level.block.Block[] COLOURS = {
+		Blocks.BLUE_CONCRETE, Blocks.YELLOW_CONCRETE, Blocks.LIME_CONCRETE,
+		Blocks.ORANGE_CONCRETE, Blocks.PURPLE_CONCRETE,
+	};
+
+	/**
+	 * Dress a minecart up as a go-kart.
+	 *
+	 * A minecart is a grey tub. Sitting a coloured block in it and dropping it
+	 * low in the frame gives it a body and a driver sitting down in it, which
+	 * is as close to a kart as you get without a model of your own.
+	 */
+	private static void paint(Minecart kart, net.minecraft.world.level.block.Block colour) {
+		kart.setCustomDisplayBlockState(java.util.Optional.of(colour.defaultBlockState()));
+		kart.setDisplayOffset(-2);
+	}
 
 	/** Where someone is in their race: laps done, whether they are round the far side. */
 	private record Run(int laps, boolean far, long started) {
@@ -87,6 +106,7 @@ public final class Kart {
 			return;
 		}
 		kart.setPos(line.getX() + 0.5, line.getY(), line.getZ() + 0.5);
+		paint(kart, Blocks.RED_CONCRETE);        // yours is the red one
 		level.addFreshEntity(kart);
 		player.startRiding(kart);
 		RACING.put(player.getUUID(), new Run(0, false, level.getGameTime()));
@@ -191,6 +211,7 @@ public final class Kart {
 			return;
 		}
 		kart.setPos(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5);
+		paint(kart, COLOURS[index % COLOURS.length]);
 		driver.setPos(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5);
 		driver.setCustomName(Component.literal("Racer " + (index + 1)));
 		driver.setInvulnerable(true);

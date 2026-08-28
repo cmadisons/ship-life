@@ -59,6 +59,7 @@ public final class Friends {
 						case Person.BEN -> ben(who, level);
 						case Person.IZZY -> izzy(who, level);
 						case Person.CHARLIE -> Chores.charlie(who);
+						case Person.COOK -> Buffet.serve(who);
 						case Person.DESK, Person.LOBBY -> Chores.security(who);
 						default -> {
 							return InteractionResult.PASS;

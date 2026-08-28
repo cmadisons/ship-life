@@ -5,6 +5,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -345,45 +348,65 @@ public final class Ship {
 	/**
 	 * Floor 6: a loop of rail, with powered rail keeping it turning.
 	 *
-	 * The track is the whole floor rather than a strip, because a lap has to
-	 * be a lap. Powered rail every fifth block on both straights, each with a
-	 * redstone block let into the floor under it, means a kart left alone goes
-	 * round for ever -- so the five that are not yours are always moving.
+	 * Every piece is laid with the shape it needs spelled out -- straights
+	 * along the straights, the right curve in each corner -- and with block
+	 * updates off. Left to work it out, a rail decides its shape from the
+	 * neighbours it can see at the moment it is placed, and the first one down
+	 * cannot see any, so the loop came out as a row of disconnected sleepers.
+	 *
+	 * Powered rail carries its own POWERED as well, for the same reason: with
+	 * updates off nothing recalculates it. The redstone block under each one
+	 * is what keeps it true afterwards.
 	 */
 	private static void furnishRace(ServerLevel level) {
 		int y = Places.floorY(6);
 		int w = Places.KART_HALF_WIDTH;
 		int d = Places.KART_HALF_DEPTH;
+		int north = Places.SHIP_Z - d;
+		int south = Places.SHIP_Z + d;
+		int west = Places.SHIP_X - w;
+		int east = Places.SHIP_X + w;
 
 		// Tarmac inside the loop, so the track reads as a track.
-		fill(level, Places.SHIP_X - w, y, Places.SHIP_Z - d,
-				Places.SHIP_X + w, y, Places.SHIP_Z + d, Blocks.BLACK_CONCRETE);
+		fill(level, west, y, north, east, y, south, Blocks.BLACK_CONCRETE);
 
-		// The loop itself, laid corners last so the curves settle right.
-		for (int x = Places.SHIP_X - w; x <= Places.SHIP_X + w; x++) {
-			rail(level, new BlockPos(x, Places.KART_Y, Places.SHIP_Z - d), x % 5 == 0);
-			rail(level, new BlockPos(x, Places.KART_Y, Places.SHIP_Z + d), x % 5 == 0);
+		// The two straights, corners included.
+		for (int x = west; x <= east; x++) {
+			rail(level, new BlockPos(x, Places.KART_Y, north), RailShape.EAST_WEST, x % 5 == 0);
+			rail(level, new BlockPos(x, Places.KART_Y, south), RailShape.EAST_WEST, x % 5 == 0);
 		}
-		for (int z = Places.SHIP_Z - d + 1; z <= Places.SHIP_Z + d - 1; z++) {
-			rail(level, new BlockPos(Places.SHIP_X - w, Places.KART_Y, z), z % 5 == 0);
-			rail(level, new BlockPos(Places.SHIP_X + w, Places.KART_Y, z), z % 5 == 0);
+		// The two sides.
+		for (int z = north + 1; z <= south - 1; z++) {
+			rail(level, new BlockPos(west, Places.KART_Y, z), RailShape.NORTH_SOUTH, z % 5 == 0);
+			rail(level, new BlockPos(east, Places.KART_Y, z), RailShape.NORTH_SOUTH, z % 5 == 0);
 		}
+		// And the four corners, which is what actually joins it up. North is
+		// -z, so the near-left corner turns east and south.
+		rail(level, new BlockPos(west, Places.KART_Y, north), RailShape.SOUTH_EAST, false);
+		rail(level, new BlockPos(east, Places.KART_Y, north), RailShape.SOUTH_WEST, false);
+		rail(level, new BlockPos(west, Places.KART_Y, south), RailShape.NORTH_EAST, false);
+		rail(level, new BlockPos(east, Places.KART_Y, south), RailShape.NORTH_WEST, false);
 
 		// The line, and the pits behind it.
-		set(level, new BlockPos(Places.SHIP_X, y, Places.SHIP_Z - d - 1), Blocks.WHITE_CONCRETE);
+		set(level, new BlockPos(Places.SHIP_X, y, north - 1), Blocks.WHITE_CONCRETE);
 		set(level, Places.RACE_CAR, Blocks.RED_CONCRETE);
 		set(level, Places.RACE_CAR.above(), Blocks.BLACK_CONCRETE);
 		set(level, Places.RACE_CAR.above(2), Blocks.SEA_LANTERN);
 	}
 
-	/** One piece of track: rail, and powered rail with a battery under it. */
-	private static void rail(ServerLevel level, BlockPos pos, boolean powered) {
-		if (powered) {
+	/** One piece of track, laid with its shape said out loud. */
+	private static void rail(ServerLevel level, BlockPos pos, RailShape shape, boolean powered) {
+		// Only a straight can be powered; a corner asked to be is a broken loop.
+		boolean straight = shape == RailShape.EAST_WEST || shape == RailShape.NORTH_SOUTH;
+		if (powered && straight) {
 			set(level, pos.below(), Blocks.REDSTONE_BLOCK);
-			level.setBlockAndUpdate(pos, Blocks.POWERED_RAIL.defaultBlockState());
-		} else {
-			level.setBlockAndUpdate(pos, Blocks.RAIL.defaultBlockState());
+			level.setBlock(pos, Blocks.POWERED_RAIL.defaultBlockState()
+					.setValue(PoweredRailBlock.SHAPE, shape)
+					.setValue(PoweredRailBlock.POWERED, true), 2);
+			return;
 		}
+		level.setBlock(pos, Blocks.RAIL.defaultBlockState()
+				.setValue(RailBlock.SHAPE, shape), 2);
 	}
 
 	/** Floors 9 and 10: an empty room with a button, and one with two doors. */
@@ -559,8 +582,12 @@ public final class Ship {
 			ShipLifeMod.LOGGER.info("Sank the pool into the floor of floor 3.");
 		}
 		// Floor 6 was a strip of concrete before the karts had a loop to run.
-		if (!level.getBlockState(Places.KART_LINE).is(Blocks.RAIL)
-				&& !level.getBlockState(Places.KART_LINE).is(Blocks.POWERED_RAIL)) {
+		// A corner that is not a curve means the loop was laid before the
+		// shapes were spelled out, and is a ring of disconnected sleepers.
+		BlockPos corner = new BlockPos(Places.SHIP_X - Places.KART_HALF_WIDTH,
+				Places.KART_Y, Places.SHIP_Z - Places.KART_HALF_DEPTH);
+		if (!level.getBlockState(corner).is(Blocks.RAIL)
+				|| level.getBlockState(corner).getValue(RailBlock.SHAPE) != RailShape.SOUTH_EAST) {
 			furnishRace(level);
 			ShipLifeMod.LOGGER.info("Laid the kart track round floor 6.");
 		}
