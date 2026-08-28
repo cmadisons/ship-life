@@ -197,8 +197,16 @@ public final class Places {
 	public static final BlockPos DESK = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z - 3);
 
 	/** Charlie's table in the lobby. */
-	/** Charlie's chair, across the table from you. */
-	public static final BlockPos CHAIR = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 5);
+	/**
+	 * The two giant chairs in the lobby, and the table between them.
+	 *
+	 * Both are five blocks across with a seat three up, so you climb a ladder
+	 * to sit in one. Charlie has the south one; the north one faces him
+	 * across the table and is yours.
+	 */
+	public static final BlockPos CHAIR = new BlockPos(SHIP_X + 4, GROUND + 4, SHIP_Z + 7);
+	public static final BlockPos CHAIR_TWO = new BlockPos(SHIP_X + 4, GROUND + 4, SHIP_Z - 7);
+	public static final BlockPos BIG_TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z);
 
 	public static final BlockPos TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 3);
 

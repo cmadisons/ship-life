@@ -191,15 +191,82 @@ public final class Ship {
 		set(level, Places.TABLE, Blocks.OAK_PLANKS);
 		set(level, Places.TABLE.above(), Blocks.FLOWER_POT);
 
-		// Charlie's chair: a wool seat with a wool back, facing the table.
-		set(level, Places.CHAIR, Blocks.RED_WOOL);
-		set(level, Places.CHAIR.south(), Blocks.RED_WOOL);
-		set(level, Places.CHAIR.south().above(), Blocks.RED_WOOL);
+		// The two giant chairs, facing each other over a table big enough to
+		// match them. Charlie is in the south one.
+		giantChair(level, Places.CHAIR, true);
+		giantChair(level, Places.CHAIR_TWO, false);
+		bigTable(level, Places.BIG_TABLE);
 		fill(level, Places.SHIP_X + 2, Places.GROUND, Places.SHIP_Z - 6,
 				Places.SHIP_X + 6, Places.GROUND, Places.SHIP_Z + 6, Blocks.POLISHED_ANDESITE);
 	}
 
 	/** Three cabinets along the far wall, and a counter facing them. */
+	/**
+	 * A chair you have to climb into.
+	 *
+	 * Five across and five deep, with the seat three blocks up, a back four
+	 * blocks higher than that, and an arm down each side. The ladder goes up
+	 * the front, which is the side facing the table -- so you climb in facing
+	 * whoever is in the other one.
+	 *
+	 * `north` says which way it looks: true for the chair on the south side
+	 * of the table, which faces north across it.
+	 */
+	private static void giantChair(ServerLevel level, BlockPos seat, boolean north) {
+		int x = seat.getX();
+		int z = seat.getZ();
+		int y = seat.getY() - 1;               // the seat's top surface
+		int back = north ? z + 2 : z - 2;      // the wall behind you
+		int front = north ? z - 2 : z + 2;     // the side you climb
+
+		// The block of the chair: solid to the seat, so it reads as furniture
+		// rather than as a box on legs.
+		fill(level, x - 2, y - 2, z - 2, x + 2, y, z + 2, Blocks.RED_WOOL);
+
+		// The back, four high behind the seat.
+		fill(level, x - 2, y + 1, back, x + 2, y + 4, back, Blocks.RED_WOOL);
+
+		// An arm down each side, two above the seat.
+		fill(level, x - 2, y + 1, Math.min(z, back), x - 2, y + 2, Math.max(z, back),
+				Blocks.RED_WOOL);
+		fill(level, x + 2, y + 1, Math.min(z, back), x + 2, y + 2, Math.max(z, back),
+				Blocks.RED_WOOL);
+
+		// The ladder up the front, from the floor to the seat.
+		BlockPos foot = new BlockPos(x, y - 2, front);
+		for (int dy = 0; dy <= 2; dy++) {
+			ladder(level, foot.above(dy), north
+					? net.minecraft.core.Direction.NORTH
+					: net.minecraft.core.Direction.SOUTH);
+		}
+	}
+
+	/** One rung, hung on the face of the chair it climbs. */
+	private static void ladder(ServerLevel level, BlockPos where,
+			net.minecraft.core.Direction facing) {
+		level.setBlockAndUpdate(where, Blocks.LADDER.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.LadderBlock.FACING, facing));
+	}
+
+	/**
+	 * The table the chairs are drawn up to.
+	 *
+	 * Seat height, so the two of you can put your elbows on it, and wide
+	 * enough that neither chair is reaching.
+	 */
+	private static void bigTable(ServerLevel level, BlockPos middle) {
+		int x = middle.getX();
+		int y = middle.getY();
+		int z = middle.getZ();
+		fill(level, x - 2, y + 3, z - 2, x + 2, y + 3, z + 2, Blocks.OAK_PLANKS);
+		for (int dx = -2; dx <= 2; dx += 4) {
+			for (int dz = -2; dz <= 2; dz += 4) {
+				fill(level, x + dx, y, z + dz, x + dx, y + 2, z + dz, Blocks.OAK_FENCE);
+			}
+		}
+		set(level, new BlockPos(x, y + 4, z), Blocks.FLOWER_POT);
+	}
+
 	private static void furnishArcade(ServerLevel level) {
 		cabinet(level, Places.SNAKE, Blocks.LIME_CONCRETE);
 		cabinet(level, Places.PACMAN, Blocks.YELLOW_CONCRETE);
@@ -590,7 +657,8 @@ public final class Ship {
 
 		// Rooms whose fittings came after the world did. Each one is asked
 		// for by a block that only that room has.
-		if (!level.getBlockState(Places.CHAIR).is(Blocks.RED_WOOL)) {
+		// The giant chairs came after most worlds did.
+		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.RED_WOOL)) {
 			furnishLobby(level);
 		}
 		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {
