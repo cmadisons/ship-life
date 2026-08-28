@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
  * The things Ship Life adds that Minecraft does not have.
  *
  * Everything you actually handle is here: the sponge and the towel, the weed
- * whacker and the lawn mower, the dish on the counter and the button you press
- * to call the lift. They were vanilla items wearing a name to begin with,
+ * whacker and the lawn mower, the plunger for the toilet, one of Ben's bombs,
+ * the dish on the counter and the button you press to call the lift. They were vanilla items wearing a name to begin with,
  * which reads well enough in a list and badly in your hand -- a towel is not a
  * block of wool, and a dish is not a flower pot.
  *
@@ -37,6 +37,8 @@ public final class Made {
 	public static Item towel;
 	public static Item weedWhacker;
 	public static Item lawnMower;
+	public static Item plunger;
+	public static Item bomb;
 	public static Block dish;
 	public static Block elevatorButton;
 
@@ -46,6 +48,9 @@ public final class Made {
 		towel = item("towel");
 		weedWhacker = item("weed_whacker");
 		lawnMower = item("lawn_mower");
+		plunger = item("plunger");
+		// Ben hands you three at once, so this one has to stack.
+		bomb = item("bomb", 8);
 
 		// The dish is china: it breaks by hand and it is not worth a tool.
 		dish = block("dish", 0.4f, SoundType.GLASS);
@@ -56,9 +61,13 @@ public final class Made {
 	}
 
 	private static Item item(String id) {
+		return item(id, 1);
+	}
+
+	private static Item item(String id, int stack) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, ShipLifeMod.id(id));
 		Item made = Registry.register(BuiltInRegistries.ITEM, key,
-				new Item(new Item.Properties().setId(key).stacksTo(1)));
+				new Item(new Item.Properties().setId(key).stacksTo(stack)));
 		ITEMS.put(id, made);
 		return made;
 	}

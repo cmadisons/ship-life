@@ -33,6 +33,8 @@ public final class Kit {
 	public static final String PLUNGER = "Plunger";
 	public static final String MOP = "Mop";
 	public static final String MEAL = "Buffet Plate";
+	public static final String ARMOUR = "Ben's Armour";
+	public static final String BOMB = "Ben's Bomb";
 	public static final String PENNY = "Penny";
 
 	public static ItemStack make(Item item, String name, ChatFormatting colour, String... lore) {
@@ -109,9 +111,35 @@ public final class Kit {
 	}
 
 	public static ItemStack plunger() {
-		return make(Items.STICK, PLUNGER, ChatFormatting.GRAY,
+		return make(Made.plunger, PLUNGER, ChatFormatting.GRAY,
 				"Hold right-click on the toilet.",
 				"Let go while the bar is green.");
+	}
+
+	/**
+	 * Ben's armour. Leather because leather takes a colour, and Ben's is green.
+	 *
+	 * What it does is not in the item at all -- {@link Gear} watches for it on
+	 * your chest and does the work.
+	 */
+	public static ItemStack armour() {
+		ItemStack coat = make(Items.LEATHER_CHESTPLATE, ARMOUR, ChatFormatting.GREEN,
+				"A tenth of every hit does not land.",
+				"What it stops goes onto your next swing.",
+				"From Ben, on floor 15.");
+		coat.set(DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x4CAF50));
+		coat.set(DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
+		return coat;
+	}
+
+	/** One of Ben's bombs. Right-click to put the gas down. */
+	public static ItemStack bomb(int howMany) {
+		ItemStack stack = make(Made.bomb, BOMB, ChatFormatting.DARK_GREEN,
+				"Right-click to drop it.",
+				"Green gas: 10 damage to every enemy in it.",
+				"It stays until they are all dead.");
+		stack.setCount(howMany);
+		return stack;
 	}
 
 	public static ItemStack penny() {

@@ -24,14 +24,16 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Floor 7, the events** — a board saying what is on today. Spooky Shooter and Christmas (a crowd of 100 and a photograph), Quest Day (four quests, 500 tickets for all four), May the Fourth (lightsaber fights, 25 a fight and 100 a win), and Summer Break, which needs no screen because it doubles what the arcade pays.
 - **Floor 9 and floor 10** — waves that get bigger and pay when you clear them, and a door each for Arachnes and the dragon.
 - **The shops** — floor 8 gives a free quest at a time from a pool of 250, all of them things the game can watch you do; floor 11 hands out one reward a month on the 70 / 25 / 4.9 / 0.1 table; floor 12 sells pet food (x1.1 a time, stopping at x2), the Skeleton and the Shadow; floor 13 is The Keg, three dishes at 25 tickets that last a day each; and the event ticket counter on floor 7 sells floors 11 to 13 together, the Go To Event Star and the x2.5.
+- **Ben, on floor 15** — the first friend, and the only one who hands you anything: his armour keeps a tenth of every hit off you and saves it for the next swing you land, and his three bombs put green gas on the floor that takes ten a second off everything hostile standing in it and does not lift until they are all dead. What the gas takes goes into the same bank the armour fills.
 - A **drawn heads-up display** — the star is out in the world where the quest is, through walls and through the floors of the ship, pinned to the edge of the screen with an arrow when it is behind you; the ship's clock, the date, your money and your tickets sit in the top-right corner.
 
 Ship 2 stands two hundred blocks east and is the same fourteen floors again. The
 lift grows a ship number once your passport has one, and crossing between them is
 a ride like any other.
 
-Still to build: whatever is above floor 15 on ship 2, the friends system, and
-chapters past 4.
+Still to build: whatever is above floor 15 on ship 2, the rest of the friends
+system -- Ben gives you his gear, but nobody has said what a friend is for after
+that -- and chapters past 4.
 
 ### The pictures
 

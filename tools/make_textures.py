@@ -5,8 +5,9 @@ That includes the loot tables. A block with no loot table drops nothing when
 you break it, which is how the dishes were vanishing off the counter rather
 than going into your pocket.
 
-Six things you handle or press: the sponge and towel you do the dishes with,
-the dish itself, the weed whacker and the lawn mower, and the elevator button.
+Everything you handle or press: the sponge and towel you do the dishes with,
+the dish itself, the weed whacker, the lawn mower, the plunger, one of Ben's
+bombs, and the elevator button.
 They started out as vanilla items wearing a name, which reads fine in a list
 and badly in your hand -- a towel should not be a block of wool.
 
@@ -146,6 +147,44 @@ MOWER = [
     "................",
 ]
 
+PLUNGER = [
+    "................",
+    "..........tt....",
+    ".........tt.....",
+    "........tt......",
+    ".......tt.......",
+    "......tt........",
+    ".....tt.........",
+    "....tt..........",
+    "...tt...........",
+    "..rrrrrr........",
+    ".rrxxxxrr.......",
+    ".rxxxxxxr.......",
+    ".rxxxxxxr.......",
+    "..rxxxxr........",
+    "...rrrr.........",
+    "................",
+]
+
+BOMB = [
+    "................",
+    "..........ee....",
+    ".........e.e....",
+    "..........ee....",
+    ".........t......",
+    "........t.......",
+    "....nnnnn.......",
+    "...nnnnnnn......",
+    "..nnknnnnnn.....",
+    "..nknnnnnnn.....",
+    "..nnnnnnnnn.....",
+    "..cnnnnnnnc.....",
+    "...nnnnnnn......",
+    "....ccccc.......",
+    "................",
+    "................",
+]
+
 BUTTON = [
     "................",
     "................",
@@ -170,6 +209,7 @@ PALETTE = {
     "w": WHITE, "d": WHITE_DK, "b": BLUE,
     "g": GREY, "s": GREY_LT, "k": GREY_DK,
     "l": STEEL, "t": WOOD, "r": RED, "a": LIME,
+    "x": RED_DK, "n": BLACK, "e": LIME, "c": GREEN,
 }
 
 ITEMS = {
@@ -177,6 +217,8 @@ ITEMS = {
     "towel": TOWEL,
     "weed_whacker": WHACKER,
     "lawn_mower": MOWER,
+    "plunger": PLUNGER,
+    "bomb": BOMB,
 }
 
 BLOCKS = {

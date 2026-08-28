@@ -23,9 +23,10 @@ import net.minecraft.world.InteractionResult;
  * upgrade, so the first thing a better passport buys you is somebody to knock
  * on rather than something to spend tickets in.
  *
- * What a friend is *for* is not decided yet, so Ben does the one thing a
- * friend can do without any rules: he is pleased to see you, and he knows how
- * you are getting on.
+ * What a friend is for is what Ben hands over the first time you knock: his
+ * armour, which keeps a tenth of every hit off you and saves it for your next
+ * swing, and three bombs that put green gas on the floor. The gear itself is
+ * in {@link Gear}; Ben is only the man who gives it to you.
  */
 public final class Friends {
 	private Friends() {
@@ -60,6 +61,35 @@ public final class Friends {
 		});
 	}
 
+	/**
+	 * The armour and the three bombs, handed over once.
+	 *
+	 * It is a one-off, so it is remembered rather than counted: lose the coat
+	 * down a hole and Ben will not replace it.
+	 */
+	private static boolean gift(ServerPlayer player) {
+		if (!State.firstTime(player, 2)) {
+			return false;
+		}
+		player.sendSystemMessage(Component.literal(
+				"Ben: \"Here. Wear the coat -- it takes a tenth off everything that "
+				+ "hits you and saves it up for the next one you land. And these "
+				+ "three, drop one in a room full of them and stand back.\"")
+				.withStyle(ChatFormatting.WHITE));
+		give(player, Kit.armour());
+		give(player, Kit.bomb(3));
+		player.sendSystemMessage(Component.literal("Ben gave you his armour and 3 bombs.")
+				.withStyle(ChatFormatting.LIGHT_PURPLE));
+		return true;
+	}
+
+	/** Into the pack, or on the floor if there is no room for it. */
+	private static void give(ServerPlayer player, net.minecraft.world.item.ItemStack stack) {
+		if (!player.getInventory().add(stack)) {
+			player.drop(stack, false);
+		}
+	}
+
 	private static void ben(ServerPlayer player, ServerLevel level) {
 		level.playSound(null, Places.BEN, SoundEvents.NOTE_BLOCK_BELL.value(),
 				SoundSource.PLAYERS, 0.6f, 1.4f);
@@ -72,6 +102,12 @@ public final class Friends {
 					.withStyle(ChatFormatting.WHITE));
 			player.sendSystemMessage(Component.literal("Ben is your first friend.")
 					.withStyle(ChatFormatting.LIGHT_PURPLE));
+			gift(player);
+			return;
+		}
+
+		// Anyone who met him before he had anything to give still gets it.
+		if (gift(player)) {
 			return;
 		}
 

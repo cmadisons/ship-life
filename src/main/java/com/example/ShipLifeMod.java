@@ -65,6 +65,7 @@ public class ShipLifeMod implements ModInitializer {
 		Fight.register();
 		Shops.register();
 		Friends.register();
+		Gear.register();
 		Buffet.register();
 		Skip.register();
 
