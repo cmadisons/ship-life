@@ -191,11 +191,18 @@ public final class Ship {
 		set(level, Places.TABLE, Blocks.OAK_PLANKS);
 		set(level, Places.TABLE.above(), Blocks.FLOWER_POT);
 
+		// The red wool chairs that stood here before the black ones. Clearing
+		// the space first means an older world does not end up with one
+		// inside the other.
+		fill(level, Places.SHIP_X, Places.GROUND + 1, Places.SHIP_Z - 9,
+				Places.SHIP_X + 8, Places.GROUND + 7, Places.SHIP_Z + 9, Blocks.AIR);
+
 		// The two giant chairs, facing each other over a table big enough to
 		// match them. Charlie is in the south one.
 		giantChair(level, Places.CHAIR, true);
 		giantChair(level, Places.CHAIR_TWO, false);
 		bigTable(level, Places.BIG_TABLE);
+		bigTable(level, Places.BIG_TABLE_TWO);
 		fill(level, Places.SHIP_X + 2, Places.GROUND, Places.SHIP_Z - 6,
 				Places.SHIP_X + 6, Places.GROUND, Places.SHIP_Z + 6, Blocks.POLISHED_ANDESITE);
 	}
@@ -204,38 +211,48 @@ public final class Ship {
 	/**
 	 * A chair you have to climb into.
 	 *
-	 * Five across and five deep, with the seat three blocks up, a back four
-	 * blocks higher than that, and an arm down each side. The ladder goes up
-	 * the front, which is the side facing the table -- so you climb in facing
-	 * whoever is in the other one.
+	 * Black wool. An X three blocks each way along the floor, one block
+	 * standing on the middle of it, and a 3x3 seat on top of that. Behind the
+	 * seat a back three wide and three high; either side of it an arm three
+	 * high; and a ladder up the front, which is the side facing the table.
 	 *
-	 * `north` says which way it looks: true for the chair on the south side
-	 * of the table, which faces north across it.
+	 * `north` says which way it looks: true for the chair on the south side,
+	 * which faces north across the room at the other one.
 	 */
 	private static void giantChair(ServerLevel level, BlockPos seat, boolean north) {
 		int x = seat.getX();
 		int z = seat.getZ();
-		int y = seat.getY() - 1;               // the seat's top surface
-		int back = north ? z + 2 : z - 2;      // the wall behind you
-		int front = north ? z - 2 : z + 2;     // the side you climb
+		int y = seat.getY() - 3;               // the floor the chair stands on
+		int backZ = north ? z + 2 : z - 2;     // behind you
+		int frontZ = north ? z - 2 : z + 2;    // the side you climb
 
-		// The block of the chair: solid to the seat, so it reads as furniture
-		// rather than as a box on legs.
-		fill(level, x - 2, y - 2, z - 2, x + 2, y, z + 2, Blocks.RED_WOOL);
+		// The X: three blocks out along each diagonal, and the middle of it.
+		set(level, new BlockPos(x, y, z), Blocks.BLACK_WOOL);
+		for (int step = 1; step <= 3; step++) {
+			set(level, new BlockPos(x - step, y, z - step), Blocks.BLACK_WOOL);
+			set(level, new BlockPos(x + step, y, z - step), Blocks.BLACK_WOOL);
+			set(level, new BlockPos(x - step, y, z + step), Blocks.BLACK_WOOL);
+			set(level, new BlockPos(x + step, y, z + step), Blocks.BLACK_WOOL);
+		}
 
-		// The back, four high behind the seat.
-		fill(level, x - 2, y + 1, back, x + 2, y + 4, back, Blocks.RED_WOOL);
+		// The one block standing on the middle of the X, and the 3x3 seat on
+		// top of it.
+		set(level, new BlockPos(x, y + 1, z), Blocks.BLACK_WOOL);
+		fill(level, x - 1, y + 2, z - 1, x + 1, y + 2, z + 1, Blocks.BLACK_WOOL);
 
-		// An arm down each side, two above the seat.
-		fill(level, x - 2, y + 1, Math.min(z, back), x - 2, y + 2, Math.max(z, back),
-				Blocks.RED_WOOL);
-		fill(level, x + 2, y + 1, Math.min(z, back), x + 2, y + 2, Math.max(z, back),
-				Blocks.RED_WOOL);
+		// The back: three wide, three high, behind the seat.
+		fill(level, x - 1, y + 3, backZ, x + 1, y + 5, backZ, Blocks.BLACK_WOOL);
 
-		// The ladder up the front, from the floor to the seat.
-		BlockPos foot = new BlockPos(x, y - 2, front);
+		// An arm each side, three high, alongside the seat.
+		fill(level, x - 2, y + 3, z - 1, x - 2, y + 5, z + 1, Blocks.BLACK_WOOL);
+		fill(level, x + 2, y + 3, z - 1, x + 2, y + 5, z + 1, Blocks.BLACK_WOOL);
+
+		// Something for the ladder to hang on, under the front of the seat,
+		// and then the ladder itself from the floor to the seat.
+		int lip = north ? z - 1 : z + 1;
+		fill(level, x, y, lip, x, y + 1, lip, Blocks.BLACK_WOOL);
 		for (int dy = 0; dy <= 2; dy++) {
-			ladder(level, foot.above(dy), north
+			ladder(level, new BlockPos(x, y + dy, frontZ), north
 					? net.minecraft.core.Direction.NORTH
 					: net.minecraft.core.Direction.SOUTH);
 		}
@@ -249,22 +266,17 @@ public final class Ship {
 	}
 
 	/**
-	 * The table the chairs are drawn up to.
+	 * The table in front of a chair: a T.
 	 *
-	 * Seat height, so the two of you can put your elbows on it, and wide
-	 * enough that neither chair is reaching.
+	 * A leg three blocks high with a 3x3 top laid across it, so it stands at
+	 * about the height of the seat you are looking at it from.
 	 */
-	private static void bigTable(ServerLevel level, BlockPos middle) {
-		int x = middle.getX();
-		int y = middle.getY();
-		int z = middle.getZ();
-		fill(level, x - 2, y + 3, z - 2, x + 2, y + 3, z + 2, Blocks.OAK_PLANKS);
-		for (int dx = -2; dx <= 2; dx += 4) {
-			for (int dz = -2; dz <= 2; dz += 4) {
-				fill(level, x + dx, y, z + dz, x + dx, y + 2, z + dz, Blocks.OAK_FENCE);
-			}
-		}
-		set(level, new BlockPos(x, y + 4, z), Blocks.FLOWER_POT);
+	private static void bigTable(ServerLevel level, BlockPos foot) {
+		int x = foot.getX();
+		int y = foot.getY();
+		int z = foot.getZ();
+		fill(level, x, y, z, x, y + 2, z, Blocks.OAK_LOG);
+		fill(level, x - 1, y + 3, z - 1, x + 1, y + 3, z + 1, Blocks.OAK_PLANKS);
 	}
 
 	private static void furnishArcade(ServerLevel level) {
@@ -658,7 +670,7 @@ public final class Ship {
 		// Rooms whose fittings came after the world did. Each one is asked
 		// for by a block that only that room has.
 		// The giant chairs came after most worlds did.
-		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.RED_WOOL)) {
+		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.BLACK_WOOL)) {
 			furnishLobby(level);
 		}
 		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {

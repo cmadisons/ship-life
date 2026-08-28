@@ -200,13 +200,15 @@ public final class Places {
 	/**
 	 * The two giant chairs in the lobby, and the table between them.
 	 *
-	 * Both are five blocks across with a seat three up, so you climb a ladder
-	 * to sit in one. Charlie has the south one; the north one faces him
-	 * across the table and is yours.
+	 * Each is an X of black wool three blocks each way with a 3x3 seat on
+	 * top, a back and two arms three high, and a ladder up the front.
+	 * Charlie has the south one; the north one faces him and is yours, and
+	 * there is a table in front of each.
 	 */
-	public static final BlockPos CHAIR = new BlockPos(SHIP_X + 4, GROUND + 4, SHIP_Z + 7);
-	public static final BlockPos CHAIR_TWO = new BlockPos(SHIP_X + 4, GROUND + 4, SHIP_Z - 7);
-	public static final BlockPos BIG_TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z);
+	public static final BlockPos CHAIR = new BlockPos(SHIP_X + 4, GROUND + 4, SHIP_Z + 6);
+	public static final BlockPos CHAIR_TWO = new BlockPos(SHIP_X + 4, GROUND + 4, SHIP_Z - 6);
+	public static final BlockPos BIG_TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 2);
+	public static final BlockPos BIG_TABLE_TWO = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z - 2);
 
 	public static final BlockPos TABLE = new BlockPos(SHIP_X + 4, GROUND + 1, SHIP_Z + 3);
 
