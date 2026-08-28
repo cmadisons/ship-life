@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -53,6 +54,45 @@ public final class Buffet {
 			serve(who);
 			return InteractionResult.SUCCESS;
 		});
+
+		// The plate is food, and Minecraft will not let you eat food on a full
+		// stomach -- which is exactly when you want it, because your hearts
+		// and your hunger bar are two different things. So the plate is eaten
+		// here instead of by the game, and it works whatever state you are in.
+		UseItemCallback.EVENT.register((player, world, hand) -> {
+			if (!Kit.is(player.getItemInHand(hand), Kit.MEAL)) {
+				return InteractionResult.PASS;
+			}
+			if (player instanceof ServerPlayer who) {
+				eat(who, who.getItemInHand(hand));
+			}
+			return InteractionResult.SUCCESS;
+		});
+
+		// Right-clicking at a block goes to the block first, so the plate has
+		// to be caught there as well or it only works pointed at the sky.
+		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
+			if (hand != InteractionHand.MAIN_HAND
+					|| !Kit.is(player.getItemInHand(hand), Kit.MEAL)) {
+				return InteractionResult.PASS;
+			}
+			if (player instanceof ServerPlayer who) {
+				eat(who, who.getItemInHand(hand));
+			}
+			return InteractionResult.SUCCESS;
+		});
+	}
+
+	/** One helping: full hearts, a full hunger bar, and the plate goes down one. */
+	private static void eat(ServerPlayer player, net.minecraft.world.item.ItemStack plate) {
+		plate.shrink(1);
+		player.setHealth(player.getMaxHealth());
+		player.getFoodData().eat(8, 0.8f);
+		player.level().playSound(null, player.blockPosition(),
+				SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.6f, 1.0f);
+		player.sendSystemMessage(Component.literal(
+				"You eat a plate from the buffet. Hearts full.")
+				.withStyle(ChatFormatting.GREEN));
 	}
 
 	private static void serve(ServerPlayer player) {

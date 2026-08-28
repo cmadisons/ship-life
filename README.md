@@ -35,6 +35,12 @@ Still to build: whatever is above floor 15 on ship 2, the rest of the friends
 system -- Ben gives you his gear, but nobody has said what a friend is for after
 that -- and chapters past 4.
 
+### The commands
+
+`/shiplife` skips chapter 1 -- it pays the hundred dollars, takes the chore
+tools back and stands you in the lobby. `/11reward` rolls another floor 11
+reward with the once-a-month wait taken off, as many times as you like.
+
 ### The pictures
 
 The sponge, the towel, the weed whacker, the lawn mower, the dish and the

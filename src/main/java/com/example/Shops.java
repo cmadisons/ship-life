@@ -221,7 +221,16 @@ public final class Shops {
 			return;
 		}
 		player.setAttached(State.REWARD_MONTH, month);
+		reward(player);
+	}
 
+	/**
+	 * Roll one reward and hand it over.
+	 *
+	 * The month gate is the caller's business, not this method's, so
+	 * /11reward can take as many as it likes.
+	 */
+	public static void reward(ServerPlayer player) {
 		double roll = new java.util.Random().nextDouble() * 100.0;
 		if (roll < 0.1) {
 			State.add(player, State.FOREVER, 1);

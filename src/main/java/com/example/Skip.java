@@ -11,7 +11,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * /shiplife -- start at the ship instead of at the sink.
+ * The commands: /shiplife and /11reward.
+ *
+ * /shiplife starts you at the ship instead of at the sink.
  *
  * Chapter 1 is the dishes, the lawn and the penny, and it is the same twenty
  * minutes every time you want to look at something further up the ship. So the
@@ -32,9 +34,26 @@ public final class Skip {
 	private static final int CHAPTER_ONE = 10_000;
 
 	public static void register() {
-		CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) ->
-				dispatcher.register(Commands.literal("shiplife")
-						.executes(context -> run(context.getSource()))));
+		CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
+			dispatcher.register(Commands.literal("shiplife")
+					.executes(context -> run(context.getSource())));
+			// Floor 11 hands out one a month, and a month is ten real hours.
+			// This is the same roll with the wait taken off, as many times as
+			// you want it.
+			dispatcher.register(Commands.literal("11reward")
+					.executes(context -> extraReward(context.getSource())));
+		});
+	}
+
+	/** /11reward -- another floor 11 reward, no waiting, as often as you like. */
+	private static int extraReward(CommandSourceStack source) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Only a player can use /11reward."));
+			return 0;
+		}
+		Shops.reward(player);
+		return 1;
 	}
 
 	private static int run(CommandSourceStack source) {
