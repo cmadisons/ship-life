@@ -72,7 +72,13 @@ public final class Cal {
 
 	// ----------------------------------------------------------------- events
 
-	/** Which event is on today, or null on an ordinary day. */
+	/**
+	 * Which event is on today.
+	 *
+	 * Never nothing. The five dated events take the days they fall on and
+	 * Quest Day takes all the rest, because a day with no event is a day with
+	 * nothing to do.
+	 */
 	public static String eventToday() {
 		boolean sunday = weekday().equals("Sunday");
 		boolean weekend = sunday || weekday().equals("Saturday");
@@ -92,10 +98,8 @@ public final class Cal {
 		if (weekend && (summer || marchBreak)) {
 			return "Summer Break";
 		}
-		// Quest Day is every other Monday, counting from the epoch.
-		if (weekday().equals("Monday") && (dayNumber() / 7) % 2 == 0) {
-			return "Quest Day";
-		}
-		return null;
+		// Quest Day fills every day nothing else has. There is always
+		// something on: a day with no event is a day with nothing to do.
+		return "Quest Day";
 	}
 }

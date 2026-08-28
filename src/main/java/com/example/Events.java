@@ -39,7 +39,7 @@ public final class Events {
 					"100 Santas, no two the same. 250 a hit."),
 			new Listing("Summer Break", "Weekends in summer and March break",
 					"Double arcade tickets, all day."),
-			new Listing("Quest Day", "Every other Monday",
+			new Listing("Quest Day", "Every day nothing else is on",
 					"Four quests, and 500 tickets for all four."),
 			new Listing("May the Fourth", "May 4",
 					"The ship flies to a Star Wars planet."),

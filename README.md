@@ -192,7 +192,7 @@ You can't do any event without floor 7.
 | 👻 **Spooky Shooter** | Every Sunday in October | You're in a crowd of 100 people, some of them lookalikes. A picture of one shows at a time and you find and shoot that one. Right = **1–200 event tickets** (targets holding a lightsaber or a shield are worth more). Wrong = **–50**, and that innocent dies and is gone. Runs all day; the crowd refills to 100 with new looks. |
 | 🎄 **Christmas** | Every Sunday in December | The same, but 100 Santa Clauses that look mostly the same — no two identical. Right = **+250**. Innocent = **–50**. |
 | 🕹️ **Summer Break** | Weekends in summer and March break | **Double arcade tickets.** |
-| 📜 **Quest Day** | Every other Monday | Four quests — a super easy, an easy, a medium and a hard. Finish all four for **500 event tickets**, then get another four, and so on. |
+| 📜 **Quest Day** | Every day nothing else is on | Four quests — a super easy, an easy, a medium and a hard. Finish all four for **500 event tickets**, then get another four, and so on. |
 | ⭐ **May the Fourth** | May 4 | The ship takes you to a Star Wars planet. **25 event tickets** per lightsaber fight you take, **100** if you win. |
 
 ## Shops
