@@ -597,10 +597,11 @@ public final class Ship {
 		if (!level.getBlockState(Places.PASSPORT_DESK).is(Blocks.LECTERN)) {
 			furnishShops(level);
 		}
+		// A lift car on every floor, including any floor this world has only
+		// just been given.
 		if (!level.getBlockState(Places.panel(Places.TOP_FLOOR)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				set(level, Places.panel(floor), Made.elevatorButton);
-				set(level, Places.panel(floor).above(), Blocks.REDSTONE_LAMP);
+				liftCar(level, floor, 1);
 			}
 		}
 
