@@ -39,7 +39,7 @@ public final class Floors {
 			case 7 -> "own one of every pet";
 			case 8 -> "earn 50 arcade tickets";
 			case 9 -> "swim a lap in 15 seconds";
-			case 10 -> "any event: earn event tickets, go to one, or take Summer Break's double";
+			case 10 -> "do an event -- Quest Day counts once you finish one of its four";
 			case 11, 12, 13 -> "1000 event tickets, all three";
 			case 14 -> "the 4.9% reward on floor 11";
 			default -> "upgrade your passport on floor 14";

@@ -151,7 +151,12 @@ public final class Events {
 					+ ALL[index].when() + ".").withStyle(ChatFormatting.GRAY));
 			return;
 		}
-		didAnEvent(player, "you went to an event");
+		// Turning up is enough at every event but Quest Day. That one is on
+		// most days, so walking in and walking out again would hand you floor
+		// 10 for nothing -- there you have to finish one of the four.
+		if (!name.equals("Quest Day")) {
+			didAnEvent(player, "you went to an event");
+		}
 		switch (name) {
 			case "Spooky Shooter" -> new Shooter(player, false).open();
 			case "Christmas" -> new Shooter(player, true).open();

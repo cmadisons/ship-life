@@ -136,10 +136,18 @@ public final class QuestDay {
 			return;
 		}
 		boolean all = true;
+		int finished = 0;
 		for (String part : set.split(",")) {
-			if (!done(player, part)) {
+			if (done(player, part)) {
+				finished++;
+			} else {
 				all = false;
 			}
+		}
+		// One of the four is what Quest Day asks before it counts as an event
+		// you did rather than an event you looked at.
+		if (finished > 0) {
+			Events.didAnEvent(player, "you finished a Quest Day quest");
 		}
 		if (all) {
 			Events.payTickets(player, PAYOUT, "all four Quest Day quests");
