@@ -105,6 +105,8 @@ public final class ArcadePackets {
 		if ("Summer Break".equals(Cal.eventToday())) {
 			tickets *= 2;
 			why = why + ", doubled for Summer Break";
+			// Summer Break is an event you attend by turning up at the arcade.
+			Events.didAnEvent(player, "you took Summer Break's double tickets");
 		}
 		State.arcade(player, tickets);
 		State.add(player, State.EARNED, tickets);

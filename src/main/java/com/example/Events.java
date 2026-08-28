@@ -68,17 +68,31 @@ public final class Events {
 		if (tickets > 0) {
 			tickets = Shops.multiplied(player, tickets);
 			State.add(player, State.EVENT_EARNED, tickets);
+			didAnEvent(player, "you earned event tickets");
 		}
 		State.event(player, tickets);
-		if (tickets > 0 && !State.hasFloor(player, 10)) {
-			State.unlock(player, 10);
-			player.sendSystemMessage(Component.literal(
-					"You did an event. Floor 10 -- the boss room -- is open.")
-					.withStyle(ChatFormatting.AQUA));
-		}
 		player.sendSystemMessage(Component.literal("+" + tickets + " event tickets  --  "
 				+ why + ". You have " + State.event(player) + ".")
 				.withStyle(ChatFormatting.GREEN));
+	}
+
+	/**
+	 * You have done an event, whatever doing one turned out to mean.
+	 *
+	 * Three things count, because all three are you having been at one:
+	 * earning event tickets, walking into whatever is running on floor 7, and
+	 * taking the doubled arcade tickets that Summer Break and March break
+	 * hand out. That last one is an event you can attend without noticing, so
+	 * it counts too.
+	 */
+	public static void didAnEvent(ServerPlayer player, String how) {
+		if (State.hasFloor(player, 10)) {
+			return;
+		}
+		State.unlock(player, 10);
+		player.sendSystemMessage(Component.literal(how
+				+ ". Floor 10 -- the boss room -- is open.")
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	/** The board on the wall of floor 7. */
@@ -137,6 +151,7 @@ public final class Events {
 					+ ALL[index].when() + ".").withStyle(ChatFormatting.GRAY));
 			return;
 		}
+		didAnEvent(player, "you went to an event");
 		switch (name) {
 			case "Spooky Shooter" -> new Shooter(player, false).open();
 			case "Christmas" -> new Shooter(player, true).open();
