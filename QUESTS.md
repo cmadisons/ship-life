@@ -3,7 +3,7 @@
 Design doc only. No mod code exists yet.
 
 - **Quest Day** (every other Monday): you get 4 quests — one super easy, one easy, one medium, one hard. Finish all 4 → **500 event tickets**, then a fresh set of 4, repeating.
-- **Random pool** (bottom of this file): once you own floors 8, 9 and 10, **25 arcade tickets** buys 3 quests drawn at random from the 250-quest pool.
+- **Random pool** (bottom of this file): once you own floors 7, 8 and 9, **25 arcade tickets** buys 3 quests drawn at random from the 250-quest pool.
 
 ---
 
@@ -491,7 +491,7 @@ Design doc only. No mod code exists yet.
 
 ## Random pool (250)
 
-Unlocked once you own floors 8, 9 and 10. **25 arcade tickets** buys the next 3 quests, drawn at random from this pool. **They pay out in event tickets.**
+Unlocked once you own floors 7, 8 and 9. **25 arcade tickets** buys the next 3 quests, drawn at random from this pool. **They pay out in event tickets.**
 
 ### Room & chores
 1. Wash 20 dishes across two days — 25

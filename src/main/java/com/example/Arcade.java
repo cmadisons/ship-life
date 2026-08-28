@@ -140,10 +140,10 @@ public final class Arcade {
 			return;
 		}
 		if (slot == 25) {
-			if (!(State.hasFloor(player, 8) && State.hasFloor(player, 9)
-					&& State.hasFloor(player, 10))) {
+			if (!(State.hasFloor(player, 7) && State.hasFloor(player, 8)
+					&& State.hasFloor(player, 9))) {
 				player.sendSystemMessage(Component.literal(
-						"The quest pool opens once you own floors 8, 9 and 10.")
+						"The quest pool opens once you own floors 7, 8 and 9.")
 						.withStyle(ChatFormatting.GRAY));
 				return;
 			}

@@ -163,7 +163,7 @@ too slow. A clean lap, no crashes and no running out of gas, is about 17.
 
 | Cost | Prize |
 |---|---|
-| 25 🎟️ | The next 3 quests — drawn at random from the [250-quest pool](QUESTS.md) once you own floors 8, 9 and 10. They pay out in event tickets. |
+| 25 🎟️ | The next 3 quests — drawn at random from the [250-quest pool](QUESTS.md) once you own floors 7, 8 and 9. They pay out in event tickets. |
 | 10 🎟️ | A pet |
 
 ## Pets
