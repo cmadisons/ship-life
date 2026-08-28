@@ -28,7 +28,7 @@ public final class Floors {
 			case 13 -> "The Keg";
 			case 14 -> "Passports";
 			case 15 -> "Ben's Room";
-			default -> "Floor 16";
+			default -> "Izzy's Room";
 		};
 	}
 

@@ -98,14 +98,24 @@ public final class Ship {
 	 * because most worlds will never buy it and a second empty tower is a lot
 	 * of blocks to lay down on the chance.
 	 */
-	public static void buildSecond(ServerLevel level) {
-		if (level.getBlockState(Places.onShip(Places.panel(1), 2)).is(Made.elevatorButton)) {
+	/**
+	 * Pull ship 2 down.
+	 *
+	 * It was this ship again floor for floor with nothing new on it and no
+	 * way in since the lift stopped offering it, so what is left is a
+	 * hundred-block tower nobody can reach. This clears the whole footprint
+	 * back to air, once, the first time a world with one in it is loaded.
+	 */
+	public static void clearSecond(ServerLevel level) {
+		int x = Places.SHIP_X + Places.SHIP_TWO_OFFSET;
+		int z = Places.SHIP_Z;
+		int r = Places.ROOM + 1;
+		if (!level.getBlockState(Places.onShip(Places.panel(1), 2)).is(Made.elevatorButton)) {
 			return;
 		}
-		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-			buildFloor(level, floor, 2);
-		}
-		ShipLifeMod.LOGGER.info("Built ship 2.");
+		fill(level, x - r, Places.GROUND, z - r,
+				x + r, Places.floorY(Places.TOP_FLOOR) + 8, z + r, Blocks.AIR);
+		ShipLifeMod.LOGGER.info("Pulled ship 2 down.");
 	}
 
 	private static void buildShip(ServerLevel level) {
@@ -121,6 +131,7 @@ public final class Ship {
 		furnishEvents(level);
 		furnishShops(level);
 		furnishBensRoom(level);
+		furnishIzzysRoom(level);
 		furnishYourRoom(level);
 	}
 
@@ -380,6 +391,21 @@ public final class Ship {
 	}
 
 	/** Floor 15: Ben's, and it looks lived in rather than fitted out. */
+	/** Floor 16: Izzy's, laid out like Ben's but hers. */
+	private static void furnishIzzysRoom(ServerLevel level) {
+		int y = Places.floorY(16);
+		set(level, Places.IZZY, Blocks.BIRCH_DOOR);
+		door(level, Places.IZZY);
+		set(level, Places.IZZY.above(2), Blocks.SEA_LANTERN);
+		fill(level, Places.SHIP_X - 6, y, Places.SHIP_Z - 6,
+				Places.SHIP_X + 6, y, Places.SHIP_Z + 6, Blocks.BIRCH_PLANKS);
+		bed(level, new BlockPos(Places.SHIP_X + 4, y + 1, Places.SHIP_Z + 4));
+		set(level, new BlockPos(Places.SHIP_X - 4, y + 1, Places.SHIP_Z + 4), Blocks.BOOKSHELF);
+		set(level, new BlockPos(Places.SHIP_X - 4, y + 2, Places.SHIP_Z + 4),
+				Blocks.POTTED_FERN);
+		set(level, new BlockPos(Places.SHIP_X - 4, y + 1, Places.SHIP_Z - 4), Blocks.JUKEBOX);
+	}
+
 	private static void furnishBensRoom(ServerLevel level) {
 		int y = Places.floorY(15);
 		set(level, Places.BEN, Blocks.OAK_DOOR);
@@ -435,6 +461,9 @@ public final class Ship {
 	 * gets its bushes back rather than needing to be started again.
 	 */
 	public static void repair(ServerLevel level) {
+		// Ship 2 came out of the lift, so it comes out of the world.
+		clearSecond(level);
+
 		// The walls went black. Rebuilding a floor only lays the shell -- the
 		// furniture sits a block above it -- but the fittings are put back
 		// afterwards anyway, so nothing is lost either way.
@@ -446,10 +475,6 @@ public final class Ship {
 				|| !level.getBlockState(deck).is(Blocks.BLACK_CONCRETE)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				buildFloor(level, floor);
-				if (level.getBlockState(Places.onShip(Places.panel(floor), 2))
-						.is(Made.elevatorButton)) {
-					buildFloor(level, floor, 2);
-				}
 			}
 			furnishLobby(level);
 			furnishArcade(level);
@@ -459,6 +484,7 @@ public final class Ship {
 			furnishEvents(level);
 			furnishShops(level);
 		furnishBensRoom(level);
+		furnishIzzysRoom(level);
 			furnishYourRoom(level);
 			ShipLifeMod.LOGGER.info("Repainted the ship's walls black.");
 		}
@@ -492,6 +518,7 @@ public final class Ship {
 		furnishEvents(level);
 		furnishShops(level);
 		furnishBensRoom(level);
+		furnishIzzysRoom(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}
 		// The pool used to be a glass tank standing on the floor.

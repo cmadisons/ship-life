@@ -28,9 +28,12 @@ import net.minecraft.world.entity.TamableAnimal;
  * all follow you at once, and two of a kind doubles the boost -- except the
  * cat, whose floor is either open or it isn't.
  *
- * They are tamed wolves and cats wearing a name, because that is what follows
- * you around in Minecraft without a single new model. A lion that looks like a
- * lion needs art this mod does not have yet.
+ * The lion is an ocelot and the dolphin is a dolphin, because those are the
+ * models Minecraft has that look like the animal on the tin. Neither can be
+ * tamed and neither follows anybody, so the ship keeps them with you itself:
+ * stray more than a dozen blocks and your pet turns up beside you. The dolphin
+ * is kept from drying out the same way -- a pet that dies of being indoors is
+ * no pet.
  */
 public final class Pets {
 	private Pets() {
@@ -74,6 +77,33 @@ public final class Pets {
 		return types;
 	}
 
+	/**
+	 * Keep the ones that cannot follow with you.
+	 *
+	 * A wolf follows its owner on its own. An ocelot and a dolphin do not, so
+	 * once a second anything of yours more than a dozen blocks off is put back
+	 * beside you, and its air is topped up while we are there.
+	 */
+	private static void herd(ServerPlayer player, ServerLevel level) {
+		for (net.minecraft.world.entity.Mob pet : level.getEntitiesOfClass(
+				net.minecraft.world.entity.Mob.class,
+				player.getBoundingBox().inflate(64.0),
+				mob -> mob.getCustomName() != null && !(mob instanceof TamableAnimal))) {
+			String name = pet.getCustomName().getString();
+			boolean ours = false;
+			for (Kind kind : Kind.values()) {
+				ours = ours || kind.label.equals(name);
+			}
+			if (!ours) {
+				continue;
+			}
+			pet.setAirSupply(pet.getMaxAirSupply());
+			if (pet.distanceToSqr(player) > 12 * 12) {
+				pet.teleportTo(player.getX() + 1, player.getY(), player.getZ() + 1);
+			}
+		}
+	}
+
 	public static int owned(ServerPlayer player, Kind kind) {
 		return player.getAttachedOrCreate(OWNED[kind.ordinal()]);
 	}
@@ -86,6 +116,16 @@ public final class Pets {
 			}
 		}
 		return true;
+	}
+
+	/** What each pet looks like. */
+	private static EntityType<? extends net.minecraft.world.entity.Mob> model(Kind kind) {
+		return switch (kind) {
+			case LION -> EntityType.OCELOT;
+			case DOLPHIN -> EntityType.DOLPHIN;
+			case CAT -> EntityType.CAT;
+			default -> EntityType.WOLF;
+		};
 	}
 
 	public static int total(ServerPlayer player) {
@@ -217,13 +257,18 @@ public final class Pets {
 	private static void spawn(ServerPlayer player, Kind kind) {
 		ServerLevel level = (ServerLevel) player.level();
 		BlockPos at = player.blockPosition();
-		TamableAnimal pet = kind == Kind.CAT
-				? EntityType.CAT.spawn(level, at, EntitySpawnReason.MOB_SUMMONED)
-				: EntityType.WOLF.spawn(level, at, EntitySpawnReason.MOB_SUMMONED);
+		net.minecraft.world.entity.Mob pet = model(kind).spawn(level, at,
+				EntitySpawnReason.MOB_SUMMONED);
 		if (pet == null) {
 			return;
 		}
-		pet.tame(player);
+		if (pet instanceof TamableAnimal tame) {
+			tame.tame(player);
+		} else {
+			// An ocelot or a dolphin cannot be tamed, and neither should be
+			// able to come to any harm indoors.
+			pet.setInvulnerable(true);
+		}
 		pet.setCustomName(Component.literal(kind.label).withStyle(ChatFormatting.AQUA));
 		pet.setCustomNameVisible(true);
 		pet.setPersistenceRequired();
@@ -249,6 +294,7 @@ public final class Pets {
 				}
 				for (ServerPlayer player : level.players()) {
 					boosts(player);
+					herd(player, level);
 				}
 			}
 		});

@@ -10,6 +10,10 @@ package com.example;
  *
  * Everything here is worked out from the wall clock, so nothing has to be
  * saved and two players in the same world always agree on the date.
+ *
+ * A week runs Sunday to Saturday, which is what the Quest Day rule reads:
+ * Quest Day is on every day of a week that has nothing else in it, and no day
+ * at all of a week that does.
  */
 public final class Cal {
 	private Cal() {
@@ -73,17 +77,19 @@ public final class Cal {
 	// ----------------------------------------------------------------- events
 
 	/**
-	 * Which event is on today.
+	 * The event on a given day, not counting Quest Day.
 	 *
-	 * Never nothing. The five dated events take the days they fall on and
-	 * Quest Day takes all the rest, because a day with no event is a day with
-	 * nothing to do.
+	 * Everything is worked out from the day number so any day can be asked
+	 * about, not only today -- which is what the Quest Day rule needs.
 	 */
-	public static String eventToday() {
-		boolean sunday = weekday().equals("Sunday");
-		boolean weekend = sunday || weekday().equals("Saturday");
-		int month = monthNumber();
-		if (month == 4 && dayOfMonth() == 4) {
+	private static String dated(long day) {
+		int dayOfMonth = (int) (day % DAYS_IN_MONTH) + 1;
+		int month = (int) ((day / DAYS_IN_MONTH) % MONTHS_IN_YEAR);
+		String weekday = WEEKDAYS[(int) (day % 7)];
+		boolean sunday = weekday.equals("Sunday");
+		boolean weekend = sunday || weekday.equals("Saturday");
+
+		if (month == 4 && dayOfMonth == 4) {
 			return "May the Fourth";
 		}
 		if (sunday && month == 9) {
@@ -94,12 +100,36 @@ public final class Cal {
 		}
 		// Summer is June through August; March break is the third week of March.
 		boolean summer = month >= 5 && month <= 7;
-		boolean marchBreak = month == 2 && dayOfMonth() >= 15 && dayOfMonth() <= 21;
+		boolean marchBreak = month == 2 && dayOfMonth >= 15 && dayOfMonth <= 21;
 		if (weekend && (summer || marchBreak)) {
 			return "Summer Break";
 		}
-		// Quest Day fills every day nothing else has. There is always
-		// something on: a day with no event is a day with nothing to do.
-		return "Quest Day";
+		return null;
+	}
+
+	/** Does the week this day falls in have a real event anywhere in it? */
+	private static boolean busyWeek(long day) {
+		long sunday = day - (day % 7);
+		for (long each = sunday; each < sunday + 7; each++) {
+			if (dated(each) != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Which event is on today, or null for none.
+	 *
+	 * The five dated events take the days they fall on. Quest Day fills the
+	 * rest of a quiet week -- but only a quiet week: a week with anything else
+	 * in it belongs to that, and the days around it are days off.
+	 */
+	public static String eventToday() {
+		String dated = dated(dayNumber());
+		if (dated != null) {
+			return dated;
+		}
+		return busyWeek(dayNumber()) ? null : "Quest Day";
 	}
 }

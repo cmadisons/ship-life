@@ -414,7 +414,6 @@ public final class Shops {
 		// Floor 15 comes with the upgrade rather than being bought: the first
 		// thing a better passport gets you is somebody to knock on.
 		State.unlock(player, 15);
-		Ship.buildSecond(level);
 		player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
 		player.sendSystemMessage(Component.literal("Your passport is upgraded.")
 				.withStyle(ChatFormatting.LIGHT_PURPLE));

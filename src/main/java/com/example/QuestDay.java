@@ -11,16 +11,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * Quest Day, every other Monday.
+ * Quest Day, on every day of a week that has nothing else on.
  *
  * Four quests -- a super easy, an easy, a medium and a hard -- and five
  * hundred event tickets for finishing all four. Do that and four more arrive,
  * worth another five hundred, for as long as the day lasts.
  *
- * The quests here are the ones the game can actually check. QUESTS.md has six
- * hundred and fifty written, but most of them are about the race track, the
- * bosses and the shops, and a quest the mod cannot see you finish is a quest
- * on the honour system. As those floors get built their quests move in here.
+ * The quests here are the ones the game can actually check, which is now the
+ * only kind there is: QUESTS.md used to have six hundred and fifty written out
+ * and most of them were descriptions rather than numbers -- turn on your TV,
+ * look in the mirror -- so they were cut. A quest the mod cannot see you
+ * finish is a quest on the honour system.
  */
 public final class QuestDay {
 	private QuestDay() {

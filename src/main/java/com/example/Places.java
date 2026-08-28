@@ -129,6 +129,9 @@ public final class Places {
 	/** Ben's door on floor 15. He is the first friend you make. */
 	public static final BlockPos BEN = new BlockPos(SHIP_X, floorY(15) + 1, SHIP_Z - 8);
 
+	/** Izzy's door, on floor 16. */
+	public static final BlockPos IZZY = new BlockPos(SHIP_X, floorY(16) + 1, SHIP_Z - 8);
+
 	/** The desk on floor 14 that upgrades your passport. */
 	public static final BlockPos PASSPORT_DESK =
 			new BlockPos(SHIP_X, floorY(14) + 1, SHIP_Z - 8);

@@ -48,7 +48,9 @@ public final class Book {
 				State.event(player) + " event tickets",
 				"",
 				Cal.date(),
-				"Today: " + Events.running(player)));
+				Events.running(player) == null
+						? "Nothing on today."
+						: "Today: " + Events.running(player)));
 
 		// One quest per slot along the middle two rows.
 		for (int index = 0; index < Quests.ALL.length && index < 14; index++) {
@@ -75,12 +77,67 @@ public final class Book {
 					lore.toArray(new String[0])));
 		}
 
+		page.setItem(42, entry(Items.FILLED_MAP, "Map of the Ship", ChatFormatting.AQUA,
+				"Every floor, drawn as a tower.",
+				"Floor " + Places.floorAt(player.getY()) + " is where you are.",
+				"",
+				"Click to open it."));
+
 		page.setItem(49, entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
 
 		player.openMenu(new SimpleMenuProvider(
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
 						(clicker, slot) -> click(clicker, slot, here)),
 				Component.literal("Quest Book")));
+	}
+
+	/**
+	 * The ship drawn as a ship.
+	 *
+	 * Sixteen floors will not fit in one column of a chest, so the tower is
+	 * cut into three stacks of six and stood side by side, highest floor at
+	 * the top left. Where you are is lit up, what you own is white, and what
+	 * you do not own says what would open it.
+	 */
+	private static void map(ServerPlayer player) {
+		SimpleContainer page = new SimpleContainer(54);
+		ItemStack filler = new ItemStack(Items.BLACK_STAINED_GLASS_PANE);
+		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
+		for (int slot = 0; slot < 54; slot++) {
+			page.setItem(slot, filler.copy());
+		}
+
+		int on = Places.floorAt(player.getY());
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			// Highest floor top-left, counting down each stack of six.
+			int fromTop = Places.TOP_FLOOR - floor;
+			int column = 2 + (fromTop / 6) * 2;
+			int row = fromTop % 6;
+			boolean yours = State.hasFloor(player, floor);
+			page.setItem(row * 9 + column, entry(
+					floor == on ? Items.LIME_DYE : yours ? Items.WHITE_DYE : Items.IRON_DOOR,
+					"Floor " + floor + " -- " + Floors.name(floor),
+					floor == on ? ChatFormatting.GREEN
+							: yours ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY,
+					floor == on ? "You are here." : yours ? "Yours." : "Locked.",
+					yours ? "" : "Opens with: " + Floors.how(floor)));
+		}
+
+		page.setItem(8, entry(Items.COMPASS, "The Ship", ChatFormatting.AQUA,
+				Places.TOP_FLOOR + " floors.",
+				"Highest at the top left, counting down.",
+				"Green is where you are standing."));
+		page.setItem(53, entry(Items.WRITABLE_BOOK, "Back", ChatFormatting.YELLOW,
+				"Back to the Quest Book."));
+
+		player.openMenu(new SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
+						(clicker, slot) -> {
+							if (slot == 53) {
+								open(clicker);
+							}
+						}),
+				Component.literal("Map of the Ship")));
 	}
 
 	private static ItemStack questIcon(ServerPlayer player, int index, int here) {
@@ -132,6 +189,10 @@ public final class Book {
 	private static void click(ServerPlayer player, int slot, int here) {
 		if (slot == 49) {
 			player.closeContainer();
+			return;
+		}
+		if (slot == 42) {
+			map(player);
 			return;
 		}
 		// Clicking the quest you are on re-points the star at it.

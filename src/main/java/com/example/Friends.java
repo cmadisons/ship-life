@@ -41,6 +41,7 @@ public final class Friends {
 					.buildAndRegister(ShipLifeMod.id("friends_met"));
 
 	public static final int BEN = 0;
+	public static final int IZZY = 1;
 
 	public static boolean knows(ServerPlayer player, int friend) {
 		return (player.getAttachedOrCreate(MET) & (1 << friend)) != 0;
@@ -55,6 +56,10 @@ public final class Friends {
 			BlockPos pos = Places.local(hit.getBlockPos());
 			if (pos.equals(Places.BEN) || pos.equals(Places.BEN.above())) {
 				ben(who, level);
+				return InteractionResult.SUCCESS;
+			}
+			if (pos.equals(Places.IZZY) || pos.equals(Places.IZZY.above())) {
+				izzy(who, level);
 				return InteractionResult.SUCCESS;
 			}
 			return InteractionResult.PASS;
@@ -81,6 +86,43 @@ public final class Friends {
 		player.sendSystemMessage(Component.literal("Ben gave you his armour and 3 bombs.")
 				.withStyle(ChatFormatting.LIGHT_PURPLE));
 		return true;
+	}
+
+	/**
+	 * Izzy, on floor 16.
+	 *
+	 * The second friend, and the floor you fight your way to rather than pay
+	 * for. What she is actually for has not been decided yet, so for now she
+	 * knows who you are and how the fighting has been going.
+	 */
+	private static void izzy(ServerPlayer player, ServerLevel level) {
+		level.playSound(null, Places.IZZY, SoundEvents.NOTE_BLOCK_BELL.value(),
+				SoundSource.PLAYERS, 0.6f, 1.8f);
+
+		if (!knows(player, IZZY)) {
+			player.setAttached(MET, player.getAttachedOrCreate(MET) | (1 << IZZY));
+			player.sendSystemMessage(Component.literal(
+					"Izzy: \"You came up the hard way, then -- nobody gets to 16 "
+					+ "without going through the fight room. I'm Izzy.\"")
+					.withStyle(ChatFormatting.WHITE));
+			player.sendSystemMessage(Component.literal("Izzy is your second friend.")
+					.withStyle(ChatFormatting.LIGHT_PURPLE));
+			return;
+		}
+
+		int waves = State.tally(player, State.WAVES);
+		int bosses = State.tally(player, State.BOSSES);
+		String about;
+		if (bosses > 0) {
+			about = bosses + " boss" + (bosses == 1 ? "" : "es") + " down. "
+					+ "You are getting good at this.";
+		} else if (waves > 2) {
+			about = waves + " waves and no boss yet. The doors are right there.";
+		} else {
+			about = "Been down on 9 lately?";
+		}
+		player.sendSystemMessage(Component.literal("Izzy: \"" + about + "\"")
+				.withStyle(ChatFormatting.WHITE));
 	}
 
 	/** What three more of his bombs cost. */

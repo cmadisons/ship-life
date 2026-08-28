@@ -38,8 +38,14 @@ public final class Fight {
 	private Fight() {
 	}
 
-	/** What a cleared wave pays. */
+	/** What the first wave pays, and what each one after adds. */
 	public static final int WAVE_PAYS = 25;
+	public static final int WAVE_STEP = 15;
+
+	/** What clearing wave n is worth. Wave 1 pays 25, wave 20 pays 310. */
+	public static int wavePay(int number) {
+		return Math.min(500, WAVE_PAYS + WAVE_STEP * (number - 1));
+	}
 
 	/** Everything alive that this floor put there, per player. */
 	private static final List<Mob> SPAWNED = new ArrayList<>();
@@ -186,7 +192,7 @@ public final class Fight {
 			spawn(level, kind, spot(level, 9), 1.0 + number * 0.1, null);
 		}
 		player.sendSystemMessage(Component.literal("Wave " + number + " -- " + howMany
-				+ " of them. Clearing it pays " + WAVE_PAYS + " event tickets.")
+				+ " of them. Clearing it pays " + wavePay(number) + " event tickets.")
 				.withStyle(ChatFormatting.RED));
 		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BASS.value(),
 				SoundSource.PLAYERS, 1.0f, 0.6f);
