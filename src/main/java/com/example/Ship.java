@@ -485,7 +485,9 @@ public final class Ship {
 		}
 
 		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
-		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
+		// Iron over the button. A redstone lamp up there was never wired to
+		// anything, so it was a light that never lit.
+		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.IRON_BLOCK);
 		set(level, new BlockPos(x0 + 2, y + n - 1, z0 + 2), Blocks.SEA_LANTERN);
 
 		ironDoor(level, Places.onShip(Places.liftDoorEast(floor), ship), Direction.EAST);
@@ -857,34 +859,9 @@ public final class Ship {
 							&& ship == 2) {
 						continue;             // ship 2 was never built here
 					}
-					// A second skin on the outside of the car, so its walls are two thick
-		// like the ship's are. The two doorways are left open, and anything
-		// that would land on the room's own wall is left alone -- the hull is
-		// already two blocks there.
-		for (int dx = -1; dx <= n; dx++) {
-			for (int dz = -1; dz <= n; dz++) {
-				if (dx != -1 && dx != n && dz != -1 && dz != n) {
-					continue;                        // the car itself
-				}
-				int wx = x0 + dx;
-				int wz = z0 + dz;
-				if (wx <= Places.SHIP_X - Places.ROOM || wz <= Places.SHIP_Z - Places.ROOM) {
-					continue;                        // that is the ship's wall
-				}
-				boolean doorway = (dx == n && dz == 2) || (dz == n && dx == 2);
-				for (int dy = 1; dy <= n; dy++) {
-					if (doorway && dy <= 2) {
-						continue;                    // walk through here
-					}
-					set(level, new BlockPos(wx, y + dy, wz),
-							dy == n ? Blocks.GRAY_CONCRETE : Blocks.QUARTZ_BLOCK);
-				}
-			}
-		}
-
-		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
+					set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
 					set(level, Places.onShip(Places.panel(floor), ship).above(),
-							Blocks.REDSTONE_LAMP);
+							Blocks.IRON_BLOCK);
 					set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
 					set(level, Places.onShip(Places.lift(floor), ship).above(), Blocks.AIR);
 					door(level, was);
