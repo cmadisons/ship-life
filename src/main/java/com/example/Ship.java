@@ -673,9 +673,13 @@ public final class Ship {
 			}
 		}
 
-		// The cistern behind it, three high. The bathroom wall is west of the
-		// bowl, so behind is that way.
-		fill(level, x - 1, y, z, x - 1, y + 2, z, Blocks.QUARTZ_BRICKS);
+		// The back: the three blocks along the north edge of the square, four
+		// blocks high. That is one side round from where the back was, and it
+		// is the side you are looking at from the rest of the room.
+		fill(level, x - 1, y, z - 1, x + 1, y + 3, z - 1, Blocks.QUARTZ_BRICKS);
+
+		// The old back, west of the bowl, goes back to being floor.
+		fill(level, x - 1, y + 1, z, x - 1, y + 3, z, Blocks.AIR);
 
 		set(level, where, Blocks.CAULDRON);
 	}
@@ -741,8 +745,8 @@ public final class Ship {
 		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.BLACK_WOOL)) {
 			furnishLobby(level);
 		}
-		// The toilet was a cauldron on its own.
-		if (!level.getBlockState(Places.TOILET.north()).is(Blocks.QUARTZ_BRICKS)) {
+		// The toilet was a cauldron on its own, and then it had a low back.
+		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)) {
 			toilet(level, Places.TOILET);
 		}
 		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {
