@@ -56,7 +56,7 @@ public final class Elevator {
 	private static final int HOLD = 100;
 
 	/**
-	 * The plates each side of the two doors.
+	 * The plates either side of the door.
 	 *
 	 * All they do is open the doors. The lift's own panel is the button on
 	 * the wall inside the car -- a plate that put the floor list in front of
@@ -100,7 +100,6 @@ public final class Elevator {
 		if (ON_PLATE.put(player.getUUID(), player.level().getGameTime()) == null
 				&& player.level() instanceof net.minecraft.server.level.ServerLevel level) {
 			swing(level, Places.liftDoorEast(floor), true);
-			swing(level, Places.liftDoorSouth(floor), true);
 		}
 	}
 

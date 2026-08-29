@@ -473,7 +473,7 @@ public final class Ship {
 				if (wx <= Places.SHIP_X - Places.ROOM || wz <= Places.SHIP_Z - Places.ROOM) {
 					continue;                        // that is the ship's wall
 				}
-				boolean doorway = (dx == n && dz == 2) || (dz == n && dx == 2);
+				boolean doorway = dx == n && dz == 2;
 				for (int dy = 1; dy <= n; dy++) {
 					if (doorway && dy <= 2) {
 						continue;                    // walk through here
@@ -490,8 +490,11 @@ public final class Ship {
 		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.IRON_BLOCK);
 		set(level, new BlockPos(x0 + 2, y + n - 1, z0 + 2), Blocks.SEA_LANTERN);
 
+		// One door, the far one from the button.
 		ironDoor(level, Places.onShip(Places.liftDoorEast(floor), ship), Direction.EAST);
-		ironDoor(level, Places.onShip(Places.liftDoorSouth(floor), ship), Direction.SOUTH);
+		BlockPos wasDoor = Places.onShip(Places.oldDoorSouth(floor), ship);
+		set(level, wasDoor, Blocks.QUARTZ_BLOCK);
+		set(level, wasDoor.above(), Blocks.QUARTZ_BLOCK);
 
 		for (BlockPos plate : Places.liftPlates(floor)) {
 			BlockPos at = Places.onShip(plate, ship);
@@ -803,7 +806,6 @@ public final class Ship {
 			// And the lift's doors were wood.
 			if (level.getBlockState(Places.liftDoorEast(floor)).is(Blocks.OAK_DOOR)) {
 				ironDoor(level, Places.liftDoorEast(floor), Direction.EAST);
-				ironDoor(level, Places.liftDoorSouth(floor), Direction.SOUTH);
 			}
 		}
 
@@ -853,7 +855,6 @@ public final class Ship {
 			// And the lift's doors were wood.
 			if (level.getBlockState(Places.liftDoorEast(floor)).is(Blocks.OAK_DOOR)) {
 				ironDoor(level, Places.liftDoorEast(floor), Direction.EAST);
-				ironDoor(level, Places.liftDoorSouth(floor), Direction.SOUTH);
 			}
 		}
 

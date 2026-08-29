@@ -160,23 +160,27 @@ public final class Places {
 	/** The car is five by five by five, walls included. */
 	public static final int LIFT_SIZE = 5;
 
-	/** The two ways out: one facing along the room, one facing across it. */
+	/**
+	 * The way out.
+	 *
+	 * One door, on the far side of the car from the button, so pressing for a
+	 * floor and walking out are not the same corner.
+	 */
 	public static BlockPos liftDoorEast(int floor) {
 		return new BlockPos(LIFT_X + LIFT_SIZE - 1, floorY(floor) + 1, LIFT_Z + 2);
 	}
 
-	public static BlockPos liftDoorSouth(int floor) {
+	/** Where the second door used to be, before there was only one. */
+	public static BlockPos oldDoorSouth(int floor) {
 		return new BlockPos(LIFT_X + 2, floorY(floor) + 1, LIFT_Z + LIFT_SIZE - 1);
 	}
 
-	/** The plate each side of each door: step on one and the lift opens. */
+	/** The plate each side of the door: step on one and it opens. */
 	public static BlockPos[] liftPlates(int floor) {
 		int y = floorY(floor) + 1;
 		return new BlockPos[] {
-			new BlockPos(LIFT_X + LIFT_SIZE, y, LIFT_Z + 2),        // outside east
-			new BlockPos(LIFT_X + LIFT_SIZE - 2, y, LIFT_Z + 2),    // inside east
-			new BlockPos(LIFT_X + 2, y, LIFT_Z + LIFT_SIZE),        // outside south
-			new BlockPos(LIFT_X + 2, y, LIFT_Z + LIFT_SIZE - 2),    // inside south
+			new BlockPos(LIFT_X + LIFT_SIZE, y, LIFT_Z + 2),        // outside
+			new BlockPos(LIFT_X + LIFT_SIZE - 2, y, LIFT_Z + 2),    // inside
 		};
 	}
 
