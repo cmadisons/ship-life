@@ -682,6 +682,13 @@ public final class Ship {
 		fill(level, x - 1, y + 1, z, x - 1, y + 3, z, Blocks.AIR);
 
 		set(level, where, Blocks.CAULDRON);
+
+		// The handle, on the face of the cistern above the bowl.
+		level.setBlockAndUpdate(Places.FLUSH, Blocks.LEVER.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.LeverBlock.FACE,
+						net.minecraft.world.level.block.state.properties.AttachFace.WALL)
+				.setValue(net.minecraft.world.level.block.LeverBlock.FACING,
+						Direction.SOUTH));
 	}
 
 	private static void furnishYourRoom(ServerLevel level) {
@@ -692,10 +699,7 @@ public final class Ship {
 		set(level, Places.TV.above(), Blocks.BLACK_CONCRETE);
 		set(level, Places.PHONE, Blocks.OAK_PRESSURE_PLATE);
 		bed(level, Places.BED);
-		// A bathroom corner, so the toilet isn't in the middle of the room.
-		fill(level, Places.SHIP_X + 5, Places.floorY(5) + 1, Places.SHIP_Z - 12,
-				Places.SHIP_X + 5, Places.floorY(5) + 4, Places.SHIP_Z - 5,
-				Blocks.WHITE_CONCRETE);
+
 	}
 
 	/**
@@ -745,9 +749,22 @@ public final class Ship {
 		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.BLACK_WOOL)) {
 			furnishLobby(level);
 		}
-		// The toilet was a cauldron on its own, and then it had a low back.
-		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)) {
+		// The toilet was a cauldron on its own, then it had a low back, and
+		// then it had no handle.
+		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
+				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)) {
 			toilet(level, Places.TOILET);
+		}
+
+		// The white wall that used to stand beside the toilet.
+		for (int dy = 1; dy <= 4; dy++) {
+			for (int dz = -12; dz <= -5; dz++) {
+				BlockPos pos = new BlockPos(Places.SHIP_X + 5, Places.floorY(5) + dy,
+						Places.SHIP_Z + dz);
+				if (level.getBlockState(pos).is(Blocks.WHITE_CONCRETE)) {
+					set(level, pos, Blocks.AIR);
+				}
+			}
 		}
 		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {
 			furnishBensRoom(level);

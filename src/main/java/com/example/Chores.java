@@ -230,6 +230,24 @@ public final class Chores {
 			}
 		}
 
+		// --- the handle on the cistern ----------------------------------------
+		//
+		// It flushes: the sound, the water, and nothing else. In particular it
+		// does not unblock a blocked one -- that is the plunger's job, and a
+		// handle that did it would be a quest you could skip by pulling a
+		// lever.
+		if (pos.equals(Places.FLUSH)) {
+			level.playSound(null, Places.FLUSH, SoundEvents.BUCKET_EMPTY,
+					SoundSource.BLOCKS, 0.7f, 1.2f);
+			level.sendParticles(net.minecraft.core.particles.ParticleTypes.SPLASH,
+					Places.TOILET.getX() + 0.5, Places.TOILET.getY() + 0.9,
+					Places.TOILET.getZ() + 0.5, 14, 0.2, 0.1, 0.2, 0.05);
+			if (Quests.on(player, 4, 0)) {
+				say(player, "It gurgles and stays where it is. You need the plunger.");
+			}
+			return InteractionResult.SUCCESS;
+		}
+
 		// --- the security desk and Charlie's table ----------------------------
 		if (pos.equals(Places.DESK) || pos.equals(Places.DESK.above())) {
 			security(player);

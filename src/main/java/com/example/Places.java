@@ -340,5 +340,8 @@ public final class Places {
 	public static final BlockPos PHONE = new BlockPos(SHIP_X - 4, ROOM_Y, SHIP_Z + 6);
 
 	/** The four things Quest 3 asks you to find, in the order it counts them. */
+	/** The handle on the cistern. Pull it and the toilet flushes. */
+	public static final BlockPos FLUSH = TOILET.above(2);
+
 	public static final BlockPos[] ROOM_THINGS = { TOILET, FRIDGE, BED, TV };
 }
