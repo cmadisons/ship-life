@@ -344,12 +344,13 @@ public final class Places {
 
 	/** The four things Quest 3 asks you to find, in the order it counts them. */
 	/**
-	 * The handle on the cistern: top left as you stand at the toilet.
+	 * The handle: on the side of the cistern, not its front.
 	 *
-	 * The back wall is three wide and four high behind the bowl, and this is
-	 * the west end of it, near the top.
+	 * The back wall runs three blocks across behind the bowl, and this hangs
+	 * off the west end of it, facing out along the wall rather than into the
+	 * room.
 	 */
-	public static final BlockPos FLUSH = TOILET.west().above(3);
+	public static final BlockPos FLUSH = TOILET.offset(-2, 3, -1);
 
 	public static final BlockPos[] ROOM_THINGS = { TOILET, FRIDGE, BED, TV };
 }

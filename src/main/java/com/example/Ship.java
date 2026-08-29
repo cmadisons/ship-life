@@ -688,15 +688,17 @@ public final class Ship {
 
 		set(level, where, Blocks.CAULDRON);
 
-		// Where the handle used to be, in the middle of the cistern.
+		// Where the handle used to be: the middle of the cistern, and then the
+		// front of its top left.
 		set(level, where.above(2), Blocks.AIR);
+		set(level, where.west().above(3), Blocks.AIR);
 
-		// The handle, at the top left of the cistern as you stand at it.
+		// The handle, on the side of the cistern.
 		level.setBlockAndUpdate(Places.FLUSH, Blocks.LEVER.defaultBlockState()
 				.setValue(net.minecraft.world.level.block.LeverBlock.FACE,
 						net.minecraft.world.level.block.state.properties.AttachFace.WALL)
 				.setValue(net.minecraft.world.level.block.LeverBlock.FACING,
-						Direction.SOUTH));
+						Direction.WEST));
 	}
 
 	private static void furnishYourRoom(ServerLevel level) {
