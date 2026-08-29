@@ -459,6 +459,31 @@ public final class Ship {
 			}
 		}
 
+		// A second skin on the outside of the car, so its walls are two thick
+		// like the ship's are. The two doorways are left open, and anything
+		// that would land on the room's own wall is left alone -- the hull is
+		// already two blocks there.
+		for (int dx = -1; dx <= n; dx++) {
+			for (int dz = -1; dz <= n; dz++) {
+				if (dx != -1 && dx != n && dz != -1 && dz != n) {
+					continue;                        // the car itself
+				}
+				int wx = x0 + dx;
+				int wz = z0 + dz;
+				if (wx <= Places.SHIP_X - Places.ROOM || wz <= Places.SHIP_Z - Places.ROOM) {
+					continue;                        // that is the ship's wall
+				}
+				boolean doorway = (dx == n && dz == 2) || (dz == n && dx == 2);
+				for (int dy = 1; dy <= n; dy++) {
+					if (doorway && dy <= 2) {
+						continue;                    // walk through here
+					}
+					set(level, new BlockPos(wx, y + dy, wz),
+							dy == n ? Blocks.GRAY_CONCRETE : Blocks.QUARTZ_BLOCK);
+				}
+			}
+		}
+
 		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
 		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
 		set(level, new BlockPos(x0 + 2, y + n - 1, z0 + 2), Blocks.SEA_LANTERN);
@@ -709,10 +734,13 @@ public final class Ship {
 			ShipLifeMod.LOGGER.info("Thickened the hull to two blocks.");
 		}
 
-		// The lift car had glass sides, and its button was on another wall.
+		// The lift car had glass sides, one-block walls, and its button on
+		// another wall.
 		if (level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE - 1,
 				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)
-				|| !level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
+				|| !level.getBlockState(Places.panel(1)).is(Made.elevatorButton)
+				|| !level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE,
+						Places.floorY(1) + 4, Places.LIFT_Z + 2)).is(Blocks.QUARTZ_BLOCK)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor, 1);
 			}
@@ -756,10 +784,13 @@ public final class Ship {
 			ShipLifeMod.LOGGER.info("Thickened the hull to two blocks.");
 		}
 
-		// The lift car had glass sides, and its button was on another wall.
+		// The lift car had glass sides, one-block walls, and its button on
+		// another wall.
 		if (level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE - 1,
 				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)
-				|| !level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
+				|| !level.getBlockState(Places.panel(1)).is(Made.elevatorButton)
+				|| !level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE,
+						Places.floorY(1) + 4, Places.LIFT_Z + 2)).is(Blocks.QUARTZ_BLOCK)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor, 1);
 			}
@@ -826,7 +857,32 @@ public final class Ship {
 							&& ship == 2) {
 						continue;             // ship 2 was never built here
 					}
-					set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
+					// A second skin on the outside of the car, so its walls are two thick
+		// like the ship's are. The two doorways are left open, and anything
+		// that would land on the room's own wall is left alone -- the hull is
+		// already two blocks there.
+		for (int dx = -1; dx <= n; dx++) {
+			for (int dz = -1; dz <= n; dz++) {
+				if (dx != -1 && dx != n && dz != -1 && dz != n) {
+					continue;                        // the car itself
+				}
+				int wx = x0 + dx;
+				int wz = z0 + dz;
+				if (wx <= Places.SHIP_X - Places.ROOM || wz <= Places.SHIP_Z - Places.ROOM) {
+					continue;                        // that is the ship's wall
+				}
+				boolean doorway = (dx == n && dz == 2) || (dz == n && dx == 2);
+				for (int dy = 1; dy <= n; dy++) {
+					if (doorway && dy <= 2) {
+						continue;                    // walk through here
+					}
+					set(level, new BlockPos(wx, y + dy, wz),
+							dy == n ? Blocks.GRAY_CONCRETE : Blocks.QUARTZ_BLOCK);
+				}
+			}
+		}
+
+		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
 					set(level, Places.onShip(Places.panel(floor), ship).above(),
 							Blocks.REDSTONE_LAMP);
 					set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
