@@ -705,6 +705,11 @@ public final class Ship {
 		set(level, Places.FRIDGE.above(), Blocks.IRON_BLOCK);
 		set(level, Places.TV, Blocks.BLACK_CONCRETE);
 		set(level, Places.TV.above(), Blocks.BLACK_CONCRETE);
+
+		// A record player next to it. This is Minecraft's own jukebox, so a
+		// disc goes in it and the disc plays -- nothing here had to make that
+		// happen, only put one in the room.
+		set(level, Places.JUKEBOX, Blocks.JUKEBOX);
 		set(level, Places.PHONE, Blocks.OAK_PRESSURE_PLATE);
 		bed(level, Places.BED);
 
@@ -762,6 +767,12 @@ public final class Ship {
 		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
 				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)) {
 			toilet(level, Places.TOILET);
+		}
+
+		// The TV, and the record player that came after it.
+		if (!level.getBlockState(Places.TV).is(Blocks.BLACK_CONCRETE)
+				|| !level.getBlockState(Places.JUKEBOX).is(Blocks.JUKEBOX)) {
+			furnishYourRoom(level);
 		}
 
 		// The doors to nowhere, in the wall where the lift used to be. Floor
