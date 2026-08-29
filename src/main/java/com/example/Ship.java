@@ -709,9 +709,10 @@ public final class Ship {
 			ShipLifeMod.LOGGER.info("Thickened the hull to two blocks.");
 		}
 
-		// The lift car had glass sides.
+		// The lift car had glass sides, and its button was on another wall.
 		if (level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE - 1,
-				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)) {
+				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)
+				|| !level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor, 1);
 			}
@@ -755,9 +756,10 @@ public final class Ship {
 			ShipLifeMod.LOGGER.info("Thickened the hull to two blocks.");
 		}
 
-		// The lift car had glass sides.
+		// The lift car had glass sides, and its button was on another wall.
 		if (level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE - 1,
-				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)) {
+				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)
+				|| !level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor, 1);
 			}

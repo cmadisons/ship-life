@@ -143,7 +143,7 @@ public final class Places {
 	 * you meet it on the way in rather than crossing the room to find it.
 	 */
 	public static BlockPos panel(int floor) {
-		return new BlockPos(LIFT_X + 2, floorY(floor) + 1, LIFT_Z);
+		return new BlockPos(LIFT_X + 3, floorY(floor) + 1, LIFT_Z + 4);
 	}
 
 	/** Where the lift puts you down: the middle of the car. */
