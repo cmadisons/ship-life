@@ -48,11 +48,20 @@ public final class Elevator {
 	private static final java.util.Map<java.util.UUID, Long> ON_PLATE =
 			new java.util.HashMap<>();
 
+	/** Doors standing open, and the tick each one shuts again. */
+	private static final java.util.Map<net.minecraft.core.BlockPos, Long> HELD =
+			new java.util.HashMap<>();
+
+	/** How long a door stays open once the plate has been stepped on. */
+	private static final int HOLD = 100;
+
 	/**
 	 * The plates each side of the two doors.
 	 *
-	 * A plate that reopened the lift every tick you stood on it would be
-	 * unusable, so one press is one opening: you have to step off and back on.
+	 * All they do is open the doors. The lift's own panel is the button on
+	 * the wall inside the car -- a plate that put the floor list in front of
+	 * you every time you walked in or out was a plate you could not walk
+	 * past.
 	 */
 	public static void register() {
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
@@ -67,6 +76,7 @@ public final class Elevator {
 				for (ServerPlayer player : level.players()) {
 					standing(player);
 				}
+				shut(level);
 			}
 		});
 	}
@@ -87,8 +97,45 @@ public final class Elevator {
 			ON_PLATE.remove(player.getUUID());
 			return;
 		}
-		if (ON_PLATE.put(player.getUUID(), player.level().getGameTime()) == null) {
-			open(player);
+		if (ON_PLATE.put(player.getUUID(), player.level().getGameTime()) == null
+				&& player.level() instanceof net.minecraft.server.level.ServerLevel level) {
+			swing(level, Places.liftDoorEast(floor), true);
+			swing(level, Places.liftDoorSouth(floor), true);
+		}
+	}
+
+	/** Open a door, or shut it, both halves at once. */
+	private static void swing(net.minecraft.server.level.ServerLevel level,
+			net.minecraft.core.BlockPos bottom, boolean open) {
+		net.minecraft.world.level.block.state.BlockState state = level.getBlockState(bottom);
+		if (!(state.getBlock() instanceof net.minecraft.world.level.block.DoorBlock door)) {
+			return;
+		}
+		if (state.getValue(net.minecraft.world.level.block.DoorBlock.OPEN) == open) {
+			if (open) {
+				HELD.put(bottom, level.getGameTime() + HOLD);
+			}
+			return;
+		}
+		door.setOpen(null, level, state, bottom, open);
+		if (open) {
+			HELD.put(bottom, level.getGameTime() + HOLD);
+		} else {
+			HELD.remove(bottom);
+		}
+	}
+
+	/** Anything that has stood open long enough shuts itself. */
+	private static void shut(net.minecraft.server.level.ServerLevel level) {
+		if (HELD.isEmpty()) {
+			return;
+		}
+		for (net.minecraft.core.BlockPos door
+				: new java.util.ArrayList<>(HELD.keySet())) {
+			if (level.getGameTime() >= HELD.get(door)) {
+				HELD.remove(door);
+				swing(level, door, false);
+			}
 		}
 	}
 

@@ -160,7 +160,9 @@ public final class Ship {
 					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
 					boolean window = dy >= 3 && dy <= 4 && Math.abs(dx) == r
 							&& Math.abs(dz) % 4 == 0;
-					set(level, pos, window ? Blocks.GLASS : Blocks.BLACK_CONCRETE);
+					// The windows are metal. It is a space ship, and the walls
+					// of one are not made of glass.
+					set(level, pos, window ? Blocks.IRON_BLOCK : Blocks.BLACK_CONCRETE);
 				}
 			}
 		}
@@ -456,8 +458,8 @@ public final class Ship {
 		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.REDSTONE_LAMP);
 		set(level, new BlockPos(x0 + 2, y + n - 1, z0 + 2), Blocks.SEA_LANTERN);
 
-		door(level, Places.onShip(Places.liftDoorEast(floor), ship), Direction.EAST);
-		door(level, Places.onShip(Places.liftDoorSouth(floor), ship), Direction.SOUTH);
+		ironDoor(level, Places.onShip(Places.liftDoorEast(floor), ship), Direction.EAST);
+		ironDoor(level, Places.onShip(Places.liftDoorSouth(floor), ship), Direction.SOUTH);
 
 		for (BlockPos plate : Places.liftPlates(floor)) {
 			BlockPos at = Places.onShip(plate, ship);
@@ -693,11 +695,59 @@ public final class Ship {
 			}
 		}
 
+		// The windows were glass before they were metal.
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			int y = Places.floorY(floor);
+			for (int dx = -Places.ROOM; dx <= Places.ROOM; dx++) {
+				for (int dz = -Places.ROOM; dz <= Places.ROOM; dz++) {
+					if (Math.abs(dx) != Places.ROOM && Math.abs(dz) != Places.ROOM) {
+						continue;
+					}
+					for (int dy = 3; dy <= 4; dy++) {
+						BlockPos pos = new BlockPos(Places.SHIP_X + dx, y + dy,
+								Places.SHIP_Z + dz);
+						if (level.getBlockState(pos).is(Blocks.GLASS)) {
+							set(level, pos, Blocks.IRON_BLOCK);
+						}
+					}
+				}
+			}
+			// And the lift's doors were wood.
+			if (level.getBlockState(Places.liftDoorEast(floor)).is(Blocks.OAK_DOOR)) {
+				ironDoor(level, Places.liftDoorEast(floor), Direction.EAST);
+				ironDoor(level, Places.liftDoorSouth(floor), Direction.SOUTH);
+			}
+		}
+
 		// Ship 2 came out of the lift, so it comes out of the world.
 		clearSecond(level);
 	}
 
 	public static void repair(ServerLevel level) {
+		// The windows were glass before they were metal.
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			int y = Places.floorY(floor);
+			for (int dx = -Places.ROOM; dx <= Places.ROOM; dx++) {
+				for (int dz = -Places.ROOM; dz <= Places.ROOM; dz++) {
+					if (Math.abs(dx) != Places.ROOM && Math.abs(dz) != Places.ROOM) {
+						continue;
+					}
+					for (int dy = 3; dy <= 4; dy++) {
+						BlockPos pos = new BlockPos(Places.SHIP_X + dx, y + dy,
+								Places.SHIP_Z + dz);
+						if (level.getBlockState(pos).is(Blocks.GLASS)) {
+							set(level, pos, Blocks.IRON_BLOCK);
+						}
+					}
+				}
+			}
+			// And the lift's doors were wood.
+			if (level.getBlockState(Places.liftDoorEast(floor)).is(Blocks.OAK_DOOR)) {
+				ironDoor(level, Places.liftDoorEast(floor), Direction.EAST);
+				ironDoor(level, Places.liftDoorSouth(floor), Direction.SOUTH);
+			}
+		}
+
 		// Ship 2 came out of the lift, so it comes out of the world.
 		clearSecond(level);
 
@@ -708,7 +758,8 @@ public final class Ship {
 				Places.SHIP_Z - Places.ROOM);
 		BlockPos deck = new BlockPos(Places.SHIP_X + 6, Places.floorY(1), Places.SHIP_Z + 6);
 		if ((!level.getBlockState(wall).is(Blocks.BLACK_CONCRETE)
-				&& !level.getBlockState(wall).is(Blocks.GLASS))
+				&& !level.getBlockState(wall).is(Blocks.GLASS)
+				&& !level.getBlockState(wall).is(Blocks.IRON_BLOCK))
 				|| !level.getBlockState(deck).is(Blocks.BLACK_CONCRETE)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				buildFloor(level, floor);
@@ -809,6 +860,24 @@ public final class Ship {
 	 */
 	private static void door(ServerLevel level, BlockPos bottom) {
 		door(level, bottom, Direction.EAST);
+	}
+
+	/**
+	 * A lift door: iron, and nothing you can pull open by hand.
+	 *
+	 * Which is the point of it. The plate on the floor works these; see
+	 * {@link Elevator}.
+	 */
+	private static void ironDoor(ServerLevel level, BlockPos bottom, Direction facing) {
+		BlockState base = Blocks.IRON_DOOR.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
+						facing);
+		level.setBlockAndUpdate(bottom, base.setValue(
+				net.minecraft.world.level.block.DoorBlock.HALF,
+				net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER));
+		level.setBlockAndUpdate(bottom.above(), base.setValue(
+				net.minecraft.world.level.block.DoorBlock.HALF,
+				net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
 	}
 
 	private static void door(ServerLevel level, BlockPos bottom, Direction facing) {
