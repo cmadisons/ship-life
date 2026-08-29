@@ -646,8 +646,39 @@ public final class Ship {
 				Blocks.POLISHED_BLACKSTONE);
 	}
 
+	/**
+	 * The toilet, built like the chairs are.
+	 *
+	 * The cauldron is the bowl and it sits where it always did. Around it is
+	 * a square of white brick -- the floor of the bathroom, one block wide all
+	 * the way round -- and behind it the cistern, three blocks high, so it
+	 * reads as a toilet from across the room rather than as a pot on the
+	 * floor.
+	 */
+	private static void toilet(ServerLevel level, BlockPos where) {
+		int x = where.getX();
+		int y = where.getY();
+		int z = where.getZ();
+
+		// The square of white brick around it, laid into the floor.
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				if (dx == 0 && dz == 0) {
+					continue;                       // the bowl stands here
+				}
+				set(level, new BlockPos(x + dx, y, z + dz), Blocks.QUARTZ_BRICKS);
+			}
+		}
+
+		// The cistern behind it, three high. The bathroom wall is west of the
+		// bowl, so behind is that way.
+		fill(level, x - 1, y, z, x - 1, y + 2, z, Blocks.QUARTZ_BRICKS);
+
+		set(level, where, Blocks.CAULDRON);
+	}
+
 	private static void furnishYourRoom(ServerLevel level) {
-		set(level, Places.TOILET, Blocks.CAULDRON);
+		toilet(level, Places.TOILET);
 		set(level, Places.FRIDGE, Blocks.IRON_BLOCK);
 		set(level, Places.FRIDGE.above(), Blocks.IRON_BLOCK);
 		set(level, Places.TV, Blocks.BLACK_CONCRETE);
@@ -706,6 +737,10 @@ public final class Ship {
 		// The giant chairs came after most worlds did.
 		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.BLACK_WOOL)) {
 			furnishLobby(level);
+		}
+		// The toilet was a cauldron on its own.
+		if (!level.getBlockState(Places.TOILET.north()).is(Blocks.QUARTZ_BRICKS)) {
+			toilet(level, Places.TOILET);
 		}
 		if (!level.getBlockState(Places.BEN).is(Blocks.OAK_DOOR)) {
 			furnishBensRoom(level);
