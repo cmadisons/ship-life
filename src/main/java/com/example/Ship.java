@@ -688,7 +688,10 @@ public final class Ship {
 
 		set(level, where, Blocks.CAULDRON);
 
-		// The handle, on the face of the cistern above the bowl.
+		// Where the handle used to be, in the middle of the cistern.
+		set(level, where.above(2), Blocks.AIR);
+
+		// The handle, at the top left of the cistern as you stand at it.
 		level.setBlockAndUpdate(Places.FLUSH, Blocks.LEVER.defaultBlockState()
 				.setValue(net.minecraft.world.level.block.LeverBlock.FACE,
 						net.minecraft.world.level.block.state.properties.AttachFace.WALL)
