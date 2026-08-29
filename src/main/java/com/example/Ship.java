@@ -177,7 +177,12 @@ public final class Ship {
 			}
 		}
 		// A door where the lift used to be, in the middle of the near wall.
-		door(level, Places.onShip(Places.oldLift(floor), ship));
+		// Only on floor 1, where it is the way in off the gangway: on every
+		// other floor it opened onto the black concrete of the hull, which is
+		// a door to nowhere.
+		if (floor == 1) {
+			door(level, Places.onShip(Places.oldLift(floor), ship));
+		}
 
 		liftCar(level, floor, ship);
 
@@ -754,6 +759,17 @@ public final class Ship {
 		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
 				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)) {
 			toilet(level, Places.TOILET);
+		}
+
+		// The doors to nowhere, in the wall where the lift used to be. Floor
+		// 1 keeps its one; the rest opened onto the hull.
+		for (int floor = 2; floor <= Places.TOP_FLOOR; floor++) {
+			BlockPos was = Places.oldLift(floor);
+			if (level.getBlockState(was).getBlock()
+					instanceof net.minecraft.world.level.block.DoorBlock) {
+				set(level, was, Blocks.BLACK_CONCRETE);
+				set(level, was.above(), Blocks.BLACK_CONCRETE);
+			}
 		}
 
 		// The white wall that used to stand beside the toilet.
