@@ -148,18 +148,22 @@ public final class Ship {
 		int z = Places.SHIP_Z;
 		int r = Places.ROOM;
 
-		fill(level, x - r, y, z - r, x + r, y, z + r, Blocks.BLACK_CONCRETE);
-		fill(level, x - r, y + 7, z - r, x + r, y + 7, z + r, Blocks.GRAY_CONCRETE);
-		// Walls, hollow inside.
-		for (int dx = -r; dx <= r; dx++) {
-			for (int dz = -r; dz <= r; dz++) {
-				if (Math.abs(dx) != r && Math.abs(dz) != r) {
-					continue;
+		// The hull is two blocks thick, and the second block goes on the
+		// outside -- putting it inside would take a block off every room and
+		// bury the lift car in the corner.
+		int outer = r + 1;
+		fill(level, x - outer, y, z - outer, x + outer, y, z + outer, Blocks.BLACK_CONCRETE);
+		fill(level, x - outer, y + 7, z - outer, x + outer, y + 7, z + outer,
+				Blocks.GRAY_CONCRETE);
+		for (int dx = -outer; dx <= outer; dx++) {
+			for (int dz = -outer; dz <= outer; dz++) {
+				if (Math.abs(dx) < r && Math.abs(dz) < r) {
+					continue;                       // the room itself, left hollow
 				}
 				for (int dy = 1; dy <= 6; dy++) {
 					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
-					boolean window = dy >= 3 && dy <= 4 && Math.abs(dx) == r
-							&& Math.abs(dz) % 4 == 0;
+					boolean window = dy >= 3 && dy <= 4
+							&& Math.abs(dx) >= r && Math.abs(dz) % 4 == 0;
 					// The windows are metal. It is a space ship, and the walls
 					// of one are not made of glass.
 					set(level, pos, window ? Blocks.IRON_BLOCK : Blocks.BLACK_CONCRETE);
@@ -204,7 +208,6 @@ public final class Ship {
 		giantChair(level, Places.CHAIR, true);
 		giantChair(level, Places.CHAIR_TWO, false);
 		bigTable(level, Places.BIG_TABLE);
-		bigTable(level, Places.BIG_TABLE_TWO);
 		fill(level, Places.SHIP_X + 2, Places.GROUND, Places.SHIP_Z - 6,
 				Places.SHIP_X + 6, Places.GROUND, Places.SHIP_Z + 6, Blocks.POLISHED_ANDESITE);
 	}
@@ -268,17 +271,17 @@ public final class Ship {
 	}
 
 	/**
-	 * The table in front of a chair: a T.
+	 * The table between the two chairs: a T, and wool like they are.
 	 *
 	 * A leg three blocks high with a 3x3 top laid across it, so it stands at
-	 * about the height of the seat you are looking at it from.
+	 * about the height of the seats either side of it.
 	 */
 	private static void bigTable(ServerLevel level, BlockPos foot) {
 		int x = foot.getX();
 		int y = foot.getY();
 		int z = foot.getZ();
-		fill(level, x, y, z, x, y + 2, z, Blocks.OAK_LOG);
-		fill(level, x - 1, y + 3, z - 1, x + 1, y + 3, z + 1, Blocks.OAK_PLANKS);
+		fill(level, x, y, z, x, y + 2, z, Blocks.BLACK_WOOL);
+		fill(level, x - 1, y + 3, z - 1, x + 1, y + 3, z + 1, Blocks.BLACK_WOOL);
 	}
 
 	private static void furnishArcade(ServerLevel level) {
@@ -447,8 +450,10 @@ public final class Ship {
 					} else {
 						// Glass at eye level on the two open sides.
 						boolean front = dx == n - 1 || dz == n - 1;
+						// Metal at eye level as well: the whole ship is
+						// metal, and a glass lift in it looked borrowed.
 						set(level, pos, front && dy >= 2 && dy <= 3
-								? Blocks.GLASS : Blocks.QUARTZ_BLOCK);
+								? Blocks.IRON_BLOCK : Blocks.QUARTZ_BLOCK);
 					}
 				}
 			}
@@ -695,6 +700,23 @@ public final class Ship {
 			}
 		}
 
+		// The hull was one block thick before it was two.
+		if (!level.getBlockState(new BlockPos(Places.SHIP_X + Places.ROOM + 1,
+				Places.floorY(1) + 3, Places.SHIP_Z)).is(Blocks.BLACK_CONCRETE)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				buildFloor(level, floor);
+			}
+			ShipLifeMod.LOGGER.info("Thickened the hull to two blocks.");
+		}
+
+		// The lift car had glass sides.
+		if (level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE - 1,
+				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				liftCar(level, floor, 1);
+			}
+		}
+
 		// The windows were glass before they were metal.
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int y = Places.floorY(floor);
@@ -724,6 +746,23 @@ public final class Ship {
 	}
 
 	public static void repair(ServerLevel level) {
+		// The hull was one block thick before it was two.
+		if (!level.getBlockState(new BlockPos(Places.SHIP_X + Places.ROOM + 1,
+				Places.floorY(1) + 3, Places.SHIP_Z)).is(Blocks.BLACK_CONCRETE)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				buildFloor(level, floor);
+			}
+			ShipLifeMod.LOGGER.info("Thickened the hull to two blocks.");
+		}
+
+		// The lift car had glass sides.
+		if (level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE - 1,
+				Places.floorY(1) + 2, Places.LIFT_Z + 1)).is(Blocks.GLASS)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				liftCar(level, floor, 1);
+			}
+		}
+
 		// The windows were glass before they were metal.
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int y = Places.floorY(floor);
