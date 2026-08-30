@@ -47,8 +47,8 @@ public final class Portals {
 	 * whole second tower is a lot of blocks to lay down on the chance.
 	 */
 	private static void arrive(ServerPlayer player, ServerLevel nether) {
-		ServerLevel home = player.getServer() == null ? null : player.getServer().overworld();
-		if (home == null || !ShipLifeMod.isShipLife(home)) {
+		ServerLevel home = nether.getServer().overworld();
+		if (!ShipLifeMod.isShipLife(home)) {
 			return;                       // an ordinary world's Nether
 		}
 		Ship.buildInTheNether(nether);
