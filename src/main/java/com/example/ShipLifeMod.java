@@ -206,6 +206,7 @@ public class ShipLifeMod implements ModInitializer {
 		// -- so they go back on every time you arrive. And turning up pays.
 		Gym.apply(player);
 		Daily.check(player);
+		Gear.openSeventeen(player);
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this

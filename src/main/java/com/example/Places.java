@@ -83,7 +83,7 @@ public final class Places {
 	public static final int FLOOR_HEIGHT = 8;
 
 	/** The top floor the ship has. */
-	public static final int TOP_FLOOR = 16;
+	public static final int TOP_FLOOR = 18;
 
 	/**
 	 * A position as this ship reads it.

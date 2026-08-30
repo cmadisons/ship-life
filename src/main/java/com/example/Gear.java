@@ -130,6 +130,29 @@ public final class Gear {
 				+ " on your next hit").withStyle(ChatFormatting.GREEN));
 	}
 
+	/**
+	 * Floor 17 opens when you are wearing the whole plant set and every floor
+	 * below it is yours.
+	 *
+	 * Checked whenever the armour does anything, which is whenever you are
+	 * wearing it and something happens -- so it opens the first time you take
+	 * a hit in the full set rather than needing a shop to notice.
+	 */
+	public static void openSeventeen(ServerPlayer player) {
+		if (State.hasFloor(player, 17) || wearing(player) < 4) {
+			return;
+		}
+		for (int floor = 1; floor <= 16; floor++) {
+			if (!State.hasFloor(player, floor)) {
+				return;
+			}
+		}
+		State.unlock(player, 17);
+		player.sendSystemMessage(Component.literal(
+				"The whole plant set, and every floor below. Floor 17 is open.")
+				.withStyle(ChatFormatting.AQUA));
+	}
+
 	private static void afterDamage(LivingEntity hurt, net.minecraft.world.damagesource.DamageSource source,
 			float before, float taken, boolean blocked) {
 		if (applying || taken <= 0) {
@@ -138,6 +161,7 @@ public final class Gear {
 
 		// A hit on you: every piece keeps a tenth of it off and remembers it.
 		if (hurt instanceof ServerPlayer player && wearing(player) > 0) {
+			openSeventeen(player);
 			float stopped = taken * STOPS * wearing(player);
 			player.heal(stopped);
 			bank(player, stopped);

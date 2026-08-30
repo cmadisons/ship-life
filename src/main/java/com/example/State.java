@@ -267,6 +267,11 @@ public final class State {
 
 	public static void unlock(ServerPlayer player, int floor) {
 		player.setAttached(FLOORS, player.getAttachedOrCreate(FLOORS) | (1 << floor));
+		if (floor < 17) {
+			// The floor that just opened may have been the last one floor 17
+			// was waiting on.
+			Gear.openSeventeen(player);
+		}
 	}
 
 	/**

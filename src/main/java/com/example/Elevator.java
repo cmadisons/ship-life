@@ -37,7 +37,7 @@ public final class Elevator {
 			"", "Lobby", "Arcade", "Swimming Pool", "Buffet", "Your Room",
 			"Race Track", "Events", "Store", "Fight Room", "Boss Room",
 			"Rewards", "Pet Store", "The Keg", "Passports", "Ben's Room",
-			"Izzy's Room"
+			"Izzy's Room", "Floor 17", "Floor 18"
 	};
 
 	/**
