@@ -33,12 +33,12 @@ public final class Kit {
 	public static final String PLUNGER = "Plunger";
 	public static final String MOP = "Mop";
 	public static final String MEAL = "Buffet Plate";
-	public static final String ARMOUR = "Ben's Armour";
+	public static final String ARMOUR = "Plant Chestplate";
 	public static final String BOMB = "Ben's Bomb";
 	public static final String STAR = "Go To Event Star";
-	public static final String BOOTS = "Izzy's Boots";
-	public static final String HELMET = "Izzy's Helmet";
-	public static final String LEGGINGS = "Izzy's Leggings";
+	public static final String BOOTS = "Plant Boots";
+	public static final String HELMET = "Plant Helmet";
+	public static final String LEGGINGS = "Plant Leggings";
 	public static final String PENNY = "Penny";
 
 	public static ItemStack make(Item item, String name, ChatFormatting colour, String... lore) {
@@ -52,6 +52,26 @@ public final class Kit {
 			stack.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(lines));
 		}
 		return stack;
+	}
+
+	/**
+	 * The set is a set: four pieces of plant armour, whoever handed it over.
+	 *
+	 * They were called Ben's and Izzy's, after the people who give them, and
+	 * anything already worn or in a chest still says that -- so both names
+	 * count as the same piece.
+	 */
+	public static boolean isPiece(ItemStack stack, String piece) {
+		if (is(stack, piece)) {
+			return true;
+		}
+		return switch (piece) {
+			case ARMOUR -> is(stack, "Ben's Armour");
+			case BOOTS -> is(stack, "Izzy's Boots");
+			case HELMET -> is(stack, "Izzy's Helmet");
+			case LEGGINGS -> is(stack, "Izzy's Leggings");
+			default -> false;
+		};
 	}
 
 	/** Is this stack the named thing, rather than an ordinary one? */
@@ -134,7 +154,7 @@ public final class Kit {
 	}
 
 	/**
-	 * Ben's armour: a coat with plants growing all over it.
+	 * The chestplate: a coat with plants growing all over it.
 	 *
 	 * What it does is not in the item at all -- {@link Gear} watches for it on
 	 * your chest and does the work.
@@ -165,7 +185,7 @@ public final class Kit {
 	}
 
 	/**
-	 * The rest of the set, from Izzy on floor 16.
+	 * The rest of the plant set, from Izzy on floor 16.
 	 *
 	 * Same leaves as Ben's coat and the same job: every piece you are wearing
 	 * keeps a tenth of the hit off you and banks it, so the whole set stops

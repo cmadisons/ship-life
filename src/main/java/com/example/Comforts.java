@@ -165,8 +165,8 @@ public final class Comforts {
 	private static void put(ServerPlayer player, net.minecraft.world.entity.EquipmentSlot where,
 			net.minecraft.world.item.Item item, Outfit outfit) {
 		ItemStack worn = player.getItemBySlot(where);
-		if (Kit.is(worn, Kit.ARMOUR) || Kit.is(worn, Kit.BOOTS)
-				|| Kit.is(worn, Kit.HELMET) || Kit.is(worn, Kit.LEGGINGS)) {
+		if (Kit.isPiece(worn, Kit.ARMOUR) || Kit.isPiece(worn, Kit.BOOTS)
+				|| Kit.isPiece(worn, Kit.HELMET) || Kit.isPiece(worn, Kit.LEGGINGS)) {
 			return;
 		}
 		ItemStack piece = Kit.make(item, outfit.name(), ChatFormatting.WHITE, outfit.what());

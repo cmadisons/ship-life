@@ -151,7 +151,7 @@ public final class Friends {
 		}
 
 		// The rest of the set, if they have not got it yet.
-		if (!Kit.is(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD),
+		if (!Kit.isPiece(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD),
 				Kit.HELMET)) {
 			counter(player, true);
 			return;

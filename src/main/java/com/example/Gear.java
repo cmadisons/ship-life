@@ -99,16 +99,16 @@ public final class Gear {
 	 */
 	public static int wearing(ServerPlayer player) {
 		int pieces = 0;
-		if (Kit.is(player.getItemBySlot(EquipmentSlot.CHEST), Kit.ARMOUR)) {
+		if (Kit.isPiece(player.getItemBySlot(EquipmentSlot.CHEST), Kit.ARMOUR)) {
 			pieces++;
 		}
-		if (Kit.is(player.getItemBySlot(EquipmentSlot.FEET), Kit.BOOTS)) {
+		if (Kit.isPiece(player.getItemBySlot(EquipmentSlot.FEET), Kit.BOOTS)) {
 			pieces++;
 		}
-		if (Kit.is(player.getItemBySlot(EquipmentSlot.HEAD), Kit.HELMET)) {
+		if (Kit.isPiece(player.getItemBySlot(EquipmentSlot.HEAD), Kit.HELMET)) {
 			pieces++;
 		}
-		if (Kit.is(player.getItemBySlot(EquipmentSlot.LEGS), Kit.LEGGINGS)) {
+		if (Kit.isPiece(player.getItemBySlot(EquipmentSlot.LEGS), Kit.LEGGINGS)) {
 			pieces++;
 		}
 		return pieces;

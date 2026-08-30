@@ -139,8 +139,8 @@ public final class Shops {
 	 */
 	private static int worth(net.minecraft.world.item.ItemStack stack) {
 		if (Kit.is(stack, Kit.QUEST_BOOK) || Kit.is(stack, Kit.PASSPORT)
-				|| Kit.is(stack, Kit.ARMOUR) || Kit.is(stack, Kit.BOOTS)
-				|| Kit.is(stack, Kit.HELMET) || Kit.is(stack, Kit.LEGGINGS)
+				|| Kit.isPiece(stack, Kit.ARMOUR) || Kit.isPiece(stack, Kit.BOOTS)
+				|| Kit.isPiece(stack, Kit.HELMET) || Kit.isPiece(stack, Kit.LEGGINGS)
 				|| Kit.is(stack, Kit.BOMB) || Kit.is(stack, Kit.STAR)) {
 			return 0;                      // not for sale, whatever you think
 		}
