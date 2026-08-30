@@ -48,7 +48,8 @@ that -- and chapters past 4.
 tools back and stands you in the lobby. `/11reward` rolls another floor 11
 reward with the once-a-month wait taken off, as many times as you like.
 `/skipsidequest` finishes every side quest you are carrying and pays what they
-were worth. `/allfloors` opens all sixteen at once.
+were worth. `/allfloors` opens all sixteen at once, and
+`/floor1` to `/floor16` ride you to one -- opening it first if it is not yours.
 
 ### The people
 

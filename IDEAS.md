@@ -56,7 +56,7 @@ The struck-through ones are done.
 10. The Nether and the End — you are on a space ship
 11. ~~The fifteen second buffet wait~~ **done**
 12. ~~The eight bomb stack cap~~ **done**
-13. Realms buttons on a single player game (needs a client mixin -- not done)
+13. ~~Realms buttons on a single player game~~ **done**
 14. ~~The Buffet cooldown map if the cook replaces it~~ **done**
 15. ~~Buying a second cat, since it does not stack~~ **done**
 16. The hundred person crowd — forty reads the same and is faster

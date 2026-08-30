@@ -44,6 +44,9 @@ public class ShipLifeClient implements ClientModInitializer {
 		net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
 				com.example.Person.TYPE, PersonRenderer::new);
 
+		// Nothing on the title screen is trying to sell you a server.
+		NoRealms.register();
+
 		HudElementRegistry.addLast(ShipLifeMod.id("hud"), Screen::draw);
 	}
 }

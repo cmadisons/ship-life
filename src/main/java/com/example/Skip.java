@@ -11,7 +11,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * The commands: /shiplife, /11reward, /skipsidequest and /allfloors.
+ * The commands: /shiplife, /11reward, /skipsidequest, /allfloors and one
+ * /floorN for every floor there is.
  *
  * /shiplife starts you at the ship instead of at the sink.
  *
@@ -55,6 +56,15 @@ public final class Skip {
 			// The same as /shiplife allfloors, typed the way you would guess.
 			dispatcher.register(Commands.literal("allfloors")
 					.executes(context -> allFloors(context.getSource())));
+
+			// /floor1 to /floor16: the lift, without the lift. One command a
+			// floor rather than one command with a number, because that is
+			// what was asked for and it is what tab-completion likes.
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				final int which = floor;
+				dispatcher.register(Commands.literal("floor" + floor)
+						.executes(context -> goToFloor(context.getSource(), which)));
+			}
 		});
 	}
 
@@ -66,6 +76,33 @@ public final class Skip {
 			return 0;
 		}
 		Shops.reward(player);
+		return 1;
+	}
+
+	/**
+	 * /floorN -- go to that floor.
+	 *
+	 * It rides rather than teleports, so the doors and the sound and the
+	 * floor name all happen, and it opens the floor first if it is not yours:
+	 * a command that took you somewhere you were not allowed and then would
+	 * not let you use the lift back would be worse than no command.
+	 */
+	private static int goToFloor(CommandSourceStack source, int floor) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Only a player can use /floor" + floor + "."));
+			return 0;
+		}
+		if (!(player.level() instanceof ServerLevel level) || !ShipLifeMod.isShipLife(level)) {
+			source.sendFailure(Component.literal("This is not a Ship Life world."));
+			return 0;
+		}
+		if (!State.hasFloor(player, floor)) {
+			State.unlock(player, floor);
+			player.sendSystemMessage(Component.literal("Floor " + floor + " -- "
+					+ Floors.name(floor) + " -- is open.").withStyle(ChatFormatting.AQUA));
+		}
+		Elevator.ride(player, floor);
 		return 1;
 	}
 
