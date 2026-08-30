@@ -103,6 +103,11 @@ public class Person extends PathfinderMob {
 	 * left alone, so this can be called as often as it likes.
 	 */
 	public static void everyone(ServerLevel level) {
+		// Anybody left over from when these people had names of their own.
+		// Renaming them was not renaming them: it made a second Charlie stood
+		// next to the first, labelled Manager.
+		clearOldNames(level);
+
 		place(level, Places.CHAIR, CHARLIE, ChatFormatting.YELLOW);
 		sit(level, Places.CHAIR, CHARLIE);
 		place(level, Places.DESK.north(), DESK, ChatFormatting.WHITE);
@@ -110,6 +115,27 @@ public class Person extends PathfinderMob {
 		place(level, Places.BEN.south(), BEN, ChatFormatting.AQUA);
 		place(level, Places.IZZY.south(), IZZY, ChatFormatting.LIGHT_PURPLE);
 		place(level, Places.BUFFET_COOK.east(), COOK, ChatFormatting.GOLD);
+	}
+
+	/**
+	 * Take away anybody whose label is not one of the jobs.
+	 *
+	 * They were called Charlie, Ben, Izzy, Maria, Sam and Gus once. A world
+	 * that met them then still has them stood about.
+	 */
+	private static void clearOldNames(ServerLevel level) {
+		java.util.Set<String> jobs = java.util.Set.of(CHARLIE, BEN, IZZY, DESK, LOBBY, COOK);
+		for (Person person : level.getEntitiesOfClass(Person.class,
+				new net.minecraft.world.phys.AABB(
+						Places.SHIP_X - 40, Places.GROUND - 8, Places.SHIP_Z - 40,
+						Places.SHIP_X + 40, Places.floorY(Places.TOP_FLOOR) + 16,
+						Places.SHIP_Z + 40))) {
+			String label = person.getCustomName() == null
+					? "" : person.getCustomName().getString();
+			if (!jobs.contains(label)) {
+				person.discard();
+			}
+		}
 	}
 
 	/**
