@@ -69,7 +69,7 @@ public final class Friends {
 					} else if (label.equals(Person.CHARLIE)) {
 						Chores.charlie(who);
 					} else if (label.equals(Person.COOK)) {
-						Buffet.serve(who);
+						Buffet.order(who);
 					} else if (label.equals(Person.DESK)) {
 						Chores.security(who);
 					} else {

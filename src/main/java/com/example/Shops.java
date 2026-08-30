@@ -108,9 +108,14 @@ public final class Shops {
 	// ------------------------------------------------------- floor 8: quests
 
 	private static void store(ServerPlayer player) {
+		// The store is two counters in one: a free quest, and somebody who
+		// will take what you are carrying off you for tickets. If you have a
+		// quest on the go already, the second is what it is for.
 		if (QuestPool.carrying(player) > 0) {
+			buyBack(player);
 			player.sendSystemMessage(Component.literal(
-					"One free quest at a time. Finish the one you have:")
+					"One free quest at a time -- and we took what you were carrying. "
+					+ "Finish the one you have:")
 					.withStyle(ChatFormatting.GRAY));
 			for (String line : QuestPool.lines(player)) {
 				player.sendSystemMessage(Component.literal("  " + line)
@@ -122,6 +127,57 @@ public final class Shops {
 	}
 
 	// ---------------------------------------------- floor 7: the ticket shop
+
+	/**
+	 * What the store will give you for something.
+	 *
+	 * Everything is worth one ticket a piece except food, which is worth two,
+	 * because a fridge full of fish should be worth carrying up here.
+	 */
+	private static int worth(net.minecraft.world.item.ItemStack stack) {
+		if (Kit.is(stack, Kit.QUEST_BOOK) || Kit.is(stack, Kit.PASSPORT)
+				|| Kit.is(stack, Kit.ARMOUR) || Kit.is(stack, Kit.BOOTS)
+				|| Kit.is(stack, Kit.HELMET) || Kit.is(stack, Kit.LEGGINGS)
+				|| Kit.is(stack, Kit.BOMB) || Kit.is(stack, Kit.STAR)) {
+			return 0;                      // not for sale, whatever you think
+		}
+		return stack.has(net.minecraft.core.component.DataComponents.FOOD) ? 2 : 1;
+	}
+
+	/**
+	 * The counter that buys rather than sells.
+	 *
+	 * Everything in your pack that is worth anything, in one click, for
+	 * arcade tickets -- which is the only way tickets have ever gone up
+	 * without playing a machine.
+	 */
+	private static void buyBack(ServerPlayer player) {
+		int paid = 0;
+		int things = 0;
+		for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+			net.minecraft.world.item.ItemStack stack = player.getInventory().getItem(slot);
+			if (stack.isEmpty() || slot == Slots.BOOK_SLOT || slot == Slots.PASSPORT_SLOT) {
+				continue;
+			}
+			int each = worth(stack);
+			if (each == 0) {
+				continue;
+			}
+			paid += each * stack.getCount();
+			things += stack.getCount();
+			player.getInventory().setItem(slot, net.minecraft.world.item.ItemStack.EMPTY);
+		}
+		if (things == 0) {
+			player.sendSystemMessage(Component.literal(
+					"Nothing here we would take off you.").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		State.arcade(player, paid);
+		State.add(player, State.EARNED, paid);
+		player.sendSystemMessage(Component.literal("Sold " + things + " thing"
+				+ (things == 1 ? "" : "s") + " for " + paid + " arcade tickets.")
+				.withStyle(ChatFormatting.GREEN));
+	}
 
 	private static void ticketShop(ServerPlayer player) {
 		SimpleContainer page = blank();

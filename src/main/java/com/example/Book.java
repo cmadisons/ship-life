@@ -99,7 +99,7 @@ public final class Book {
 	 * the top left. Where you are is lit up, what you own is white, and what
 	 * you do not own says what would open it.
 	 */
-	private static void map(ServerPlayer player) {
+	public static void map(ServerPlayer player) {
 		SimpleContainer page = new SimpleContainer(54);
 		ItemStack filler = new ItemStack(Items.BLACK_STAINED_GLASS_PANE);
 		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));

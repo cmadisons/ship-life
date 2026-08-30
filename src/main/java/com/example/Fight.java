@@ -232,6 +232,62 @@ public final class Fight {
 				SoundSource.PLAYERS, 1.0f, 0.6f);
 	}
 
+	/**
+	 * The rest of the bosses, borrowed from the SkyBlock mod's own list.
+	 *
+	 * Broodmother out of the Spider's Den, the Watcher out of the Dragon's
+	 * Nest, and the Magma Boss out of the Magma Chamber. Same doors, same
+	 * room: which one comes out depends on which door you knock on.
+	 */
+	public enum Boss {
+		ARACHNES("Arachnes", EntityType.SPIDER, 6.0, 150),
+		DRAGON("Ender Dragon", EntityType.WITHER, 1.0, 200),
+		BROODMOTHER("Broodmother", EntityType.CAVE_SPIDER, 12.0, 250),
+		WATCHER("The Watcher", EntityType.WITHER_SKELETON, 10.0, 300),
+		MAGMA("Magma Boss", EntityType.MAGMA_CUBE, 14.0, 400);
+
+		public final String label;
+		public final EntityType<? extends Mob> kind;
+		public final double toughness;
+		public final int pays;
+
+		Boss(String label, EntityType<? extends Mob> kind, double toughness, int pays) {
+			this.label = label;
+			this.kind = kind;
+			this.toughness = toughness;
+			this.pays = pays;
+		}
+	}
+
+	/** Let one out. */
+	public static void boss(ServerPlayer player, ServerLevel level, Boss which) {
+		if (inTheWay(player)) {
+			return;
+		}
+		lastBoss = which.label;
+		spawn(level, which.kind, Places.BOSS_SPOT, which.toughness, which.label);
+		if (which == Boss.ARACHNES || which == Boss.BROODMOTHER) {
+			for (int i = 0; i < 4; i++) {
+				spawn(level, EntityType.CAVE_SPIDER, spot(level, 10), 1.0, "Brood");
+			}
+		}
+		player.sendSystemMessage(Component.literal(which.label + ". "
+				+ which.pays + " event tickets if you put it down.")
+				.withStyle(ChatFormatting.RED));
+		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BASS.value(),
+				SoundSource.PLAYERS, 1.0f, 0.5f);
+	}
+
+	/** What the boss that is out is worth. */
+	public static int bossPay() {
+		for (Boss boss : Boss.values()) {
+			if (boss.label.equals(lastBoss)) {
+				return boss.pays;
+			}
+		}
+		return 200;
+	}
+
 	/** Arachnes, or the dragon. */
 	private static void boss(ServerPlayer player, ServerLevel level, boolean arachnes) {
 		if (inTheWay(player)) {

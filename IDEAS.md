@@ -10,29 +10,32 @@ rest of the set), and what floor 16 is (the friends' room, Izzy's).
 
 ## Add
 
+The struck-through ones are built.
+
+
 1. Chapter 5 — the story stops after Charlie
 2. A job that earns money — cash is dead after chapter 1
-3. A shower in the bathroom stall
-4. A window seat you can sit on (the chair code already does sitting)
+~~A shower in the bathroom stall~~ **built**
+~~A window seat you can sit on (the chair code already does sitting)~~ **built**
 5. More friends above 16
-6. A cook you can order particular meals from
-7. A gym for permanent extra hearts
-8. A third boss behind a third door on 10
-9. Fishing off the side of the ship
-10. A pet that fights beside you on 9
-11. A wardrobe that changes your clothes
+~~A cook you can order particular meals from~~ **built**
+~~A gym for permanent extra hearts~~ **built**
+~~A third boss behind a third door on 10~~ **built**
+~~Fishing off the side of the ship~~ **built**
+~~A pet that fights beside you on 9~~ **built**
+~~A wardrobe that changes your clothes~~ **built**
 12. Tetris or Breakout as a fourth cabinet
 13. A photo wall in your room of bosses you have beaten
-14. A daily log-in reward
-15. A shop that buys things back for tickets
+~~A daily log-in reward~~ **built**
+~~A shop that buys things back for tickets~~ **built**
 16. A hard mode on floor 9 that pays double
-17. A map of the whole ship on the lobby wall
+~~A map of the whole ship on the lobby wall~~ **built**
 18. Sounds and music for each event
-19. An intercom that says what is on today
-20. A sofa to match the giant chairs
+~~An intercom that says what is on today~~ **built**
+~~A sofa to match the giant chairs~~ **built**
 21. Bomb upgrades — bigger gas, longer lasting
-22. Somebody to race on floor 6, not just a clock
-23. A balcony you can walk out onto and see space
+~~Somebody to race on floor 6, not just a clock~~ **built**
+~~A balcony you can walk out onto and see space~~ **built**
 24. A trophy for owning every floor
 25. An ending the whole game builds to
 

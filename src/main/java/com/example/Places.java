@@ -304,6 +304,14 @@ public final class Places {
 	public static final BlockPos DRAGON_DOOR =
 			new BlockPos(SHIP_X + 6, floorY(10) + 1, SHIP_Z - 10);
 
+	/** The three doors the SkyBlock bosses come out of. */
+	public static final BlockPos BROOD_DOOR =
+			new BlockPos(SHIP_X - 10, floorY(10) + 1, SHIP_Z - 4);
+	public static final BlockPos WATCHER_DOOR =
+			new BlockPos(SHIP_X + 10, floorY(10) + 1, SHIP_Z - 4);
+	public static final BlockPos MAGMA_DOOR =
+			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z - 10);
+
 	/** Where a boss comes in. */
 	public static final BlockPos BOSS_SPOT =
 			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z + 4);
@@ -344,6 +352,42 @@ public final class Places {
 	 */
 	public static final BlockPos TV = new BlockPos(SHIP_X + 2, ROOM_Y, SHIP_Z - 10);
 	public static final BlockPos PHONE = new BlockPos(SHIP_X - 4, ROOM_Y, SHIP_Z + 6);
+
+	/** The two window seats in your room, under the windows on the east wall. */
+	public static final BlockPos[] WINDOW_SEATS = {
+		new BlockPos(SHIP_X + 10, ROOM_Y, SHIP_Z + 1),
+		new BlockPos(SHIP_X + 10, ROOM_Y, SHIP_Z - 1),
+	};
+
+	/** The shower, in the corner of the stall. */
+	public static final BlockPos SHOWER = new BlockPos(SHIP_X + 8, ROOM_Y + 3, SHIP_Z - 10);
+
+	/** The wardrobe, beside the bed. */
+	public static final BlockPos WARDROBE = new BlockPos(SHIP_X - 8, ROOM_Y, SHIP_Z + 6);
+
+	/** The wall your trophies go on, opposite the bed. */
+	public static final BlockPos PHOTOS = new BlockPos(SHIP_X - 10, ROOM_Y + 1, SHIP_Z - 2);
+
+	/** The sofa in the lobby, between the two giant chairs. */
+	public static BlockPos[] sofaSeats() {
+		int y = GROUND + 1;
+		return new BlockPos[] {
+			new BlockPos(SHIP_X - 3, y, SHIP_Z - 1),
+			new BlockPos(SHIP_X - 3, y, SHIP_Z),
+			new BlockPos(SHIP_X - 3, y, SHIP_Z + 1),
+		};
+	}
+
+	/** The map on the lobby wall, and the intercom beside it. */
+	public static final BlockPos LOBBY_MAP = new BlockPos(SHIP_X + 6, GROUND + 3, SHIP_Z - 11);
+	public static final BlockPos INTERCOM = new BlockPos(SHIP_X + 8, GROUND + 3, SHIP_Z - 11);
+
+	/** The gym, in the corner of floor 3 by the pool. */
+	public static final BlockPos GYM = new BlockPos(SHIP_X + 8, floorY(3) + 1, SHIP_Z + 8);
+
+	/** The balcony off floor 1, and the water you fish in from it. */
+	public static final BlockPos BALCONY = new BlockPos(SHIP_X + ROOM + 4, GROUND + 1, SHIP_Z);
+	public static final BlockPos FISHING = new BlockPos(SHIP_X + ROOM + 6, GROUND, SHIP_Z);
 
 	/** The record player, beside the TV. Put a disc in and it plays it. */
 	public static final BlockPos JUKEBOX = new BlockPos(SHIP_X - 4, ROOM_Y, SHIP_Z - 8);

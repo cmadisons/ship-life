@@ -155,12 +155,35 @@ public final class Kart {
 		finished(player, (int) ticks);
 	}
 
+	/**
+	 * The time to beat, and who set it.
+	 *
+	 * The track had a clock and nothing else in it -- you raced the number two
+	 * minutes. Vic drives one of the five karts out there and has held the
+	 * ship record for as long as anybody remembers, which is something to
+	 * race rather than something to read.
+	 */
+	public static final String RIVAL = "Vic";
+	public static final int RIVAL_TICKS = 1900;          // one minute thirty-five
+	public static final int BEATING_VIC_PAYS = 60;
+
 	private static void finished(ServerPlayer player, int ticks) {
 		player.level().playSound(null, player.blockPosition(),
 				SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.8f, 1.4f);
 		State.add(player, State.RACES, 1);
 		player.sendSystemMessage(Component.literal(LAPS + " laps in " + Pool.time(ticks) + ".")
 				.withStyle(ChatFormatting.GREEN));
+
+		// Vic's time, which is the race behind the race.
+		if (ticks < RIVAL_TICKS) {
+			player.sendSystemMessage(Component.literal(RIVAL + "'s five laps are "
+					+ Pool.time(RIVAL_TICKS) + ". You just beat them.")
+					.withStyle(ChatFormatting.LIGHT_PURPLE));
+			Events.payTickets(player, BEATING_VIC_PAYS, "you beat " + RIVAL);
+		} else {
+			player.sendSystemMessage(Component.literal(RIVAL + " does it in "
+					+ Pool.time(RIVAL_TICKS) + ".").withStyle(ChatFormatting.GRAY));
+		}
 
 		if (ticks > TARGET_TICKS) {
 			player.sendSystemMessage(Component.literal(

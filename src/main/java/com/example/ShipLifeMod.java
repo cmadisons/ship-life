@@ -71,6 +71,11 @@ public class ShipLifeMod implements ModInitializer {
 		Friends.register();
 		Gear.register();
 		Star.register();
+		Seats.register();
+		Seats.tidy();
+		Comforts.register();
+		Gym.register();
+		Fishing.register();
 		Buffet.register();
 		Elevator.register();
 		Kart.register();
@@ -193,6 +198,11 @@ public class ShipLifeMod implements ModInitializer {
 		// the people the mod has grown since. This one only ever adds.
 		Ship.catchUp(level);
 		Person.everyone(level);
+
+		// The hearts the gym gave you are not saved with you -- the lifts are
+		// -- so they go back on every time you arrive. And turning up pays.
+		Gym.apply(player);
+		Daily.check(player);
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this

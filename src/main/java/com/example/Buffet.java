@@ -95,6 +95,81 @@ public final class Buffet {
 				.withStyle(ChatFormatting.GREEN));
 	}
 
+	/** What the cook will make you, and what each one does. */
+	public record Dish(String name, String what, int heals, String effect) {
+	}
+
+	public static final Dish[] MENU = {
+			new Dish("The Full Plate", "Three helpings. Hearts back to full.", 20, ""),
+			new Dish("Fish Supper", "Off the balcony this morning.", 8, "swim"),
+			new Dish("Steak and Chips", "What you want before floor 9.", 10, "strong"),
+			new Dish("Something Sweet", "Ten minutes of not being hungry.", 6, "quick"),
+	};
+
+	/** The cook's board: pick a dish rather than take whatever is going. */
+	public static void order(ServerPlayer player) {
+		net.minecraft.world.SimpleContainer page = Comforts.blank();
+		page.setItem(4, Book.entry(net.minecraft.world.item.Items.COOKED_BEEF,
+				"The Cook", ChatFormatting.GOLD,
+				"\"Tell me what you want and I will make it.\"",
+				"Everything here is free. It is a buffet."));
+		for (int i = 0; i < MENU.length; i++) {
+			page.setItem(20 + i, Book.entry(icon(i), MENU[i].name(), ChatFormatting.WHITE,
+					MENU[i].what(), "", "Click to order it."));
+		}
+		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
+				ChatFormatting.RED, "Press Escape."));
+		player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page, Buffet::cook),
+				Component.literal("The Cook")));
+	}
+
+	private static net.minecraft.world.item.Item icon(int dish) {
+		return switch (dish) {
+			case 1 -> net.minecraft.world.item.Items.COOKED_SALMON;
+			case 2 -> net.minecraft.world.item.Items.COOKED_BEEF;
+			case 3 -> net.minecraft.world.item.Items.CAKE;
+			default -> net.minecraft.world.item.Items.BREAD;
+		};
+	}
+
+	private static void cook(ServerPlayer player, int slot) {
+		if (slot == 49) {
+			player.closeContainer();
+			return;
+		}
+		int index = slot - 20;
+		if (index < 0 || index >= MENU.length) {
+			return;
+		}
+		long now = player.level().getGameTime();
+		Long last = SERVED.get(player.getUUID());
+		if (last != null && now - last < WAIT) {
+			say(player, "\"Finish what you have got and come back.\"");
+			return;
+		}
+		SERVED.put(player.getUUID(), now);
+
+		Dish dish = MENU[index];
+		player.heal(dish.heals());
+		player.getFoodData().eat(10, 1.0f);
+		switch (dish.effect()) {
+			case "swim" -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+					net.minecraft.world.effect.MobEffects.DOLPHINS_GRACE, 1200, 0));
+			case "strong" -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+					net.minecraft.world.effect.MobEffects.STRENGTH, 1200, 0));
+			case "quick" -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+					net.minecraft.world.effect.MobEffects.SPEED, 1200, 0));
+			default -> {
+			}
+		}
+		if (index == 0) {
+			player.getInventory().add(Kit.meal());
+		}
+		say(player, "\"" + dish.name() + ". There you go.\"");
+		player.closeContainer();
+	}
+
 	public static void serve(ServerPlayer player) {
 		// The wait is there so a buffet is not a free stack of beef. It is not
 		// there to send you away hungry, so an empty pocket goes to the front.

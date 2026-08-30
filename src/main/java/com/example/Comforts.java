@@ -1,0 +1,232 @@
+package com.example;
+
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+/**
+ * The things in your room and the lobby that are not chores.
+ *
+ * The shower, the wardrobe, the wall you hang your bosses on, the map on the
+ * lobby wall and the intercom that tells you what is on today. None of them
+ * are worth a class each: they are all one block, one click, one thing that
+ * happens.
+ */
+public final class Comforts {
+	private Comforts() {
+	}
+
+	public static void register() {
+		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
+			if (!(player instanceof ServerPlayer who) || !(world instanceof ServerLevel level)
+					|| !ShipLifeMod.isShipLife(level)) {
+				return InteractionResult.PASS;
+			}
+			BlockPos pos = Places.local(hit.getBlockPos());
+
+			if (pos.equals(Places.SHOWER) || pos.equals(Places.SHOWER.below())) {
+				shower(who, level);
+				return InteractionResult.SUCCESS;
+			}
+			if (pos.equals(Places.WARDROBE) || pos.equals(Places.WARDROBE.above())) {
+				wardrobe(who);
+				return InteractionResult.SUCCESS;
+			}
+			if (isPhotoWall(pos)) {
+				photos(who);
+				return InteractionResult.SUCCESS;
+			}
+			if (pos.equals(Places.LOBBY_MAP)) {
+				Book.map(who);
+				return InteractionResult.SUCCESS;
+			}
+			if (pos.equals(Places.INTERCOM)) {
+				intercom(who, level);
+				return InteractionResult.SUCCESS;
+			}
+			return InteractionResult.PASS;
+		});
+	}
+
+	private static boolean isPhotoWall(BlockPos pos) {
+		return pos.getX() == Places.PHOTOS.getX()
+				&& Math.abs(pos.getZ() - Places.PHOTOS.getZ()) <= 1
+				&& pos.getY() >= Places.PHOTOS.getY()
+				&& pos.getY() <= Places.PHOTOS.getY() + 1;
+	}
+
+	// ---------------------------------------------------------------- shower
+
+	/** Water, steam, and clean hearts. */
+	private static void shower(ServerPlayer player, ServerLevel level) {
+		level.playSound(null, Places.SHOWER, SoundEvents.BUCKET_EMPTY,
+				SoundSource.BLOCKS, 0.8f, 1.6f);
+		level.sendParticles(ParticleTypes.FALLING_WATER,
+				Places.SHOWER.getX() + 0.5, Places.SHOWER.getY() - 0.2,
+				Places.SHOWER.getZ() + 0.5, 40, 0.3, 1.0, 0.3, 0.0);
+		player.heal(4.0f);
+		player.removeAllEffects();
+		player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+				net.minecraft.world.effect.MobEffects.REGENERATION, 200, 0));
+		player.sendSystemMessage(Component.literal(
+				"A hot shower. That is better.").withStyle(ChatFormatting.AQUA));
+	}
+
+	// -------------------------------------------------------------- wardrobe
+
+	/** Four outfits, and you wear the one you pick. */
+	private static void wardrobe(ServerPlayer player) {
+		SimpleContainer page = blank();
+		page.setItem(4, Book.entry(Items.LEATHER_CHESTPLATE, "Your Wardrobe",
+				ChatFormatting.AQUA, "Pick something to wear.",
+				"Ben and Izzy's armour goes over the top."));
+		for (int i = 0; i < OUTFITS.length; i++) {
+			Outfit outfit = OUTFITS[i];
+			page.setItem(20 + i, Book.entry(Items.LEATHER_CHESTPLATE, outfit.name(),
+					ChatFormatting.WHITE, outfit.what(), "", "Click to put it on."));
+		}
+		page.setItem(29, Book.entry(Items.BARRIER, "Take it all off",
+				ChatFormatting.GRAY, "Back to nothing."));
+		page.setItem(49, Book.entry(Items.BARRIER, "Close", ChatFormatting.RED,
+				"Press Escape."));
+		player.openMenu(new SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
+						Comforts::wear),
+				Component.literal("Wardrobe")));
+	}
+
+	private record Outfit(String name, String what, int colour) {
+	}
+
+	private static final Outfit[] OUTFITS = {
+			new Outfit("Ship Uniform", "What the staff wear.", 0xE8ECF0),
+			new Outfit("Swimming Kit", "For floor 3.", 0x3C9BE0),
+			new Outfit("Racing Overalls", "For floor 6.", 0xD84A3C),
+			new Outfit("Evening Wear", "For the events on 7.", 0x2B2F45),
+	};
+
+	private static void wear(ServerPlayer player, int slot) {
+		if (slot == 49) {
+			player.closeContainer();
+			return;
+		}
+		if (slot == 29) {
+			for (net.minecraft.world.entity.EquipmentSlot where : DRESSED) {
+				if (!Kit.is(player.getItemBySlot(where), Kit.ARMOUR)) {
+					player.setItemSlot(where, ItemStack.EMPTY);
+				}
+			}
+			player.closeContainer();
+			return;
+		}
+		int index = slot - 20;
+		if (index < 0 || index >= OUTFITS.length) {
+			return;
+		}
+		Outfit outfit = OUTFITS[index];
+		put(player, net.minecraft.world.entity.EquipmentSlot.HEAD,
+				Items.LEATHER_HELMET, outfit);
+		put(player, net.minecraft.world.entity.EquipmentSlot.CHEST,
+				Items.LEATHER_CHESTPLATE, outfit);
+		put(player, net.minecraft.world.entity.EquipmentSlot.LEGS,
+				Items.LEATHER_LEGGINGS, outfit);
+		put(player, net.minecraft.world.entity.EquipmentSlot.FEET,
+				Items.LEATHER_BOOTS, outfit);
+		player.sendSystemMessage(Component.literal("You put on the " + outfit.name() + ".")
+				.withStyle(ChatFormatting.AQUA));
+		player.closeContainer();
+	}
+
+	private static final net.minecraft.world.entity.EquipmentSlot[] DRESSED = {
+			net.minecraft.world.entity.EquipmentSlot.HEAD,
+			net.minecraft.world.entity.EquipmentSlot.CHEST,
+			net.minecraft.world.entity.EquipmentSlot.LEGS,
+			net.minecraft.world.entity.EquipmentSlot.FEET,
+	};
+
+	/**
+	 * Put one piece on, unless Ben or Izzy's is already there.
+	 *
+	 * Clothes are clothes; the armour is the thing that keeps a tenth of every
+	 * hit off you, and nobody wants to lose that to a change of shirt.
+	 */
+	private static void put(ServerPlayer player, net.minecraft.world.entity.EquipmentSlot where,
+			net.minecraft.world.item.Item item, Outfit outfit) {
+		ItemStack worn = player.getItemBySlot(where);
+		if (Kit.is(worn, Kit.ARMOUR) || Kit.is(worn, Kit.BOOTS)
+				|| Kit.is(worn, Kit.HELMET) || Kit.is(worn, Kit.LEGGINGS)) {
+			return;
+		}
+		ItemStack piece = Kit.make(item, outfit.name(), ChatFormatting.WHITE, outfit.what());
+		piece.set(net.minecraft.core.component.DataComponents.DYED_COLOR,
+				new net.minecraft.world.item.component.DyedItemColor(outfit.colour()));
+		piece.set(net.minecraft.core.component.DataComponents.UNBREAKABLE,
+				net.minecraft.util.Unit.INSTANCE);
+		player.setItemSlot(where, piece);
+	}
+
+	// ------------------------------------------------------------ the photos
+
+	/** The wall of what you have put down. */
+	private static void photos(ServerPlayer player) {
+		SimpleContainer page = blank();
+		int bosses = State.tally(player, State.BOSSES);
+		int waves = State.tally(player, State.WAVES);
+
+		page.setItem(4, Book.entry(Items.ITEM_FRAME, "Your Wall", ChatFormatting.AQUA,
+				"Everything you have put down.",
+				bosses == 0 ? "Nothing on it yet." : bosses + " bosses beaten"));
+		page.setItem(20, Book.entry(bosses >= 1 ? Items.COBWEB : Items.GRAY_DYE,
+				"Arachnes", bosses >= 1 ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+				bosses >= 1 ? "Beaten." : "Still down there, floor 10."));
+		page.setItem(22, Book.entry(bosses >= 2 ? Items.DRAGON_HEAD : Items.GRAY_DYE,
+				"The Dragon", bosses >= 2 ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+				bosses >= 2 ? "Beaten." : "Still down there, floor 10."));
+		page.setItem(24, Book.entry(waves > 0 ? Items.IRON_SWORD : Items.GRAY_DYE,
+				"The Waves", waves > 0 ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+				waves + " cleared on floor 9"));
+		page.setItem(49, Book.entry(Items.BARRIER, "Close", ChatFormatting.RED,
+				"Press Escape."));
+		player.openMenu(new SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
+						(clicker, slot) -> clicker.closeContainer()),
+				Component.literal("Your Wall")));
+	}
+
+	// ----------------------------------------------------------- the tannoy
+
+	/** What is on today, said out loud. */
+	public static void intercom(ServerPlayer player, ServerLevel level) {
+		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BELL.value(),
+				SoundSource.BLOCKS, 0.7f, 1.2f);
+		String on = Events.running(player);
+		player.sendSystemMessage(Component.literal("*ding* ").withStyle(ChatFormatting.GOLD)
+				.append(Component.literal(Cal.date() + ". ")
+						.withStyle(ChatFormatting.GRAY))
+				.append(Component.literal(on == null
+								? "Nothing on today."
+								: "Today on floor 7: " + on + ".")
+						.withStyle(ChatFormatting.WHITE)));
+	}
+
+	static SimpleContainer blank() {
+		SimpleContainer page = new SimpleContainer(54);
+		ItemStack filler = Game.cell(Items.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
+		for (int slot = 0; slot < 54; slot++) {
+			page.setItem(slot, filler.copy());
+		}
+		return page;
+	}
+}

@@ -104,6 +104,37 @@ public final class Pets {
 		}
 	}
 
+	/**
+	 * The lion fights.
+	 *
+	 * "Helps you fight" was a line in a shop menu and nothing else. Now, on
+	 * the fighting floors, anything hostile within a few blocks of your lion
+	 * gets swiped at once a second -- harder if you have two of them, harder
+	 * again if you have been feeding it.
+	 */
+	private static void lionFights(ServerPlayer player, ServerLevel level) {
+		int lions = owned(player, Kind.LION);
+		if (lions == 0) {
+			return;
+		}
+		int floor = Places.floorAt(player.getY());
+		if (floor != 9 && floor != 10) {
+			return;
+		}
+		double bite = 4.0 * Math.min(2, lions) * strength(player, Kind.LION);
+		for (net.minecraft.world.entity.monster.Monster prey : level.getEntitiesOfClass(
+				net.minecraft.world.entity.monster.Monster.class,
+				player.getBoundingBox().inflate(8.0),
+				monster -> monster.isAlive())) {
+			prey.invulnerableTime = 0;
+			prey.hurtServer(level, level.damageSources().magic(), (float) bite);
+			level.playSound(null, prey.blockPosition(),
+					net.minecraft.sounds.SoundEvents.RAVAGER_ROAR,
+					SoundSource.PLAYERS, 0.35f, 1.6f);
+			return;                        // one swipe a second, not a massacre
+		}
+	}
+
 	public static int owned(ServerPlayer player, Kind kind) {
 		return player.getAttachedOrCreate(OWNED[kind.ordinal()]);
 	}
@@ -295,6 +326,7 @@ public final class Pets {
 				for (ServerPlayer player : level.players()) {
 					boosts(player);
 					herd(player, level);
+					lionFights(player, level);
 				}
 			}
 		});

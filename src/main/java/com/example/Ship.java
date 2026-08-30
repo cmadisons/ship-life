@@ -135,6 +135,8 @@ public final class Ship {
 		furnishShops(level);
 		furnishBensRoom(level);
 		furnishIzzysRoom(level);
+		furnishGym(level);
+		furnishBalcony(level);
 		furnishYourRoom(level);
 	}
 
@@ -214,6 +216,17 @@ public final class Ship {
 		giantChair(level, Places.CHAIR, true);
 		giantChair(level, Places.CHAIR_TWO, false);
 		bigTable(level, Places.BIG_TABLE);
+
+		// A sofa along the west side, matching the chairs.
+		for (BlockPos seat : Places.sofaSeats()) {
+			set(level, seat, Blocks.BLACK_WOOL);
+			set(level, seat.west(), Blocks.BLACK_WOOL);
+			set(level, seat.west().above(), Blocks.BLACK_WOOL);
+		}
+
+		// The map on the wall, and the intercom beside it.
+		set(level, Places.LOBBY_MAP, Blocks.LIGHT_BLUE_GLAZED_TERRACOTTA);
+		set(level, Places.INTERCOM, Blocks.NOTE_BLOCK);
 		fill(level, Places.SHIP_X + 2, Places.GROUND, Places.SHIP_Z - 6,
 				Places.SHIP_X + 6, Places.GROUND, Places.SHIP_Z + 6, Blocks.POLISHED_ANDESITE);
 	}
@@ -532,6 +545,62 @@ public final class Ship {
 	 * updates off nothing recalculates it. The redstone block under each one
 	 * is what keeps it true afterwards.
 	 */
+	/**
+	 * The gym, in the corner of floor 3.
+	 *
+	 * Three anvils to lift. Doing the set enough times is worth a heart, and
+	 * a heart you have earned stays earned -- see {@link Gym}.
+	 */
+	private static void furnishGym(ServerLevel level) {
+		int y = Places.floorY(3);
+		fill(level, Places.GYM.getX() - 2, y, Places.GYM.getZ() - 2,
+				Places.GYM.getX() + 2, y, Places.GYM.getZ() + 2, Blocks.POLISHED_ANDESITE);
+		set(level, Places.GYM, Blocks.ANVIL);
+		set(level, Places.GYM.west(2), Blocks.CHIPPED_ANVIL);
+		set(level, Places.GYM.north(2), Blocks.DAMAGED_ANVIL);
+		set(level, Places.GYM.above(2), Blocks.SEA_LANTERN);
+	}
+
+	/**
+	 * The balcony off floor 1, and the water you fish in from it.
+	 *
+	 * It hangs off the east side of the ship with nothing under it but the
+	 * void, which is the point: it is the one place you can stand outside and
+	 * look at where you live.
+	 */
+	private static void furnishBalcony(ServerLevel level) {
+		int y = Places.GROUND;
+		int x = Places.BALCONY.getX();
+		int z = Places.BALCONY.getZ();
+
+		// The way out, through the hull.
+		for (int dx = 0; dx <= 2; dx++) {
+			for (int dy = 1; dy <= 2; dy++) {
+				set(level, new BlockPos(Places.SHIP_X + Places.ROOM + dx - 1, y + dy, z),
+						Blocks.AIR);
+			}
+		}
+
+		fill(level, x - 1, y, z - 3, x + 5, y, z + 3, Blocks.POLISHED_ANDESITE);
+		// A rail round the edge, so it is a balcony and not a diving board.
+		for (int dx = -1; dx <= 5; dx++) {
+			for (int dz = -3; dz <= 3; dz++) {
+				if (dx != 5 && Math.abs(dz) != 3) {
+					continue;
+				}
+				set(level, new BlockPos(x + dx, y + 1, z + dz), Blocks.IRON_BARS);
+			}
+		}
+
+		// The water you fish in, sunk into the deck at the far end.
+		fill(level, Places.FISHING.getX() - 1, y - 1, Places.FISHING.getZ() - 1,
+				Places.FISHING.getX() + 1, y - 1, Places.FISHING.getZ() + 1,
+				Blocks.PRISMARINE);
+		fill(level, Places.FISHING.getX() - 1, y, Places.FISHING.getZ() - 1,
+				Places.FISHING.getX() + 1, y, Places.FISHING.getZ() + 1, Blocks.WATER);
+		set(level, Places.FISHING.above(2), Blocks.SEA_LANTERN);
+	}
+
 	private static void furnishRace(ServerLevel level) {
 		int y = Places.floorY(6);
 		int w = Places.KART_HALF_WIDTH;
@@ -595,6 +664,15 @@ public final class Ship {
 		set(level, Places.ARACHNES_DOOR.above(), Blocks.SEA_LANTERN);
 		set(level, Places.DRAGON_DOOR, Blocks.OBSIDIAN);
 		set(level, Places.DRAGON_DOOR.above(), Blocks.SEA_LANTERN);
+
+		// Three more, out of the SkyBlock list: the Broodmother, the Watcher
+		// and the Magma Boss. A door apiece, each made of what is behind it.
+		set(level, Places.BROOD_DOOR, Blocks.COBWEB);
+		set(level, Places.BROOD_DOOR.above(), Blocks.RED_CONCRETE);
+		set(level, Places.WATCHER_DOOR, Blocks.SOUL_SAND);
+		set(level, Places.WATCHER_DOOR.above(), Blocks.SOUL_LANTERN);
+		set(level, Places.MAGMA_DOOR, Blocks.MAGMA_BLOCK);
+		set(level, Places.MAGMA_DOOR.above(), Blocks.SHROOMLIGHT);
 		fill(level, Places.SHIP_X - 9, Places.floorY(10), Places.SHIP_Z - 9,
 				Places.SHIP_X + 9, Places.floorY(10), Places.SHIP_Z + 9,
 				Blocks.POLISHED_BLACKSTONE);
@@ -705,6 +783,11 @@ public final class Ship {
 		}
 		door(level, new BlockPos(x, y, z + 2), Direction.NORTH);
 
+		// A shower in the far corner of the stall: a head on the wall and a
+		// drain under it.
+		set(level, Places.SHOWER, Blocks.IRON_TRAPDOOR);
+		set(level, Places.SHOWER.below(3), Blocks.LIGHT_GRAY_CONCRETE);
+
 		set(level, where, Blocks.CAULDRON);
 
 		// Where the handle used to be: the middle of the cistern, and then the
@@ -741,6 +824,19 @@ public final class Ship {
 		// disc goes in it and the disc plays -- nothing here had to make that
 		// happen, only put one in the room.
 		set(level, Places.JUKEBOX, Blocks.JUKEBOX);
+
+		// Two window seats along the east wall, under the glass.
+		for (BlockPos seat : Places.WINDOW_SEATS) {
+			set(level, seat, Blocks.SPRUCE_STAIRS);
+			set(level, seat.above(), Blocks.AIR);
+		}
+
+		// A wardrobe by the bed and a bare wall opposite it for trophies.
+		set(level, Places.WARDROBE, Blocks.SPRUCE_PLANKS);
+		set(level, Places.WARDROBE.above(), Blocks.SPRUCE_TRAPDOOR);
+		fill(level, Places.PHOTOS.getX(), Places.PHOTOS.getY(), Places.PHOTOS.getZ() - 1,
+				Places.PHOTOS.getX(), Places.PHOTOS.getY() + 1, Places.PHOTOS.getZ() + 1,
+				Blocks.POLISHED_BLACKSTONE);
 		set(level, Places.PHONE, Blocks.OAK_PRESSURE_PLATE);
 		bed(level, Places.BED);
 
@@ -823,6 +919,22 @@ public final class Ship {
 			}
 		}
 
+		// The gym, the balcony, the sofa and the seats all came later.
+		if (!level.getBlockState(Places.GYM).is(Blocks.ANVIL)) {
+			furnishGym(level);
+		}
+		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
+			furnishBalcony(level);
+		}
+		if (!level.getBlockState(Places.sofaSeats()[0]).is(Blocks.BLACK_WOOL)) {
+			furnishLobby(level);
+		}
+		if (!level.getBlockState(Places.WINDOW_SEATS[0]).is(Blocks.SPRUCE_STAIRS)
+				|| !level.getBlockState(Places.SHOWER).is(Blocks.IRON_TRAPDOOR)) {
+			furnishYourRoom(level);
+			toilet(level, Places.TOILET);
+		}
+
 		// The TV, its screen, and the record player that came after it.
 		if (!level.getBlockState(Places.TV).is(Blocks.GRAY_CONCRETE)
 				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.GRAY_CONCRETE)
@@ -857,7 +969,8 @@ public final class Ship {
 		if (!level.getBlockState(Places.IZZY).is(Blocks.BIRCH_DOOR)) {
 			furnishIzzysRoom(level);
 		}
-		if (!level.getBlockState(Places.FIGHT_BUTTON).is(Blocks.REDSTONE_BLOCK)) {
+		if (!level.getBlockState(Places.FIGHT_BUTTON).is(Blocks.REDSTONE_BLOCK)
+				|| !level.getBlockState(Places.MAGMA_DOOR).is(Blocks.MAGMA_BLOCK)) {
 			furnishFighting(level);
 		}
 		if (!level.getBlockState(Places.PASSPORT_DESK).is(Blocks.LECTERN)) {
@@ -997,6 +1110,8 @@ public final class Ship {
 			furnishShops(level);
 		furnishBensRoom(level);
 		furnishIzzysRoom(level);
+		furnishGym(level);
+		furnishBalcony(level);
 			furnishYourRoom(level);
 			ShipLifeMod.LOGGER.info("Repainted the ship's walls black.");
 		}
@@ -1031,6 +1146,8 @@ public final class Ship {
 		furnishShops(level);
 		furnishBensRoom(level);
 		furnishIzzysRoom(level);
+		furnishGym(level);
+		furnishBalcony(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
 		}
 		// The pool used to be a glass tank standing on the floor.
