@@ -117,6 +117,21 @@ public final class Ship {
 		ShipLifeMod.LOGGER.info("Pulled ship 2 down.");
 	}
 
+	/**
+	 * Ship 2, in the Nether.
+	 *
+	 * The same ship, floor for floor, at the same coordinates -- but with no
+	 * town, no gangway and nothing under it. It is built once, the first time
+	 * somebody comes through the portal on 18.
+	 */
+	public static void buildInTheNether(ServerLevel nether) {
+		if (nether.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
+			return;
+		}
+		buildShip(nether);
+		ShipLifeMod.LOGGER.info("Built ship 2 in the Nether.");
+	}
+
 	private static void buildShip(ServerLevel level) {
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			buildFloor(level, floor);

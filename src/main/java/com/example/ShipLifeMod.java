@@ -77,6 +77,7 @@ public class ShipLifeMod implements ModInitializer {
 		Gym.register();
 		Fishing.register();
 		Weapons.register();
+		Portals.register();
 		Buffet.register();
 		Elevator.register();
 		Kart.register();
@@ -294,6 +295,17 @@ public class ShipLifeMod implements ModInitializer {
 	}
 
 	/** Is this one of our worlds? Everything else in the mod asks this first. */
+	/**
+	 * Say that this level is one of ours.
+	 *
+	 * Used by the Nether, which becomes a Ship Life world the moment ship 2
+	 * is built in it -- everything from the lift to the arcade works over
+	 * there because of this one line.
+	 */
+	public static void claim(ServerLevel level) {
+		SHIP_WORLDS.add(level.dimension().identifier().toString());
+	}
+
 	public static boolean isShipLife(ServerLevel level) {
 		return SHIP_WORLDS.contains(level.dimension().identifier().toString());
 	}
