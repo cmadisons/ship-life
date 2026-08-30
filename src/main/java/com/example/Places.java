@@ -346,7 +346,7 @@ public final class Places {
 	public static final BlockPos PHONE = new BlockPos(SHIP_X - 4, ROOM_Y, SHIP_Z + 6);
 
 	/** The record player, beside the TV. Put a disc in and it plays it. */
-	public static final BlockPos JUKEBOX = new BlockPos(SHIP_X + 4, ROOM_Y, SHIP_Z - 10);
+	public static final BlockPos JUKEBOX = new BlockPos(SHIP_X - 4, ROOM_Y, SHIP_Z - 8);
 
 	/** The four things Quest 3 asks you to find, in the order it counts them. */
 	/**

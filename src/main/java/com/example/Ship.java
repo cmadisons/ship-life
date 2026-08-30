@@ -697,7 +697,9 @@ public final class Ship {
 				boolean doorway = dz == 2 && dx == 0;
 				for (int dy = 0; dy <= 2; dy++) {
 					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
-					set(level, pos, doorway ? Blocks.AIR : Blocks.QUARTZ_BRICKS);
+					// The door is two high, so the third block above it is
+					// wall like the rest -- an open top read as a gap.
+					set(level, pos, doorway && dy < 2 ? Blocks.AIR : Blocks.QUARTZ_BRICKS);
 				}
 			}
 		}
@@ -795,7 +797,9 @@ public final class Ship {
 		// then it had no handle.
 		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
 				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)
-				|| !level.getBlockState(Places.TOILET.east(2)).is(Blocks.QUARTZ_BRICKS)) {
+				|| !level.getBlockState(Places.TOILET.east(2)).is(Blocks.QUARTZ_BRICKS)
+				|| !level.getBlockState(Places.TOILET.south(2).above(2))
+						.is(Blocks.QUARTZ_BRICKS)) {
 			toilet(level, Places.TOILET);
 		}
 
@@ -806,6 +810,9 @@ public final class Ship {
 				for (int dz = -9; dz <= -8; dz++) {
 					BlockPos pos = new BlockPos(Places.SHIP_X + dx, Places.floorY(5) + 1 + dy,
 							Places.SHIP_Z + dz);
+					if (pos.equals(Places.JUKEBOX)) {
+						continue;               // the record player lives here
+					}
 					if (level.getBlockState(pos).is(Blocks.BLACK_CONCRETE)
 							|| level.getBlockState(pos).is(Blocks.POLISHED_BLACKSTONE)
 							|| level.getBlockState(pos).is(Blocks.JUKEBOX)) {
