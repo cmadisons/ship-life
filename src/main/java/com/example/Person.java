@@ -118,12 +118,15 @@ public class Person extends PathfinderMob {
 	}
 
 	/**
-	 * Take away anybody whose label is not one of the jobs.
+	 * Take away anybody whose label is not one of the jobs, and any second
+	 * copy of anybody who is.
 	 *
-	 * They were called Charlie, Ben, Izzy, Maria, Sam and Gus once. A world
-	 * that met them then still has them stood about.
+	 * They were called Charlie, Ben, Izzy, Maria, Sam and Gus once, and a
+	 * world that met them then still has them stood about. This also runs
+	 * every ten seconds rather than only on joining, because the join that
+	 * should have swept them up was the join that was crashing.
 	 */
-	private static void clearOldNames(ServerLevel level) {
+	public static void clearOldNames(ServerLevel level) {
 		// A set built by hand: two of these labels are the same string on
 		// purpose -- both friends are Friend -- and Set.of refuses duplicates.
 		java.util.Set<String> jobs = new java.util.HashSet<>(
@@ -139,6 +142,42 @@ public class Person extends PathfinderMob {
 				person.discard();
 			}
 		}
+
+		// And anybody stood on top of somebody with the same label.
+		java.util.List<Person> left = level.getEntitiesOfClass(Person.class,
+				new net.minecraft.world.phys.AABB(
+						Places.SHIP_X - 40, Places.GROUND - 8, Places.SHIP_Z - 40,
+						Places.SHIP_X + 40, Places.floorY(Places.TOP_FLOOR) + 16,
+						Places.SHIP_Z + 40));
+		for (int i = 0; i < left.size(); i++) {
+			for (int j = i + 1; j < left.size(); j++) {
+				Person one = left.get(i);
+				Person two = left.get(j);
+				if (two.isRemoved() || one.isRemoved() || one.getCustomName() == null
+						|| two.getCustomName() == null) {
+					continue;
+				}
+				if (one.getCustomName().getString().equals(two.getCustomName().getString())
+						&& one.distanceToSqr(two) < 16.0) {
+					two.discard();
+				}
+			}
+		}
+	}
+
+	/** Sweep for leftovers on a timer, not only when somebody joins. */
+	public static void watch() {
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % 200 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (ShipLifeMod.isShipLife(level)) {
+					clearOldNames(level);
+				}
+			}
+		});
 	}
 
 	/**

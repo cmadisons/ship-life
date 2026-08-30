@@ -54,6 +54,7 @@ public class ShipLifeMod implements ModInitializer {
 		Fridge.register();
 		Telly.register();
 		Person.register();
+		Person.watch();
 		Made.register();
 		Ticker.register();
 		Slots.register();
