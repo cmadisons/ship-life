@@ -105,12 +105,80 @@ public final class Book {
 				"",
 				"Click to open it."));
 
+		page.setItem(45, entry(Items.WRITTEN_BOOK, "Everything Else", ChatFormatting.YELLOW,
+				"Your money, your tickets, your records,",
+				"what you have beaten and what is on.",
+				"",
+				"Click for the second page."));
 		page.setItem(49, entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
 
 		player.openMenu(new SimpleMenuProvider(
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
 						(clicker, slot) -> click(clicker, slot, here)),
 				Component.literal("Quest Book")));
+	}
+
+	/**
+	 * The second page.
+	 *
+	 * One chest is fifty-four squares and the quests fill most of them, so
+	 * everything that is a number rather than a job lives through here: what
+	 * you have, what you have done, and what is on today.
+	 */
+	public static void more(ServerPlayer player) {
+		SimpleContainer page = new SimpleContainer(54);
+		ItemStack filler = new ItemStack(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
+		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
+		for (int slot = 0; slot < 54; slot++) {
+			page.setItem(slot, filler.copy());
+		}
+
+		page.setItem(4, entry(Items.CLOCK, Cal.date(), ChatFormatting.AQUA,
+				Events.running(player) == null
+						? "Nothing on today."
+						: "Today: " + Events.running(player),
+				"A day is 20 real minutes."));
+
+		page.setItem(19, entry(Items.GOLD_NUGGET, "What You Have", ChatFormatting.GOLD,
+				State.dollars(State.money(player)),
+				State.arcade(player) + " arcade tickets",
+				State.event(player) + " event tickets",
+				State.tally(player, State.EVENT_SPENT) + " event tickets paid out"));
+
+		page.setItem(21, entry(Items.IRON_SWORD, "The Fighting", ChatFormatting.RED,
+				State.tally(player, State.WAVES) + " waves cleared",
+				State.tally(player, State.BOSSES) + " bosses beaten",
+				State.tally(player, State.BOMBS_USED) + " bombs used",
+				"Floor 16 wants 3 waves, a boss, 6 bombs",
+				"and 1500 tickets paid out."));
+
+		page.setItem(23, entry(Items.GOLDEN_APPLE, "The Machines", ChatFormatting.YELLOW,
+				"Pac-Man record: " + State.best(player),
+				State.tally(player, State.FOODS) + " food eaten in Snake",
+				State.tally(player, State.ROUNDS) + " Galaga rounds",
+				State.tally(player, State.EARNED) + " arcade tickets earned"));
+
+		page.setItem(25, entry(Items.HEART_OF_THE_SEA, "The Rest", ChatFormatting.AQUA,
+				State.tally(player, State.LAPS) + " laps swum",
+				"Best lap: " + (State.bestLap(player) == 0
+						? "none yet" : Pool.time(State.bestLap(player))),
+				State.tally(player, State.RACES) + " races finished",
+				Gym.hearts(player) + " hearts from the gym"));
+
+		page.setItem(45, entry(Items.WRITABLE_BOOK, "Back", ChatFormatting.YELLOW,
+				"Back to the quests."));
+		page.setItem(49, entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
+
+		player.openMenu(new SimpleMenuProvider(
+				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
+						(clicker, slot) -> {
+							if (slot == 45) {
+								open(clicker);
+							} else if (slot == 49) {
+								clicker.closeContainer();
+							}
+						}),
+				Component.literal("Quest Book  --  Everything Else")));
 	}
 
 	/**
@@ -215,6 +283,10 @@ public final class Book {
 		}
 		if (slot == 42) {
 			map(player);
+			return;
+		}
+		if (slot == 45) {
+			more(player);
 			return;
 		}
 		// Clicking the quest you are on re-points the star at it.

@@ -41,57 +41,63 @@ The struck-through ones are built.
 
 ## Take away
 
-1. `Places.SHIP_TWO_OFFSET` and the ship 2 code with it
-2. The `SHIPS` passport number — it means nothing now
-3. `oldLift`, `oldPanel`, `oldDoorSouth` — three names for things that moved
-4. `Fight.announce()` — nothing calls it
-5. `Gear.clouds()` — nothing calls it
-6. The mop and the plunger once chapter 1 is done
+The struck-through ones are done.
+
+
+1. ~~`Places.SHIP_TWO_OFFSET` and the ship 2 code with it~~ **done**
+2. ~~The `SHIPS` passport number — it means nothing now~~ **done**
+3. ~~`oldLift`, `oldPanel`, `oldDoorSouth` — three names for things that moved~~ **done**
+4. ~~`Fight.announce()` — nothing calls it~~ **done**
+5. ~~`Gear.clouds()` — nothing calls it~~ **done**
+6. ~~The mop and the plunger once chapter 1 is done~~ **done**
 7. The 0.1% forever x2.5 reward — you will never see it
 8. The `REWARD_MONTH` gate now that /11reward exists
 9. The lift's lock icon — it only ever shows floor 2
 10. The Nether and the End — you are on a space ship
-11. The fifteen second buffet wait
-12. The eight bomb stack cap
-13. Realms buttons on a single player game
-14. The Buffet cooldown map if the cook replaces it
-15. Buying a second cat, since it does not stack
+11. ~~The fifteen second buffet wait~~ **done**
+12. ~~The eight bomb stack cap~~ **done**
+13. Realms buttons on a single player game (needs a client mixin -- not done)
+14. ~~The Buffet cooldown map if the cook replaces it~~ **done**
+15. ~~Buying a second cat, since it does not stack~~ **done**
 16. The hundred person crowd — forty reads the same and is faster
 17. Empty rooms on floors nothing uses yet
 18. `Kit.dropChores` once the chores are gone for good
 19. The Shooter's page buttons if the crowd shrinks
-20. Ship 2's leftover blocks in old saves
-21. The `firstTime` bit soup — five meanings in one number
-22. Dead entries in `Floors.how` for rules that changed
+20. ~~Ship 2's leftover blocks in old saves~~ **done**
+21. ~~The `firstTime` bit soup — five meanings in one number~~ **done**
+22. ~~Dead entries in `Floors.how` for rules that changed~~ **done**
 23. The white concrete left over from the old bathroom
-24. Anything in QUESTS.md the mod still cannot watch
-25. Repair checks that now test the same thing twice
+24. ~~Anything in QUESTS.md the mod still cannot watch~~ **done**
+25. ~~Repair checks that now test the same thing twice~~ **done**
 
 ## Change
 
-1. The dragon is a Wither wearing the name
-2. Pets are ocelots and wolves wearing names
-3. Waves cap at ten mobs — wave 30 is the size of wave 8
-4. Bosses pay a flat 150 and 200 forever
+The struck-through ones are done.
+
+
+1. ~~The dragon is a Wither wearing the name~~ **done**
+2. ~~Pets are ocelots and wolves wearing names~~ **done**
+3. ~~Waves cap at ten mobs — wave 30 is the size of wave 8~~ **done**
+4. ~~Bosses pay a flat 150 and 200 forever~~ **done**
 5. A month is ten real hours — floor 11 is a long wait
 6. Quest Day's four are all arcade and pool goals
 7. Side quests only ever pay event tickets
-8. The buffet plate is the only healing in the game
+8. ~~The buffet plate is the only healing in the game~~ **done**
 9. Money stops mattering after chapter 1
 10. The race track is one quest and then never used
-11. Pet boosts are invisible — you cannot tell they work
+11. ~~Pet boosts are invisible — you cannot tell they work~~ **done**
 12. The pool is one timed lap and then nothing
-13. Floors 11 to 13 are all or nothing at 1000
-14. Phones are 70% of the floor 11 table
-15. Christmas pays a flat 250 with no risk
-16. Arcade tickets are tiny next to one event
-17. The Quest Book is a chest menu and cannot show much
-18. Nothing on the ship can kill you but 9 and 10  ~~(blocks are now unbreakable outside creative)~~
-19. The star is one use for 250
-20. Ben's bombs are 250 for three
+13. ~~Floors 11 to 13 are all or nothing at 1000~~ **done**
+14. ~~Phones are 70% of the floor 11 table~~ **done**
+15. ~~Christmas pays a flat 250 with no risk~~ **done**
+16. ~~Arcade tickets are tiny next to one event~~ **done**
+17. ~~The Quest Book is a chest menu and cannot show much~~ **done**
+18. ~~Nothing on the ship can kill you but 9 and 10~~ **done**  ~~(blocks are now unbreakable outside creative)~~
+19. ~~The star is one use for 250~~ **done**
+20. ~~Ben's bombs are 250 for three~~ **done**
 21. Your room has no reason to go back to it
-22. The lift takes the same two seconds to 2 as to 16
-23. Floor 1's gangway door leads nowhere in particular
+22. ~~The lift takes the same two seconds to 2 as to 16~~ **done**
+23. ~~Floor 1's gangway door leads nowhere in particular~~ **done**
 24. Izzy has nothing to say after she hands the set over
 25. Charlie has nothing to say after chapter 4
 
