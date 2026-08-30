@@ -159,11 +159,11 @@ public final class Kart {
 	 * The time to beat, and who set it.
 	 *
 	 * The track had a clock and nothing else in it -- you raced the number two
-	 * minutes. Vic drives one of the five karts out there and has held the
-	 * ship record for as long as anybody remembers, which is something to
-	 * race rather than something to read.
+	 * minutes. The racer drives one of the five karts out there and holds the
+	 * ship record, which is something to race rather than something to read.
+	 * Called what they are, like everybody else on the ship.
 	 */
-	public static final String RIVAL = "Vic";
+	public static final String RIVAL = "The racer";
 	public static final int RIVAL_TICKS = 1900;          // one minute thirty-five
 	public static final int BEATING_VIC_PAYS = 60;
 
@@ -176,10 +176,10 @@ public final class Kart {
 
 		// Vic's time, which is the race behind the race.
 		if (ticks < RIVAL_TICKS) {
-			player.sendSystemMessage(Component.literal(RIVAL + "'s five laps are "
+			player.sendSystemMessage(Component.literal(RIVAL + " does five laps in "
 					+ Pool.time(RIVAL_TICKS) + ". You just beat them.")
 					.withStyle(ChatFormatting.LIGHT_PURPLE));
-			Events.payTickets(player, BEATING_VIC_PAYS, "you beat " + RIVAL);
+			Events.payTickets(player, BEATING_VIC_PAYS, "you beat the racer");
 		} else {
 			player.sendSystemMessage(Component.literal(RIVAL + " does it in "
 					+ Pool.time(RIVAL_TICKS) + ".").withStyle(ChatFormatting.GRAY));
