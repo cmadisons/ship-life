@@ -132,6 +132,7 @@ public final class Ship {
 		furnishBensRoom(level);
 		furnishIzzysRoom(level);
 		furnishGym(level);
+		furnishWeapons(level);
 		furnishBalcony(level);
 		furnishGangway(level);
 		furnishYourRoom(level);
@@ -547,6 +548,25 @@ public final class Ship {
 	 * Three anvils to lift. Doing the set enough times is worth a heart, and
 	 * a heart you have earned stays earned -- see {@link Gym}.
 	 */
+	/**
+	 * Floor 17: the weapon store.
+	 *
+	 * A counter with the stock racked behind it. You have to be wearing the
+	 * whole plant set to get up here, so what it sells is what goes with it.
+	 */
+	private static void furnishWeapons(ServerLevel level) {
+		int y = Places.floorY(17);
+		counter(level, Places.WEAPONS, Blocks.SMITHING_TABLE);
+		fill(level, Places.WEAPONS.getX() - 4, y + 1, Places.WEAPONS.getZ() - 1,
+				Places.WEAPONS.getX() + 4, y + 3, Places.WEAPONS.getZ() - 1,
+				Blocks.POLISHED_BLACKSTONE);
+		for (int dx = -3; dx <= 3; dx += 3) {
+			set(level, new BlockPos(Places.WEAPONS.getX() + dx, y + 2,
+					Places.WEAPONS.getZ() - 1), Blocks.LANTERN);
+		}
+		set(level, Places.WEAPONS.above(2), Blocks.SEA_LANTERN);
+	}
+
 	private static void furnishGym(ServerLevel level) {
 		int y = Places.floorY(3);
 		fill(level, Places.GYM.getX() - 2, y, Places.GYM.getZ() - 2,
@@ -932,6 +952,9 @@ public final class Ship {
 		}
 		if (!level.getBlockState(Places.GYM).is(Blocks.ANVIL)) {
 			furnishGym(level);
+		}
+		if (!level.getBlockState(Places.WEAPONS).is(Blocks.SMITHING_TABLE)) {
+			furnishWeapons(level);
 		}
 		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
 			furnishBalcony(level);

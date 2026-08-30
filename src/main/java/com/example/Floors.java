@@ -29,7 +29,8 @@ public final class Floors {
 			case 14 -> "Passports";
 			case 15 -> "Ben's Room";
 			case 16 -> "Izzy's Room";
-			default -> "Floor " + floor;          // 17 and 18, waiting on a name
+			case 17 -> "Weapon Store";
+			default -> "Floor " + floor;          // 18, waiting on a name
 		};
 	}
 
@@ -47,6 +48,7 @@ public final class Floors {
 			case 15 -> "upgrade your passport on floor 14";
 			case 16 -> "1500 event tickets paid, 6 bombs used, wave 3 and a boss";
 			case 17 -> "wear the whole plant set, and own floors 1 to 16";
+			case 18 -> "carry a sword and a bow";
 			default -> "nothing opens this one yet";
 		};
 	}

@@ -42,6 +42,8 @@ Still to build: the rest of the friends
 system -- Ben gives you his gear, but nobody has said what a friend is for after
 that -- and chapters past 4.
 
+- **Floor 17, the weapon store** — a sword and a bow at 100 event tickets each, and the teleport pair at 250. Right-click either teleport weapon and you are wherever you were pointing, up to thirty-two blocks, for twenty-five mana out of a hundred that comes back four a second. The floor opens when you are wearing the whole plant set and own every floor below it; floor 18 opens once you are carrying a sword and a bow.
+
 ### The commands
 
 `/shiplife` skips chapter 1 -- it pays the hundred dollars, takes the chore

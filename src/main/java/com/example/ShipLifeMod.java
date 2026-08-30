@@ -76,6 +76,7 @@ public class ShipLifeMod implements ModInitializer {
 		Comforts.register();
 		Gym.register();
 		Fishing.register();
+		Weapons.register();
 		Buffet.register();
 		Elevator.register();
 		Kart.register();
@@ -207,6 +208,7 @@ public class ShipLifeMod implements ModInitializer {
 		Gym.apply(player);
 		Daily.check(player);
 		Gear.openSeventeen(player);
+		Weapons.openEighteen(player);
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this
