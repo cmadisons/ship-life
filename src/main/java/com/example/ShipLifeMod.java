@@ -140,17 +140,13 @@ public class ShipLifeMod implements ModInitializer {
 				}
 				for (ServerPlayer player : level.players()) {
 					if (player.getY() < Places.GROUND - 8) {
-						// Being fished out of the void used to be free, which
-						// made the edge of the island and the rail round the
-						// balcony decoration. It costs three hearts now: the
-						// ship still will not let you die down there, but it
-						// is no longer nothing.
+						// The ship catches you and costs you nothing for it.
+						// What can hurt you is the fall itself, the cliffs,
+						// and floors 9 and 10 -- that is the whole list.
 						putSomewhereSafe(player);
-						player.hurtServer(level, level.damageSources().fall(), 6.0f);
 						player.sendSystemMessage(Component.literal(
-								"You went over the edge. The ship caught you, "
-								+ "but not gently.")
-								.withStyle(ChatFormatting.RED));
+								"Careful -- that is the edge of the world.")
+								.withStyle(ChatFormatting.GRAY));
 					}
 				}
 			}

@@ -92,7 +92,7 @@ The struck-through ones are done.
 15. ~~Christmas pays a flat 250 with no risk~~ **done**
 16. ~~Arcade tickets are tiny next to one event~~ **done**
 17. ~~The Quest Book is a chest menu and cannot show much~~ **done**
-18. ~~Nothing on the ship can kill you but 9 and 10~~ **done**  ~~(blocks are now unbreakable outside creative)~~
+18. Nothing on the ship can kill you but 9 and 10 -- **left alone on purpose**: falling, the cliffs, and 9 and 10 are the whole list  ~~(blocks are now unbreakable outside creative)~~
 19. ~~The star is one use for 250~~ **done**
 20. ~~Ben's bombs are 250 for three~~ **done**
 21. Your room has no reason to go back to it
