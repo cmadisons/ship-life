@@ -133,6 +133,7 @@ public final class Ship {
 		furnishIzzysRoom(level);
 		furnishGym(level);
 		furnishBalcony(level);
+		furnishGangway(level);
 		furnishYourRoom(level);
 	}
 
@@ -563,6 +564,29 @@ public final class Ship {
 	 * void, which is the point: it is the one place you can stand outside and
 	 * look at where you live.
 	 */
+	/**
+	 * The walkway from the town to the ship's front door.
+	 *
+	 * The door on floor 1 opened onto nothing: you went up to the ship by
+	 * walking to it and the door was scenery. Now there is a gangway under
+	 * it, running west to the edge of the island, with a rail either side.
+	 */
+	private static void furnishGangway(ServerLevel level) {
+		int y = Places.GROUND;
+		int z = Places.SHIP_Z;
+		for (int x = 14; x <= Places.SHIP_X - Places.ROOM; x++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				set(level, new BlockPos(x, y, z + dz), Blocks.POLISHED_ANDESITE);
+			}
+			set(level, new BlockPos(x, y + 1, z - 2), Blocks.IRON_BARS);
+			set(level, new BlockPos(x, y + 1, z + 2), Blocks.IRON_BARS);
+			if (x % 6 == 0) {
+				set(level, new BlockPos(x, y + 2, z - 2), Blocks.LANTERN);
+				set(level, new BlockPos(x, y + 2, z + 2), Blocks.LANTERN);
+			}
+		}
+	}
+
 	private static void furnishBalcony(ServerLevel level) {
 		int y = Places.GROUND;
 		int x = Places.BALCONY.getX();
@@ -911,6 +935,10 @@ public final class Ship {
 		}
 		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
 			furnishBalcony(level);
+		}
+		if (!level.getBlockState(new BlockPos(20, Places.GROUND, Places.SHIP_Z))
+				.is(Blocks.POLISHED_ANDESITE)) {
+			furnishGangway(level);
 		}
 
 		// The television used to stand in the lift's corner. Anything left of

@@ -40,8 +40,16 @@ public final class Elevator {
 			"Izzy's Room"
 	};
 
-	/** How long the ride takes, in ticks. */
-	private static final int RIDE = 40;
+	/**
+	 * How long a ride takes.
+	 *
+	 * Eight ticks a floor rather than two flat seconds however far you are
+	 * going: floor 2 is a hop and floor 16 is a climb, and the lift should
+	 * know the difference.
+	 */
+	private static int ride(int from, int to) {
+		return Math.max(16, Math.min(90, Math.abs(to - from) * 8));
+	}
 
 	/** Open the floor panel. */
 	/** Who is stood on a plate, so it fires once rather than every tick. */
@@ -200,17 +208,18 @@ public final class Elevator {
 	public static void ride(ServerPlayer player, int floor) {
 		ServerLevel level = (ServerLevel) player.level();
 		BlockPos from = player.blockPosition();
+		int takes = ride(Math.max(1, Places.floorAt(player.getY())), floor);
 
 		level.playSound(null, from, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 0.8f, 1.0f);
-		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, RIDE + 10, 0, true, false, false));
-		Hud.busy(player, RIDE + 10);
+		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, takes + 10, 0, true, false, false));
+		Hud.busy(player, takes + 10);
 		player.sendOverlayMessage(Component.literal("▲  Floor " + floor
 				+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
 
 		// The whirr while it moves, then the doors at the far end.
-		Ticker.after(20, () -> level.playSound(null, from,
+		Ticker.after(Math.min(20, takes / 2), () -> level.playSound(null, from,
 				SoundEvents.ELYTRA_FLYING, SoundSource.BLOCKS, 0.5f, 0.8f));
-		Ticker.after(RIDE, () -> {
+		Ticker.after(takes, () -> {
 			BlockPos to = Places.lift(floor);
 			player.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
 			level.playSound(null, to, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8f, 1.0f);

@@ -194,10 +194,12 @@ public final class Kit {
 
 	/** The one-use star off floor 7. {@link Star} is what it does. */
 	public static ItemStack star() {
-		return make(Items.NETHER_STAR, STAR, ChatFormatting.AQUA,
+		ItemStack star = make(Items.NETHER_STAR, STAR, ChatFormatting.AQUA,
 				"Right-click to pick an event.",
 				"It is on for the rest of the day.",
-				"One use.");
+				"Three uses.");
+		star.setCount(3);
+		return star;
 	}
 
 	public static ItemStack mop() {

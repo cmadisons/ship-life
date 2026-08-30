@@ -151,7 +151,10 @@ public class Shooter extends Game {
 		}
 		Person shot = crowd.get(index);
 		if (shot.sameAs(wanted)) {
-			int paid = christmas ? 250 : 1 + random.nextInt(200);
+			// Christmas used to be a flat 250, which is the one payout in the
+			// game with nothing riding on it. It is a spread now like the
+			// October one, only richer.
+			int paid = christmas ? 100 + random.nextInt(301) : 1 + random.nextInt(200);
 			if (shot.carrying()) {
 				paid += christmas ? 100 : 150;
 			}

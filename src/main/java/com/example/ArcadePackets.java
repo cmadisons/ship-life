@@ -66,7 +66,7 @@ public final class ArcadePackets {
 	/**
 	 * What the machines pay.
 	 *
-	 * A ticket a food on Snake, five a stage on Galaga, and five for beating
+	 * Three a food on Snake, fifteen a stage on Galaga, and twenty for beating
 	 * your own record on Pac-Man -- which is why that one sends its score and
 	 * the others send what they did.
 	 */
@@ -79,16 +79,19 @@ public final class ArcadePackets {
 		switch (bits[0] + ":" + bits[1]) {
 			case "snake:food" -> {
 				State.add(player, State.FOODS, amount);
-				pay(player, amount, amount + (amount == 1 ? " food" : " foods"));
+				// One ticket a food was an evening at the machines for the
+				// price of a pet. The cabinets pay like the rest of the ship
+				// now: a good run is worth an event.
+				pay(player, 3 * amount, amount + (amount == 1 ? " food" : " foods"));
 			}
 			case "galaga:stage" -> {
 				State.add(player, State.ROUNDS, amount);
-				pay(player, 5 * amount, "stage " + amount + " cleared");
+				pay(player, 15 * amount, "stage " + amount + " cleared");
 			}
 			case "pacman:score" -> {
 				if (amount > State.best(player)) {
 					State.best(player, amount);
-					pay(player, 5, "a new record of " + amount);
+					pay(player, 20, "a new record of " + amount);
 				} else {
 					player.sendSystemMessage(Component.literal(amount
 							+ " -- your best is still " + State.best(player) + ".")

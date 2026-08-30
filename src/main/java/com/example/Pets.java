@@ -309,6 +309,18 @@ public final class Pets {
 			// able to come to any harm indoors.
 			pet.setInvulnerable(true);
 		}
+		// A lion is not an ocelot's size, and a pet dolphin indoors is not a
+		// wild one's. Scale is the one thing Minecraft will let a model do
+		// without a model, and it is enough to tell them apart across a room.
+		var scale = pet.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
+		if (scale != null) {
+			scale.setBaseValue(switch (kind) {
+				case LION -> 1.9;
+				case DOLPHIN -> 1.2;
+				case SHADOW -> 0.8;
+				default -> 1.0;
+			});
+		}
 		pet.setCustomName(Component.literal(kind.label).withStyle(ChatFormatting.AQUA));
 		pet.setCustomNameVisible(true);
 		pet.setPersistenceRequired();

@@ -77,6 +77,28 @@ public final class Book {
 					lore.toArray(new String[0])));
 		}
 
+		// What your pets are actually doing, which was a number nobody could
+		// see: the boost each one gives and how far up the food has taken it.
+		java.util.List<String> pets = new ArrayList<>();
+		for (Pets.Kind kind : Pets.Kind.values()) {
+			int have = Pets.owned(player, kind);
+			if (have == 0) {
+				continue;
+			}
+			double strength = Pets.strength(player, kind);
+			pets.add(have + "x " + kind.label + "  --  " + kind.what
+					+ (strength > 1.0
+							? String.format("  (fed to x%.1f)", strength)
+							: "")
+					+ (have > 1 && kind != Pets.Kind.CAT ? "  (doubled)" : ""));
+		}
+		if (pets.isEmpty()) {
+			pets.add("You have no pets yet.");
+			pets.add("Ten arcade tickets each, floor 2.");
+		}
+		page.setItem(44, entry(Items.BONE, "Your Pets", ChatFormatting.AQUA,
+				pets.toArray(new String[0])));
+
 		page.setItem(42, entry(Items.FILLED_MAP, "Map of the Ship", ChatFormatting.AQUA,
 				"Every floor, drawn as a tower.",
 				"Floor " + Places.floorAt(player.getY()) + " is where you are.",

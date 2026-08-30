@@ -189,7 +189,7 @@ public final class Friends {
 	}
 
 	/** What three more of his bombs cost. */
-	public static final int BOMBS_COST = 250;
+	public static final int BOMBS_COST = 120;
 
 	/** How many of his bombs you are carrying. */
 	private static int bombsOn(ServerPlayer player) {

@@ -35,8 +35,11 @@ public final class Shops {
 	/** What the three floors cost together. */
 	public static final int FLOORS_COST = 1000;
 
+	/** Or one floor at a time, which is what most people want. */
+	public static final int ONE_FLOOR_COST = 400;
+
 	/** The one-use jump to any event. */
-	public static final int STAR_COST = 250;
+	public static final int STAR_COST = 150;
 
 	/** Two and a half times the tickets, for the next three events. */
 	public static final int MULTIPLIER_COST = 1000;
@@ -184,18 +187,29 @@ public final class Shops {
 		boolean hasFloors = State.hasFloor(player, 11);
 		page.setItem(4, Book.entry(Items.GOLD_NUGGET, "Event Tickets",
 				ChatFormatting.GOLD, State.event(player) + " event tickets"));
-		page.setItem(20, Book.entry(Items.IRON_DOOR, "Floors 11, 12 and 13",
+		page.setItem(19, Book.entry(Items.IRON_DOOR, "Floors 11, 12 and 13",
 				hasFloors ? ChatFormatting.DARK_GRAY : ChatFormatting.AQUA,
 				"Rewards, the pet store and The Keg.",
 				FLOORS_COST + " event tickets, all three",
 				hasFloors ? "Already yours." : "Click to buy."));
-		page.setItem(22, Book.entry(Items.NETHER_STAR, "Go To Event Star",
+
+		// Or one at a time, for people who want the pet store and not the rest.
+		for (int floor = 11; floor <= 13; floor++) {
+			boolean owned = State.hasFloor(player, floor);
+			page.setItem(28 + (floor - 11), Book.entry(Items.OAK_DOOR,
+					"Floor " + floor + " -- " + Floors.name(floor),
+					owned ? ChatFormatting.DARK_GRAY : ChatFormatting.WHITE,
+					ONE_FLOOR_COST + " event tickets",
+					owned ? "Already yours." : "Click to buy this one."));
+		}
+		page.setItem(21, Book.entry(Items.NETHER_STAR, "Go To Event Star",
 				ChatFormatting.AQUA,
+				"Three events, not one.",
 				"One use. Right-click it and pick any event --",
 				"it is then on for the rest of the day.",
 				STAR_COST + " event tickets",
 				"Click to buy."));
-		page.setItem(24, Book.entry(Items.EXPERIENCE_BOTTLE, "x2.5 Tickets",
+		page.setItem(23, Book.entry(Items.EXPERIENCE_BOTTLE, "x2.5 Tickets",
 				ChatFormatting.AQUA,
 				"Two and a half times what events pay,",
 				"for your next " + MULTIPLIER_EVENTS + " ticket events.",
@@ -209,7 +223,20 @@ public final class Shops {
 
 	private static void buyTickets(ServerPlayer player, int slot) {
 		switch (slot) {
-			case 20 -> {
+			case 28, 29, 30 -> {
+				int floor = 11 + (slot - 28);
+				if (State.hasFloor(player, floor)) {
+					return;
+				}
+				if (spend(player, ONE_FLOOR_COST)) {
+					State.unlock(player, floor);
+					player.sendSystemMessage(Component.literal("Floor " + floor
+							+ " -- " + Floors.name(floor) + " -- is open.")
+							.withStyle(ChatFormatting.AQUA));
+					player.closeContainer();
+				}
+			}
+			case 19 -> {
 				if (State.hasFloor(player, 11)) {
 					return;
 				}
@@ -222,7 +249,7 @@ public final class Shops {
 					player.closeContainer();
 				}
 			}
-			case 22 -> {
+			case 21 -> {
 				if (spend(player, STAR_COST)) {
 					player.getInventory().add(Kit.star());
 					player.sendSystemMessage(Component.literal(
@@ -231,7 +258,7 @@ public final class Shops {
 					player.closeContainer();
 				}
 			}
-			case 24 -> {
+			case 23 -> {
 				if (spend(player, MULTIPLIER_COST)) {
 					State.add(player, State.MULTIPLIER, MULTIPLIER_EVENTS);
 					player.sendSystemMessage(Component.literal("x2.5 on your next "
@@ -309,6 +336,11 @@ public final class Shops {
 			player.sendSystemMessage(Component.literal(
 					"x2.5 on the next event that pays tickets.")
 					.withStyle(ChatFormatting.GREEN));
+		} else if (roll < 60.0) {
+			// Tickets, plainly. Phones used to be seventy in a hundred, which
+			// meant most months you got a phone line you already had.
+			int paid = 60 + new java.util.Random().nextInt(140);
+			Events.payTickets(player, paid, "this month's reward");
 		} else {
 			int which = new java.util.Random().nextInt(3);
 			String name = switch (which) {

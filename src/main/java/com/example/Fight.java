@@ -47,6 +47,9 @@ public final class Fight {
 		return Math.min(500, WAVE_PAYS + WAVE_STEP * (number - 1));
 	}
 
+	/** How far a boss may drift from the room before it is put back. */
+	private static final double TETHER = 24.0;
+
 	/** Everything alive that this floor put there, per player. */
 	private static final List<Mob> SPAWNED = new ArrayList<>();
 
@@ -113,6 +116,28 @@ public final class Fight {
 							&& !FIGHTING_FLOORS.contains(Places.floorAt(entity.getY()))) {
 						entity.discard();
 					}
+				}
+			}
+		});
+
+		// A real Ender Dragon flies off to the world origin looking for
+		// crystals that are not there, which is why this used to be a wither
+		// wearing the name. It is a dragon now, on a leash: drift out of the
+		// room and it is put back in it.
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (server.getTickCount() % 10 != 0 || SPAWNED.isEmpty()) {
+				return;
+			}
+			for (Mob mob : SPAWNED) {
+				if (!mob.isAlive()) {
+					continue;
+				}
+				double away = mob.position().distanceTo(net.minecraft.world.phys.Vec3
+						.atCenterOf(Places.BOSS_SPOT));
+				if (away > TETHER) {
+					mob.snapTo(Places.BOSS_SPOT.getX() + 0.5, Places.BOSS_SPOT.getY() + 2,
+							Places.BOSS_SPOT.getZ() + 0.5, mob.getYRot(), 0.0f);
+					mob.setDeltaMovement(0.0, 0.0, 0.0);
 				}
 			}
 		});
@@ -214,7 +239,8 @@ public final class Fight {
 			return;
 		}
 		int number = State.tally(player, State.WAVES) + 1;
-		int howMany = Math.min(10, 2 + number);
+		// Wave 30 used to be the size of wave 8. It is not now.
+		int howMany = Math.min(24, 2 + number * 2);
 		for (int i = 0; i < howMany; i++) {
 			EntityType<? extends Mob> kind = switch (RANDOM.nextInt(5)) {
 				case 0 -> EntityType.ENDERMAN;
@@ -241,7 +267,7 @@ public final class Fight {
 	 */
 	public enum Boss {
 		ARACHNES("Arachnes", EntityType.SPIDER, 6.0, 150),
-		DRAGON("Ender Dragon", EntityType.WITHER, 1.0, 200),
+		DRAGON("Ender Dragon", EntityType.ENDER_DRAGON, 1.0, 200),
 		BROODMOTHER("Broodmother", EntityType.CAVE_SPIDER, 12.0, 250),
 		WATCHER("The Watcher", EntityType.WITHER_SKELETON, 10.0, 300),
 		MAGMA("Magma Boss", EntityType.MAGMA_CUBE, 14.0, 400);
@@ -278,14 +304,20 @@ public final class Fight {
 				SoundSource.PLAYERS, 1.0f, 0.5f);
 	}
 
-	/** What the boss that is out is worth. */
-	public static int bossPay() {
+	/**
+	 * What the boss that is out is worth.
+	 *
+	 * Its own price, and twenty-five more for every boss you have already put
+	 * down -- so the tenth one is worth having a go at.
+	 */
+	public static int bossPay(ServerPlayer player) {
+		int base = 200;
 		for (Boss boss : Boss.values()) {
 			if (boss.label.equals(lastBoss)) {
-				return boss.pays;
+				base = boss.pays;
 			}
 		}
-		return 200;
+		return base + 25 * State.tally(player, State.BOSSES);
 	}
 
 	/** Arachnes, or the dragon. */
