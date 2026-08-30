@@ -124,7 +124,10 @@ public class Person extends PathfinderMob {
 	 * that met them then still has them stood about.
 	 */
 	private static void clearOldNames(ServerLevel level) {
-		java.util.Set<String> jobs = java.util.Set.of(CHARLIE, BEN, IZZY, DESK, LOBBY, COOK);
+		// A set built by hand: two of these labels are the same string on
+		// purpose -- both friends are Friend -- and Set.of refuses duplicates.
+		java.util.Set<String> jobs = new java.util.HashSet<>(
+				java.util.List.of(CHARLIE, BEN, IZZY, DESK, LOBBY, COOK));
 		for (Person person : level.getEntitiesOfClass(Person.class,
 				new net.minecraft.world.phys.AABB(
 						Places.SHIP_X - 40, Places.GROUND - 8, Places.SHIP_Z - 40,

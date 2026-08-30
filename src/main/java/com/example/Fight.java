@@ -52,6 +52,21 @@ public final class Fight {
 
 	private static final Random RANDOM = new Random();
 
+	/** Which boss was let out last, for the television to say. */
+	private static String lastBoss = "A boss";
+
+	/**
+	 * Write down how a fight went.
+	 *
+	 * The television in your room reads this back, so it is kept as one line
+	 * rather than as a pile of numbers: what you fought, how it went, and
+	 * what it paid.
+	 */
+	public static void remember(ServerPlayer player, String what, String how, int paid) {
+		State.set(player, State.LAST_FIGHT, what + "|" + how + "|" + paid + "|"
+				+ Cal.date());
+	}
+
 	/**
 	 * The only floors anything hostile is allowed on.
 	 *
@@ -222,6 +237,7 @@ public final class Fight {
 		if (inTheWay(player)) {
 			return;
 		}
+		lastBoss = arachnes ? "Arachnes" : "The dragon";
 		if (arachnes) {
 			spawn(level, EntityType.SPIDER, Places.BOSS_SPOT, 6.0, "Arachnes");
 			for (int i = 0; i < 4; i++) {

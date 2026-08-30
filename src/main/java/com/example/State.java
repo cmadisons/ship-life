@@ -40,7 +40,7 @@ public final class State {
 	 */
 	public static void register() {
 		// Touching the class is the point; this line is just proof it happened.
-		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 28);
+		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 29);
 	}
 
 	private static <T> AttachmentType<T> of(String name, T start, Codec<T> codec) {
@@ -109,6 +109,9 @@ public final class State {
 
 	/** The four quests running today, as "stat:target:amount" four times over. */
 	public static final AttachmentType<String> QUEST_DAY = of("quest_day", "", Codec.STRING);
+
+	/** The last fight you were in, as "what|how many|how it went|tickets". */
+	public static final AttachmentType<String> LAST_FIGHT = of("last_fight", "", Codec.STRING);
 
 	/** Event tickets you have paid out over the whole game, and bombs used. */
 	public static final AttachmentType<Integer> EVENT_SPENT = of("event_spent", 0, Codec.INT);
@@ -216,6 +219,15 @@ public final class State {
 
 	public static void questDay(ServerPlayer player, String set) {
 		player.setAttached(QUEST_DAY, set);
+	}
+
+	/** Put a string away under any of the attachments above. */
+	public static void set(ServerPlayer player, AttachmentType<String> what, String value) {
+		player.setAttached(what, value);
+	}
+
+	public static String get(ServerPlayer player, AttachmentType<String> what) {
+		return player.getAttachedOrCreate(what);
 	}
 
 	public static String starEvent(ServerPlayer player) {
