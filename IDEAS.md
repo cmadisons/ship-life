@@ -131,3 +131,122 @@ The struck-through ones are done.
 23. ~~The ship could have a hull you see from outside~~ **done**
 24. ~~Your room could show off what you have won~~ **done**
 25. Everything for sale could take money or tickets, your pick
+
+---
+
+# Round two
+
+Another hundred, written after the first hundred were built. Same rules: cross
+one off when it is done, add to it whenever something comes up.
+
+## Add (round two)
+
+1. Chapter 5, and an ending the whole game builds to
+2. A job on the ship that pays money, not tickets
+3. A friend on ship 2 who only exists over there
+4. Boss drops -- something to carry away, not just tickets
+5. A quest that sends you into the Nether ship
+6. A shop on ship 2 that sells what the overworld one does not
+7. Enchanting for the plant set
+8. A pet that follows you into the Nether
+9. A locker in your room for the things you are not carrying
+10. A second racer, so floor 6 is a field and not a duel
+11. A diving board over the pool
+12. Achievements with names, listed in the book
+13. A ship's log that writes down what you did each day
+14. Weather in the town -- rain on the island
+15. A tram along the gangway
+16. A pet shop trade-in: two of a kind for something better
+17. A boss rush: all five, one after another, for a big payout
+18. Fireworks off the balcony on event days
+19. A second buffet on ship 2, run by somebody else
+20. A gym leaderboard against the racer's time
+21. Ranks -- deckhand to captain -- shown on the HUD
+22. A key that opens one locked floor of your choosing
+23. Fishing that pulls up junk as well as tickets
+24. A telescope on the balcony that names what you are looking at
+25. A guest cabin you can invite somebody into
+
+## Take away (round two)
+
+1. `Kart.RIVAL_TICKS` being a constant nobody can beat twice
+2. The unused `Fridge.register(HolderLookup)` leftover, if any remains
+3. `Places.BIG_TABLE_TWO` if nothing references it any more
+4. The `Telly.LIT` map, which never has more than one entry
+5. Duplicate `Comforts.blank()` and `Book` filler code
+6. The `WHOLE` field in Fight, if the bar can read it off the wave
+7. The `Seats.tidy` sweep once seats clean themselves up
+8. `Weapons.REACH` as a magic number -- make it the mana cost's business
+9. The second `UseBlockCallback` in every class that only wants an item
+10. `Places.oldPanel`-style leftovers that crept back in
+11. The `firstTime` CALLS integer entirely, once every flag has a name
+12. Hardcoded slot numbers in every menu
+13. The `Shooter` page buttons if the crowd shrinks
+14. `QuestDay.TIERS` duplication with `QuestPool.build`
+15. The unused `Gear.GAS_LINGER` if clouds now clear on their own
+16. `Ship.WAS_EAST` once no world has ship 2 blocks left
+17. Any `System.currentTimeMillis` outside `Cal`
+18. The `ArcadePackets` string-keyed games, in favour of an enum
+19. `Person.place`'s 3-block dedupe, now the sweep does it
+20. Dead lang keys in en_us.json
+21. `Places.WINDOW_SEATS` as an array of two if a rectangle would do
+22. The `Buffet.MENU` heals field, now the dish of the day doubles it
+23. `State.get`/`State.set` if the named getters cover everything
+24. The lift's `NAMES` array, duplicating `Floors.name`
+25. Anything in README that describes what the mod used to do
+
+## Change (round two)
+
+1. The Nether ship has no way back except the portal you came through
+2. Ship 2 is identical -- nothing over there is its own
+3. Mana only does one thing
+4. The gym caps at ten hearts with nothing after
+5. Fishing pays the same wherever you cast
+6. The buy-back counter pays one a piece for everything
+7. Floor 17 needs the full set, which needs floor 16, which needs 1500 paid
+8. The star and the phones do nearly the same job
+9. Quest Day is still the only source of the 500-ticket payout
+10. Wave mobs are five kinds on rotation
+11. The bosses all fight the same way
+12. Plant armour is the only armour in the game
+13. Teleporting is silent to everybody but you
+14. The racer's time never changes
+15. Snake, Pac-Man and Galaga pay by different rules
+16. The daily reward is a flat 40
+17. Pets cannot be sold or given away
+18. The photo wall only counts bosses and waves
+19. Nothing on the ship reacts to the time of day
+20. Charlie is the only one who gives quests
+21. The buffet's four dishes are the same four forever
+22. Event tickets and arcade tickets never convert
+23. The lift is the only way between floors
+24. Floor 18 is a portal and nothing else
+25. There is no reason to leave the ship once you have every floor
+
+## Make better (round two)
+
+1. The hull could have a name painted on it
+2. The bar could name what is left, not just how much
+3. The Quest Book could remember which page you were on
+4. Pets could ride the lift with you
+5. The map could show where the people are standing
+6. The fridge could hold more as the ship grows
+7. Signs could show your best time on the pool floor
+8. The arcade could have a demo screen when nobody is playing
+9. The intercom could announce the wave you are on
+10. Sleeping could pass the ship's day, not the world's
+11. Trophies could be picked up and moved
+12. The gas could stain the floor while it lasts
+13. The plant set could look different as you finish it
+14. The lift could have music while you ride
+15. Bosses could taunt you between hits
+16. The shooter could show how close you were when you miss
+17. Quest Day could pick harder quests as you get better
+18. The balcony could show the stars moving
+19. The gym could show a stronger you -- scale, like the pets
+20. The store could stock what you sold it
+21. The wardrobe could remember what you wore last
+22. Ship 2's rooms could be laid out mirrored
+23. The Nether ship could have lava outside the windows
+24. The racer could talk to you at the finish line
+25. Every counter could take both currencies at a rate
