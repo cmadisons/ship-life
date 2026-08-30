@@ -77,8 +77,30 @@ public final class Telly {
 			page.setItem(slot, filler.copy());
 		}
 
+		page.setItem(4, Book.entry(Items.TARGET, "The Board", ChatFormatting.AQUA,
+				"Everything you have a record in.",
+				"Your last fight is in the middle."));
+		page.setItem(19, Book.entry(Items.GOLDEN_APPLE, "The Machines",
+				ChatFormatting.YELLOW,
+				"Pac-Man record: " + State.best(player),
+				State.tally(player, State.FOODS) + " food eaten in Snake",
+				State.tally(player, State.ROUNDS) + " Galaga rounds passed",
+				State.tally(player, State.EARNED) + " arcade tickets earned"));
+		page.setItem(21, Book.entry(Items.HEART_OF_THE_SEA, "The Pool",
+				ChatFormatting.AQUA,
+				State.tally(player, State.LAPS) + " laps swum",
+				"Best lap: " + (State.bestLap(player) == 0
+						? "none yet" : Pool.time(State.bestLap(player)))));
+		page.setItem(23, Book.entry(Items.MINECART, "The Track", ChatFormatting.RED,
+				State.tally(player, State.RACES) + " races finished",
+				"The racer does five laps in " + Pool.time(Kart.RIVAL_TICKS)));
+		page.setItem(25, Book.entry(Items.IRON_SWORD, "The Fighting", ChatFormatting.RED,
+				State.tally(player, State.WAVES) + " waves cleared",
+				State.tally(player, State.BOSSES) + " bosses beaten",
+				State.tally(player, State.BOMBS_USED) + " bombs used"));
+
 		if (last.isEmpty()) {
-			page.setItem(22, Book.entry(Items.GRAY_DYE, "Nothing On", ChatFormatting.GRAY,
+			page.setItem(40, Book.entry(Items.GRAY_DYE, "No Fight Yet", ChatFormatting.GRAY,
 					"You have not been in a fight yet.",
 					"Floor 9 is the waves; floor 10 is the bosses.",
 					"Whatever you do down there is on here after."));
@@ -89,16 +111,11 @@ public final class Telly {
 			String paid = bits.length > 2 ? bits[2] : "0";
 			String when = bits.length > 3 ? bits[3] : "";
 
-			page.setItem(13, Book.entry(Items.IRON_SWORD, what, ChatFormatting.RED,
-					"Your last fight.",
+			page.setItem(40, Book.entry(Items.IRON_SWORD, "Your Last Fight",
+					ChatFormatting.RED,
+					what + " -- " + how,
+					paid + " event tickets",
 					when));
-			page.setItem(29, Book.entry(Items.SHIELD, "How it went",
-					ChatFormatting.WHITE, what + " -- " + how));
-			page.setItem(31, Book.entry(Items.GOLD_NUGGET, "What it paid",
-					ChatFormatting.GOLD, paid + " event tickets"));
-			page.setItem(33, Book.entry(Items.TARGET, "Since then", ChatFormatting.AQUA,
-					State.tally(player, State.WAVES) + " waves cleared",
-					State.tally(player, State.BOSSES) + " bosses beaten"));
 		}
 
 		page.setItem(49, Book.entry(Items.BARRIER, "Off", ChatFormatting.RED,

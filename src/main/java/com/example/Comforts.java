@@ -28,7 +28,26 @@ public final class Comforts {
 	private Comforts() {
 	}
 
+	/** How often the ship's speakers pick the record up again. */
+	private static final int EVERY = 400;
+
 	public static void register() {
+		// A record player in one room is a record player in one room. This
+		// one is wired to the ship: while there is a disc turning on floor 5,
+		// everybody aboard hears it, wherever they are.
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % EVERY != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				playToTheShip(level);
+			}
+		});
+
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (!(player instanceof ServerPlayer who) || !(world instanceof ServerLevel level)
 					|| !ShipLifeMod.isShipLife(level)) {
@@ -58,6 +77,30 @@ public final class Comforts {
 			}
 			return InteractionResult.PASS;
 		});
+	}
+
+	/** Whatever is on the record player, played to everybody aboard. */
+	private static void playToTheShip(ServerLevel level) {
+		if (!(level.getBlockEntity(Places.JUKEBOX)
+				instanceof net.minecraft.world.level.block.entity.JukeboxBlockEntity box)) {
+			return;
+		}
+		ItemStack disc = box.getTheItem();
+		if (disc.isEmpty()) {
+			return;
+		}
+		var playable = disc.get(net.minecraft.core.component.DataComponents.JUKEBOX_PLAYABLE);
+		if (playable == null) {
+			return;
+		}
+		var song = playable.song().value();
+		for (ServerPlayer listener : level.players()) {
+			if (Places.floorAt(listener.getY()) == 0) {
+				continue;                      // not aboard
+			}
+			level.playSound(null, listener.blockPosition(), song.soundEvent().value(),
+					SoundSource.RECORDS, 0.5f, 1.0f);
+		}
 	}
 
 	private static boolean isPhotoWall(BlockPos pos) {

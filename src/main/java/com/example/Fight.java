@@ -50,6 +50,14 @@ public final class Fight {
 	/** How far a boss may drift from the room before it is put back. */
 	private static final double TETHER = 24.0;
 
+	/** The bar over a fight, so you can see what is left of it. */
+	private static final net.minecraft.server.level.ServerBossEvent BAR =
+			new net.minecraft.server.level.ServerBossEvent(
+					java.util.UUID.nameUUIDFromBytes("shiplife:fight".getBytes()),
+					Component.literal("Floor 9"),
+					net.minecraft.world.BossEvent.BossBarColor.RED,
+					net.minecraft.world.BossEvent.BossBarOverlay.NOTCHED_10);
+
 	/** Everything alive that this floor put there, per player. */
 	private static final List<Mob> SPAWNED = new ArrayList<>();
 
@@ -148,7 +156,19 @@ public final class Fight {
 				return;
 			}
 			SPAWNED.removeIf(mob -> !mob.isAlive() || mob.isRemoved());
+
+			// The bar: how much of the fight is left, whether that is twenty
+			// of them or one boss with a lot of hearts.
+			if (SPAWNED.size() == 1 && SPAWNED.get(0).getMaxHealth() > 40.0f) {
+				Mob boss = SPAWNED.get(0);
+				BAR.setProgress(Math.max(0.0f, boss.getHealth() / boss.getMaxHealth()));
+			} else {
+				BAR.setProgress(Math.min(1.0f, SPAWNED.size() / (float) WHOLE));
+			}
+
 			if (SPAWNED.isEmpty()) {
+				BAR.setVisible(false);
+				BAR.removeAllPlayers();
 				for (ServerLevel level : server.getAllLevels()) {
 					if (!ShipLifeMod.isShipLife(level)) {
 						continue;
@@ -241,6 +261,10 @@ public final class Fight {
 		int number = State.tally(player, State.WAVES) + 1;
 		// Wave 30 used to be the size of wave 8. It is not now.
 		int howMany = Math.min(24, 2 + number * 2);
+
+		// What is coming, before it comes. A wave you can see the shape of is
+		// a wave you can plan for.
+		java.util.Map<String, Integer> coming = new java.util.LinkedHashMap<>();
 		for (int i = 0; i < howMany; i++) {
 			EntityType<? extends Mob> kind = switch (RANDOM.nextInt(5)) {
 				case 0 -> EntityType.ENDERMAN;
@@ -249,8 +273,19 @@ public final class Fight {
 				case 3 -> EntityType.WITCH;
 				default -> EntityType.VINDICATOR;
 			};
+			coming.merge(kind.getDescription().getString(), 1, Integer::sum);
 			spawn(level, kind, spot(level, 9), 1.0 + number * 0.1, null);
 		}
+		StringBuilder shape = new StringBuilder();
+		for (java.util.Map.Entry<String, Integer> each : coming.entrySet()) {
+			if (!shape.isEmpty()) {
+				shape.append(", ");
+			}
+			shape.append(each.getValue()).append(" ").append(each.getKey());
+		}
+		player.sendSystemMessage(Component.literal("Coming out: " + shape + ".")
+				.withStyle(ChatFormatting.GRAY));
+		showBar(player, "Wave " + number, howMany);
 		player.sendSystemMessage(Component.literal("Wave " + number + " -- " + howMany
 				+ " of them. Clearing it pays " + wavePay(number) + " event tickets.")
 				.withStyle(ChatFormatting.RED));
@@ -300,6 +335,7 @@ public final class Fight {
 		player.sendSystemMessage(Component.literal(which.label + ". "
 				+ which.pays + " event tickets if you put it down.")
 				.withStyle(ChatFormatting.RED));
+		showBar(player, which.label, SPAWNED.size());
 		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BASS.value(),
 				SoundSource.PLAYERS, 1.0f, 0.5f);
 	}
@@ -343,6 +379,18 @@ public final class Fight {
 		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BASS.value(),
 				SoundSource.PLAYERS, 1.0f, 0.5f);
 	}
+
+	/** Hang a bar over the fight and point it at the player. */
+	private static void showBar(ServerPlayer player, String name, int howMany) {
+		BAR.setName(Component.literal(name));
+		BAR.setProgress(1.0f);
+		BAR.addPlayer(player);
+		BAR.setVisible(true);
+		WHOLE = Math.max(1, howMany);
+	}
+
+	/** How big the fight was when it started, for the bar to measure against. */
+	private static int WHOLE = 1;
 
 	/** Put one in the world, as big as it needs to be, and remember it. */
 	private static void spawn(ServerLevel level, EntityType<? extends Mob> kind,

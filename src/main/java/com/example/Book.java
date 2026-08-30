@@ -210,7 +210,8 @@ public final class Book {
 					floor == on ? ChatFormatting.GREEN
 							: yours ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY,
 					floor == on ? "You are here." : yours ? "Yours." : "Locked.",
-					yours ? "" : "Opens with: " + Floors.how(floor)));
+					yours ? "" : "Opens with: " + Floors.how(floor),
+					yours && floor != on ? "Click to ride there." : ""));
 		}
 
 		page.setItem(8, entry(Items.COMPASS, "The Ship", ChatFormatting.AQUA,
@@ -225,7 +226,22 @@ public final class Book {
 						(clicker, slot) -> {
 							if (slot == 53) {
 								open(clicker);
+								return;
 							}
+							// A map you can only look at is a picture. Click a
+							// floor you own and the lift takes you.
+							int column = slot % 9;
+							int row = slot / 9;
+							if (column < 2 || column > 6 || (column - 2) % 2 != 0) {
+								return;
+							}
+							int floor = Places.TOP_FLOOR - (((column - 2) / 2) * 6 + row);
+							if (floor < 1 || floor > Places.TOP_FLOOR
+									|| !State.hasFloor(clicker, floor)) {
+								return;
+							}
+							clicker.closeContainer();
+							Elevator.ride(clicker, floor);
 						}),
 				Component.literal("Map of the Ship")));
 	}

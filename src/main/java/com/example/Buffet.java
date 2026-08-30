@@ -51,6 +51,12 @@ public final class Buffet {
 		// and your hunger bar are two different things. So the plate is eaten
 		// here instead of by the game, and it works whatever state you are in.
 		UseItemCallback.EVENT.register((player, world, hand) -> {
+			if (isFresh(player.getItemInHand(hand))) {
+				if (player instanceof ServerPlayer who) {
+					eatFresh(who, who.getItemInHand(hand));
+				}
+				return InteractionResult.SUCCESS;
+			}
 			if (!Kit.is(player.getItemInHand(hand), Kit.MEAL)) {
 				return InteractionResult.PASS;
 			}
@@ -72,6 +78,24 @@ public final class Buffet {
 			}
 			return InteractionResult.SUCCESS;
 		});
+	}
+
+	/** Has this been in your fridge? */
+	private static boolean isFresh(net.minecraft.world.item.ItemStack stack) {
+		net.minecraft.network.chat.Component named =
+				stack.get(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+		return named != null && named.getString().startsWith(Fridge.FRESH + " ");
+	}
+
+	/** Anything out of the fridge: what it was worth, and six hearts on top. */
+	private static void eatFresh(ServerPlayer player, net.minecraft.world.item.ItemStack food) {
+		food.shrink(1);
+		player.heal(Fridge.FRESH_HEALS);
+		player.getFoodData().eat(6, 0.6f);
+		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP,
+				SoundSource.PLAYERS, 0.6f, 1.1f);
+		player.sendSystemMessage(Component.literal("Straight out of the fridge.")
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	/** One helping: full hearts, a full hunger bar, and the plate goes down one. */

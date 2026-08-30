@@ -43,6 +43,44 @@ public final class Fridge {
 					.copyOnDeath()
 					.buildAndRegister(ShipLifeMod.id("fridge"));
 
+	/** What a night in the fridge is worth when you eat it. */
+	public static final float FRESH_HEALS = 6.0f;
+
+	/** The word that says a thing has been in there. */
+	public static final String FRESH = "Fresh";
+
+	/**
+	 * Anything edible on the shelves comes out fresh.
+	 *
+	 * A fridge that only held things was a chest with five slots. What it
+	 * does now is keep food: put a steak in, take a Fresh Steak out, and eat
+	 * it for six hearts on top of what it was worth.
+	 */
+	private static void chill(SimpleContainer shelves) {
+		for (int slot = 0; slot < shelves.getContainerSize(); slot++) {
+			ItemStack stack = shelves.getItem(slot);
+			if (stack.isEmpty()
+					|| !stack.has(net.minecraft.core.component.DataComponents.FOOD)) {
+				continue;
+			}
+			net.minecraft.network.chat.Component named =
+					stack.get(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+			if (named != null && named.getString().startsWith(FRESH)) {
+				continue;
+			}
+			String was = named != null ? named.getString()
+					: stack.getItem().getName(stack).getString();
+			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,
+					net.minecraft.network.chat.Component.literal(FRESH + " " + was)
+							.withStyle(ChatFormatting.AQUA));
+			stack.set(net.minecraft.core.component.DataComponents.LORE,
+					new net.minecraft.world.item.component.ItemLore(java.util.List.of(
+							net.minecraft.network.chat.Component
+									.literal("Out of your fridge. Six hearts on top.")
+									.withStyle(ChatFormatting.GRAY))));
+		}
+	}
+
 	/** Open it: the five shelves, with whatever you left on them. */
 	public static void open(ServerPlayer player) {
 		// Saved on every change rather than when the screen closes, so pulling
@@ -59,6 +97,7 @@ public final class Fridge {
 			shelves.setItem(slot, saved.get(slot).copy());
 		}
 
+		chill(shelves);
 		player.level().playSound(null, Places.FRIDGE, SoundEvents.IRON_DOOR_OPEN,
 				SoundSource.BLOCKS, 0.6f, 1.4f);
 		player.openMenu(new SimpleMenuProvider(
