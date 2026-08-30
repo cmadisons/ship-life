@@ -96,14 +96,14 @@ public class ShipLifeMod implements ModInitializer {
 		// is the exception, because creative is the mod's edit mode and the
 		// whole point of it is changing the ship.
 		//
-		// The one thing you may still break is a dish: washing up is a chore
-		// and dropping one is part of it.
+		// Not even the dishes. Washing one is holding the sponge on it, and
+		// knocking it off the counter was never the point of the chore.
 		net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register(
 				(world, player, pos, state, entity) -> {
 					if (!(world instanceof ServerLevel level) || !isShipLife(level)) {
 						return true;
 					}
-					if (player.isCreative() || state.is(Made.dish)) {
+					if (player.isCreative()) {
 						return true;
 					}
 					if (player instanceof ServerPlayer who) {
