@@ -83,7 +83,7 @@ rest of the set), and what floor 16 is (the friends' room, Izzy's).
 15. Christmas pays a flat 250 with no risk
 16. Arcade tickets are tiny next to one event
 17. The Quest Book is a chest menu and cannot show much
-18. Nothing on the ship can kill you but 9 and 10
+18. Nothing on the ship can kill you but 9 and 10  ~~(blocks are now unbreakable outside creative)~~
 19. The star is one use for 250
 20. Ben's bombs are 250 for three
 21. Your room has no reason to go back to it

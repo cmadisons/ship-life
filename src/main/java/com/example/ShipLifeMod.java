@@ -89,6 +89,32 @@ public class ShipLifeMod implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
 				onJoin(handler.getPlayer()));
 
+		// The ship is not yours to knock down.
+		//
+		// Nothing hostile could break a block already -- mob griefing is off in
+		// every Ship Life world -- and now nothing you do can either. Creative
+		// is the exception, because creative is the mod's edit mode and the
+		// whole point of it is changing the ship.
+		//
+		// The one thing you may still break is a dish: washing up is a chore
+		// and dropping one is part of it.
+		net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register(
+				(world, player, pos, state, entity) -> {
+					if (!(world instanceof ServerLevel level) || !isShipLife(level)) {
+						return true;
+					}
+					if (player.isCreative() || state.is(Made.dish)) {
+						return true;
+					}
+					if (player instanceof ServerPlayer who) {
+						Hud.busy(who, 20);
+						who.sendOverlayMessage(Component.literal(
+								"That is part of the ship.")
+								.withStyle(ChatFormatting.GRAY));
+					}
+					return false;
+				});
+
 		// Dying puts you back on the ground rather than wherever the world
 		// happened to think its spawn was.
 		ServerPlayerEvents.AFTER_RESPAWN.register((was, now, alive) -> {
