@@ -76,6 +76,30 @@ public class GalagaScreen extends ArcadeScreen {
 		shots.clear();
 		bombs.clear();
 		ship = COLUMNS / 2;
+
+		// Every fifth stage is a boss: one thing across the top of the screen
+		// that takes a lot of hits, with a short guard either side of it.
+		if (stage % 5 == 0) {
+			for (int i = 0; i < 6; i++) {
+				Enemy boss = new Enemy();
+				boss.homeX = COLUMNS / 2 - 5 + i * 2;
+				boss.homeY = 2;
+				boss.x = boss.homeX;
+				boss.y = -2;
+				boss.kind = ROW_FLAGSHIP;
+				enemies.add(boss);
+			}
+			for (int i = 0; i < 6; i++) {
+				Enemy guard = new Enemy();
+				guard.homeX = COLUMNS / 2 - 5 + i * 2;
+				guard.homeY = 5;
+				guard.x = guard.homeX;
+				guard.y = -4;
+				guard.kind = ROW_BUTTERFLY;
+				enemies.add(guard);
+			}
+			return;
+		}
 		for (int row = 0; row < 5; row++) {
 			int howMany = row == 0 ? 4 : 8;
 			for (int i = 0; i < howMany; i++) {

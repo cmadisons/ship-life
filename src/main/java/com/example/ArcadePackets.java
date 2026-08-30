@@ -83,15 +83,18 @@ public final class ArcadePackets {
 				// price of a pet. The cabinets pay like the rest of the ship
 				// now: a good run is worth an event.
 				pay(player, 3 * amount, amount + (amount == 1 ? " food" : " foods"));
+				remember(player, "snake", amount);
 			}
 			case "galaga:stage" -> {
 				State.add(player, State.ROUNDS, amount);
 				pay(player, 15 * amount, "stage " + amount + " cleared");
+				remember(player, "galaga", amount);
 			}
 			case "pacman:score" -> {
 				if (amount > State.best(player)) {
 					State.best(player, amount);
 					pay(player, 20, "a new record of " + amount);
+					remember(player, "pacman", amount);
 				} else {
 					player.sendSystemMessage(Component.literal(amount
 							+ " -- your best is still " + State.best(player) + ".")
@@ -101,6 +104,58 @@ public final class ArcadePackets {
 			default -> {
 			}
 		}
+	}
+
+	/**
+	 * The board at each cabinet: your best five, kept in order.
+	 *
+	 * A machine that only remembered your very best gave you nothing to chase
+	 * on the way there. Five is enough to see yourself getting better.
+	 */
+	public static void remember(ServerPlayer player, String game, int score) {
+		java.util.List<String> games = new java.util.ArrayList<>(
+				java.util.List.of(State.get(player, State.TOP_FIVE).split("\\|")));
+		java.util.List<Integer> mine = new java.util.ArrayList<>();
+		games.removeIf(entry -> entry.isEmpty());
+		for (String entry : new java.util.ArrayList<>(games)) {
+			if (entry.startsWith(game + ":")) {
+				for (String number : entry.substring(game.length() + 1).split(",")) {
+					if (!number.isEmpty()) {
+						mine.add(Integer.parseInt(number));
+					}
+				}
+				games.remove(entry);
+			}
+		}
+		mine.add(score);
+		mine.sort(java.util.Comparator.reverseOrder());
+		while (mine.size() > 5) {
+			mine.remove(mine.size() - 1);
+		}
+		StringBuilder line = new StringBuilder(game + ":");
+		for (int i = 0; i < mine.size(); i++) {
+			line.append(i == 0 ? "" : ",").append(mine.get(i));
+		}
+		games.add(line.toString());
+		State.set(player, State.TOP_FIVE, String.join("|", games));
+	}
+
+	/** The five, in words, for a screen to show. */
+	public static java.util.List<String> board(ServerPlayer player, String game) {
+		java.util.List<String> lines = new java.util.ArrayList<>();
+		for (String entry : State.get(player, State.TOP_FIVE).split("\\|")) {
+			if (!entry.startsWith(game + ":")) {
+				continue;
+			}
+			String[] numbers = entry.substring(game.length() + 1).split(",");
+			for (int i = 0; i < numbers.length; i++) {
+				lines.add((i + 1) + ".  " + numbers[i]);
+			}
+		}
+		if (lines.isEmpty()) {
+			lines.add("Nothing on this one yet.");
+		}
+		return lines;
 	}
 
 	/** Pay arcade tickets, doubled if it is Summer Break. */

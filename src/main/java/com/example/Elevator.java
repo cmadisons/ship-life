@@ -125,6 +125,11 @@ public final class Elevator {
 			return;
 		}
 		door.setOpen(null, level, state, bottom, open);
+		// The hiss of a lift door, over the top of the iron one's clunk.
+		level.playSound(null, bottom,
+				open ? net.minecraft.sounds.SoundEvents.PISTON_EXTEND
+						: net.minecraft.sounds.SoundEvents.PISTON_CONTRACT,
+				net.minecraft.sounds.SoundSource.BLOCKS, 0.7f, 1.6f);
 		if (open) {
 			HELD.put(bottom, level.getGameTime() + HOLD);
 		} else {
@@ -215,6 +220,21 @@ public final class Elevator {
 		Hud.busy(player, takes + 10);
 		player.sendOverlayMessage(Component.literal("▲  Floor " + floor
 				+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
+
+		// Every floor it passes, named, on the way. A lift that told you
+		// nothing between the two ends was a loading screen with a sound.
+		int here = Math.max(1, Places.floorAt(player.getY()));
+		int steps = Math.abs(floor - here);
+		for (int step = 1; step <= steps; step++) {
+			final int passing = here + (floor > here ? step : -step);
+			Ticker.after(takes * step / Math.max(1, steps + 1), () -> {
+				Hud.busy(player, 20);
+				player.sendOverlayMessage(Component.literal(
+						(floor > here ? "▲  " : "▼  ") + passing + "  --  " + NAMES[passing])
+						.withStyle(passing == floor ? ChatFormatting.AQUA
+								: ChatFormatting.GRAY));
+			});
+		}
 
 		// The whirr while it moves, then the doors at the far end.
 		Ticker.after(Math.min(20, takes / 2), () -> level.playSound(null, from,

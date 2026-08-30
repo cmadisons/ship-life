@@ -51,8 +51,15 @@ public class SnakeScreen extends ArcadeScreen {
 	}
 
 	/** How many ticks between moves. It quickens as you grow. */
+	/**
+	 * How many ticks between steps.
+	 *
+	 * It used to shave a tick off every twelve apples and stop at two, which
+	 * you could barely feel. It sheds one every four now and goes down to
+	 * one, so a long snake is genuinely hard to steer.
+	 */
 	private int pace() {
-		return Math.max(2, 6 - eaten / 12);
+		return Math.max(1, 6 - eaten / 4);
 	}
 
 	@Override

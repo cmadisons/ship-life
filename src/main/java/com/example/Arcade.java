@@ -120,6 +120,18 @@ public final class Arcade {
 				ready ? "Click to buy." : "Needs floors 7, 8 and 9 first.",
 				"You are carrying " + QuestPool.carrying(player) + "."));
 
+		// The boards, one a machine, so there is something to beat besides
+		// your own best.
+		page.setItem(38, Book.entry(net.minecraft.world.item.Items.LIME_DYE,
+				"Snake -- your best five", ChatFormatting.GREEN,
+				ArcadePackets.board(player, "snake").toArray(new String[0])));
+		page.setItem(40, Book.entry(net.minecraft.world.item.Items.YELLOW_DYE,
+				"Pac-Man -- your best five", ChatFormatting.YELLOW,
+				ArcadePackets.board(player, "pacman").toArray(new String[0])));
+		page.setItem(42, Book.entry(net.minecraft.world.item.Items.LIGHT_BLUE_DYE,
+				"Galaga -- your best five", ChatFormatting.AQUA,
+				ArcadePackets.board(player, "galaga").toArray(new String[0])));
+
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));
 

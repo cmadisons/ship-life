@@ -52,8 +52,10 @@ public final class Gear {
 	/** What the gas takes off each enemy, each go. */
 	public static final float GAS_BITE = 10.0f;
 
-	/** How wide the gas spreads. */
-	public static final double GAS_REACH = 4.0;
+	/** How wide the gas starts, how wide it gets, and how fast it grows. */
+	public static final double GAS_REACH = 2.5;
+	public static final double GAS_MOST = 7.0;
+	private static final double GAS_GROWS = 0.05;
 
 	/** Ticks between doses -- once a second. */
 	private static final int GAS_EVERY = 20;
@@ -71,6 +73,17 @@ public final class Gear {
 
 	/** A cloud of gas: where it is, who put it there, and when. */
 	private record Cloud(ServerLevel level, Vec3 at, UUID owner, long born) {
+		/**
+		 * How far it has spread by now.
+		 *
+		 * Gas that stayed the size of the ball it came out of never read as
+		 * gas. This creeps outward a twentieth of a block a tick until it
+		 * fills the room, which is what everybody standing in it will notice.
+		 */
+		double reach() {
+			return Math.min(GAS_MOST,
+					GAS_REACH + (level.getGameTime() - born) * GAS_GROWS);
+		}
 	}
 
 	private static final List<Cloud> CLOUDS = new ArrayList<>();
@@ -276,7 +289,7 @@ public final class Gear {
 					continue;
 				}
 				List<LivingEntity> caught = cloud.level().getEntitiesOfClass(LivingEntity.class,
-						new AABB(cloud.at(), cloud.at()).inflate(GAS_REACH),
+						new AABB(cloud.at(), cloud.at()).inflate(cloud.reach()),
 						living -> living instanceof Monster && living.isAlive());
 				ServerPlayer owner = server.getPlayerList().getPlayer(cloud.owner());
 				float took = 0;
@@ -309,10 +322,12 @@ public final class Gear {
 	private static void show(Cloud cloud) {
 		ServerLevel level = cloud.level();
 		Vec3 at = cloud.at();
+		double reach = cloud.reach();
 		level.sendParticles(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0x55DD44),
-				at.x, at.y + 0.6, at.z, 14, GAS_REACH * 0.5, 0.8, GAS_REACH * 0.5, 0.0);
+				at.x, at.y + 0.6, at.z, (int) (6 + reach * 3),
+				reach * 0.5, 0.8, reach * 0.5, 0.0);
 		level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
-				at.x, at.y + 0.4, at.z, 4, GAS_REACH * 0.5, 0.6, GAS_REACH * 0.5, 0.0);
+				at.x, at.y + 0.4, at.z, 4, reach * 0.5, 0.6, reach * 0.5, 0.0);
 	}
 
 	/** Nothing hostile should be able to keep gas alive across a reload. */
