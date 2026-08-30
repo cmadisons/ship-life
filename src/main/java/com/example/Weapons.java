@@ -246,7 +246,8 @@ public final class Weapons {
 		}
 		State.unlock(player, 18);
 		player.sendSystemMessage(Component.literal(
-				"A sword and a bow. Floor 18 is open.").withStyle(ChatFormatting.AQUA));
+				"A sword and a bow. Floor 18 is open -- there is a portal up there.")
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	/**

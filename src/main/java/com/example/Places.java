@@ -290,6 +290,9 @@ public final class Places {
 	public static final BlockPos BOSS_SPOT =
 			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z + 4);
 
+	/** The middle of the portal frame on floor 18. */
+	public static final BlockPos PORTAL = new BlockPos(SHIP_X, floorY(18) + 1, SHIP_Z);
+
 	/** The counter in the weapon store on floor 17. */
 	public static final BlockPos WEAPONS = new BlockPos(SHIP_X, floorY(17) + 1, SHIP_Z - 8);
 

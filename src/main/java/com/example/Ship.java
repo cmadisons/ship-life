@@ -133,6 +133,7 @@ public final class Ship {
 		furnishIzzysRoom(level);
 		furnishGym(level);
 		furnishWeapons(level);
+		furnishPortal(level);
 		furnishBalcony(level);
 		furnishGangway(level);
 		furnishYourRoom(level);
@@ -554,6 +555,45 @@ public final class Ship {
 	 * A counter with the stock racked behind it. You have to be wearing the
 	 * whole plant set to get up here, so what it sells is what goes with it.
 	 */
+	/**
+	 * Floor 18: the portal.
+	 *
+	 * A lit nether portal in an obsidian frame, standing in the middle of an
+	 * otherwise empty floor. Everything else on this ship is the ship; this
+	 * is the way off it.
+	 */
+	private static void furnishPortal(ServerLevel level) {
+		int x = Places.PORTAL.getX();
+		int y = Places.PORTAL.getY();
+		int z = Places.PORTAL.getZ();
+
+		fill(level, x - 3, y - 1, z - 3, x + 3, y - 1, z + 3, Blocks.POLISHED_BLACKSTONE);
+
+		// The frame: four across, five up, with the corners left out the way
+		// a portal is built by hand.
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dy = -1; dy <= 4; dy++) {
+				boolean edge = Math.abs(dx) == 2 || dy == -1 || dy == 4;
+				boolean corner = Math.abs(dx) == 2 && (dy == -1 || dy == 4);
+				if (!edge || corner) {
+					continue;
+				}
+				set(level, new BlockPos(x + dx, y + dy, z), Blocks.OBSIDIAN);
+			}
+		}
+		// And the portal itself, lit.
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dy = 0; dy <= 3; dy++) {
+				level.setBlockAndUpdate(new BlockPos(x + dx, y + dy, z),
+						Blocks.NETHER_PORTAL.defaultBlockState().setValue(
+								net.minecraft.world.level.block.NetherPortalBlock.AXIS,
+								net.minecraft.core.Direction.Axis.X));
+			}
+		}
+		set(level, new BlockPos(x - 3, y + 1, z), Blocks.SHROOMLIGHT);
+		set(level, new BlockPos(x + 3, y + 1, z), Blocks.SHROOMLIGHT);
+	}
+
 	private static void furnishWeapons(ServerLevel level) {
 		int y = Places.floorY(17);
 		counter(level, Places.WEAPONS, Blocks.SMITHING_TABLE);
@@ -955,6 +995,9 @@ public final class Ship {
 		}
 		if (!level.getBlockState(Places.WEAPONS).is(Blocks.SMITHING_TABLE)) {
 			furnishWeapons(level);
+		}
+		if (!level.getBlockState(Places.PORTAL).is(Blocks.NETHER_PORTAL)) {
+			furnishPortal(level);
 		}
 		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
 			furnishBalcony(level);

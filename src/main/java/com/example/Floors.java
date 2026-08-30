@@ -30,7 +30,7 @@ public final class Floors {
 			case 15 -> "Ben's Room";
 			case 16 -> "Izzy's Room";
 			case 17 -> "Weapon Store";
-			default -> "Floor " + floor;          // 18, waiting on a name
+			default -> "The Portal";
 		};
 	}
 
