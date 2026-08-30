@@ -103,28 +103,31 @@ The struck-through ones are done.
 
 ## Make better
 
-1. The fridge could keep food fresh
-2. The television could show a record board, not one fight
-3. The jukebox could play to the whole floor
-4. Waves could say what is coming before it comes
-5. The boss doors could show a health bar
-6. The Quest Book map could be clickable to ride there
+The struck-through ones are done.
+
+
+1. ~~The fridge could keep food fresh~~ **done**
+2. ~~The television could show a record board, not one fight~~ **done**
+3. ~~The jukebox could play to the whole floor~~ **done**
+4. ~~Waves could say what is coming before it comes~~ **done**
+5. ~~The boss doors could show a health bar~~ **done**
+6. ~~The Quest Book map could be clickable to ride there~~ **done**
 7. The star could point at people as well as quests
 8. Pets could take names you choose
 9. The armour's bank could be a bar rather than a message
-10. The gas could spread rather than sit in a ball
-11. The arcade could keep a top five per game
-12. Snake could speed up as it grows
-13. Galaga could have a boss wave
+10. ~~The gas could spread rather than sit in a ball~~ **done**
+11. ~~The arcade could keep a top five per game~~ **done**
+12. ~~Snake could speed up as it grows~~ **done**
+13. ~~Galaga could have a boss wave~~ **done**
 14. Pac-Man could have ghosts with personalities
-15. The lift could show each floor number as it passes
-16. The plates could hiss like real lift doors
+15. ~~The lift could show each floor number as it passes~~ **done**
+16. ~~The plates could hiss like real lift doors~~ **done**
 17. Charlie could hand out quests on a schedule
 18. Izzy could sell bomb upgrades
-19. The buffet could serve a different dish each day
-20. The shooter's crowd could shuffle while you look
-21. The calendar could warn you the day before an event
-22. Each floor could have its name on the wall
-23. The ship could have a hull you see from outside
-24. Your room could show off what you have won
+19. ~~The buffet could serve a different dish each day~~ **done**
+20. ~~The shooter's crowd could shuffle while you look~~ **done**
+21. ~~The calendar could warn you the day before an event~~ **done**
+22. ~~Each floor could have its name on the wall~~ **done**
+23. ~~The ship could have a hull you see from outside~~ **done**
+24. ~~Your room could show off what you have won~~ **done**
 25. Everything for sale could take money or tickets, your pick

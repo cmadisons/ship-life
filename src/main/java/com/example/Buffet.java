@@ -121,6 +121,11 @@ public final class Buffet {
 			new Dish("Something Sweet", "Ten minutes of not being hungry.", 6, "quick"),
 	};
 
+	/** Which of the four the cook is pushing today. */
+	public static int dishOfTheDay() {
+		return (int) (Cal.dayNumber() % MENU.length);
+	}
+
 	/** The cook's board: pick a dish rather than take whatever is going. */
 	public static void order(ServerPlayer player) {
 		net.minecraft.world.SimpleContainer page = Comforts.blank();
@@ -128,9 +133,14 @@ public final class Buffet {
 				"The Cook", ChatFormatting.GOLD,
 				"\"Tell me what you want and I will make it.\"",
 				"Everything here is free. It is a buffet."));
+		int today = dishOfTheDay();
 		for (int i = 0; i < MENU.length; i++) {
-			page.setItem(20 + i, Book.entry(icon(i), MENU[i].name(), ChatFormatting.WHITE,
-					MENU[i].what(), "", "Click to order it."));
+			boolean special = i == today;
+			page.setItem(20 + i, Book.entry(icon(i), MENU[i].name(),
+					special ? ChatFormatting.GOLD : ChatFormatting.WHITE,
+					MENU[i].what(),
+					special ? "Today's dish -- twice the helping." : "",
+					"", "Click to order it."));
 		}
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));
@@ -158,8 +168,10 @@ public final class Buffet {
 			return;
 		}
 		Dish dish = MENU[index];
-		player.heal(dish.heals());
-		player.getFoodData().eat(10, 1.0f);
+		// The dish of the day is worth ordering: twice the plate.
+		boolean special = index == dishOfTheDay();
+		player.heal(dish.heals() * (special ? 2 : 1));
+		player.getFoodData().eat(special ? 16 : 10, 1.0f);
 		switch (dish.effect()) {
 			case "swim" -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
 					net.minecraft.world.effect.MobEffects.DOLPHINS_GRACE, 1200, 0));
@@ -170,7 +182,7 @@ public final class Buffet {
 			default -> {
 			}
 		}
-		if (index == 0) {
+		if (index == 0 || special) {
 			player.getInventory().add(Kit.meal());
 		}
 		say(player, "\"" + dish.name() + ". There you go.\"");

@@ -64,6 +64,7 @@ public final class Comforts {
 				return InteractionResult.SUCCESS;
 			}
 			if (isPhotoWall(pos)) {
+				trophies(who, level);
 				photos(who);
 				return InteractionResult.SUCCESS;
 			}
@@ -222,6 +223,41 @@ public final class Comforts {
 
 	// ------------------------------------------------------------ the photos
 
+	/**
+	 * Put your trophies up on the wall for real.
+	 *
+	 * The screen listed them; the wall did not show them. Every boss you have
+	 * put down and every floor you have earned puts a block on the shelf
+	 * opposite your bed, so the room fills up as you get on with it.
+	 */
+	public static void trophies(ServerPlayer player, ServerLevel level) {
+		BlockPos shelf = Places.PHOTOS.above(2);
+		int bosses = State.tally(player, State.BOSSES);
+		int floors = 0;
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			if (State.hasFloor(player, floor)) {
+				floors++;
+			}
+		}
+
+		put(level, shelf.north(), bosses >= 1 ? Blocks.COBWEB : null);
+		put(level, shelf, bosses >= 2 ? Blocks.DRAGON_EGG : null);
+		put(level, shelf.south(), bosses >= 3 ? Blocks.SOUL_LANTERN : null);
+		put(level, shelf.north().above(), State.tally(player, State.WAVES) >= 5
+				? Blocks.IRON_BLOCK : null);
+		put(level, shelf.above(), floors >= 10 ? Blocks.GOLD_BLOCK : null);
+		put(level, shelf.south().above(), floors >= Places.TOP_FLOOR
+				? Blocks.DIAMOND_BLOCK : null);
+	}
+
+	/** One trophy, or nothing if it has not been won. */
+	private static void put(ServerLevel level, BlockPos where,
+			net.minecraft.world.level.block.Block block) {
+		level.setBlockAndUpdate(where, block == null
+				? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
+				: block.defaultBlockState());
+	}
+
 	/** The wall of what you have put down. */
 	private static void photos(ServerPlayer player) {
 		SimpleContainer page = blank();
@@ -255,13 +291,18 @@ public final class Comforts {
 		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BELL.value(),
 				SoundSource.BLOCKS, 0.7f, 1.2f);
 		String on = Events.running(player);
+		String next = Cal.eventTomorrow();
 		player.sendSystemMessage(Component.literal("*ding* ").withStyle(ChatFormatting.GOLD)
 				.append(Component.literal(Cal.date() + ". ")
 						.withStyle(ChatFormatting.GRAY))
 				.append(Component.literal(on == null
 								? "Nothing on today."
 								: "Today on floor 7: " + on + ".")
-						.withStyle(ChatFormatting.WHITE)));
+						.withStyle(ChatFormatting.WHITE))
+				.append(Component.literal(next == null
+								? "  Nothing tomorrow either."
+								: "  Tomorrow: " + next + ".")
+						.withStyle(ChatFormatting.GRAY)));
 	}
 
 	static SimpleContainer blank() {

@@ -210,6 +210,7 @@ public class ShipLifeMod implements ModInitializer {
 		Daily.check(player);
 		Gear.openSeventeen(player);
 		Weapons.openEighteen(player);
+		Comforts.trophies(player, level);
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this

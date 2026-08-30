@@ -96,8 +96,21 @@ public class Shooter extends Game {
 		return 40;                        // nothing moves; this only redraws
 	}
 
+	/**
+	 * The crowd will not stand still.
+	 *
+	 * Every minute they shuffle, so a face you found and did not shoot is not
+	 * where you left it. The one you are looking for is still in there.
+	 */
 	@Override
 	public void step() {
+		if (age % 1200 != 0 || age == 0) {
+			return;
+		}
+		java.util.Collections.shuffle(crowd, random);
+		page = 0;
+		player.sendSystemMessage(Component.literal("The crowd moves about.")
+				.withStyle(ChatFormatting.GRAY));
 	}
 
 	/** How many of the crowd fit on one page of the screen. */

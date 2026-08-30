@@ -151,6 +151,7 @@ public final class Ship {
 		furnishPortal(level);
 		furnishBalcony(level);
 		furnishGangway(level);
+		furnishHull(level);
 		furnishYourRoom(level);
 	}
 
@@ -199,6 +200,9 @@ public final class Ship {
 		}
 
 		liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
 
 		// There used to be a light blue block here, meant as a marker. It only
 		// ever read as one odd block in the floor.
@@ -291,6 +295,38 @@ public final class Ship {
 			ladder(level, new BlockPos(x, y + dy, frontZ), north
 					? net.minecraft.core.Direction.NORTH
 					: net.minecraft.core.Direction.SOUTH);
+		}
+	}
+
+	/**
+	 * The floor's name, written on the wall beside the lift.
+	 *
+	 * A sign, because a sign is the only thing in Minecraft that holds words.
+	 * You step out of the car and the first thing facing you says where you
+	 * are.
+	 */
+	private static void nameOnTheWall(ServerLevel level, int floor) {
+		BlockPos where = new BlockPos(Places.LIFT_X + Places.LIFT_SIZE + 1,
+				Places.floorY(floor) + 2, Places.LIFT_Z + 2);
+		set(level, where.east(), Blocks.POLISHED_BLACKSTONE);
+		level.setBlockAndUpdate(where, Blocks.OAK_WALL_SIGN.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.WallSignBlock.FACING,
+						Direction.WEST));
+		if (level.getBlockEntity(where)
+				instanceof net.minecraft.world.level.block.entity.SignBlockEntity sign) {
+			net.minecraft.world.level.block.entity.SignText text =
+					sign.getFrontText()
+							.setMessage(0, net.minecraft.network.chat.Component
+									.literal("Floor " + floor))
+							.setMessage(1, net.minecraft.network.chat.Component
+									.literal(Floors.name(floor)))
+							.setMessage(2, net.minecraft.network.chat.Component.empty())
+							.setMessage(3, net.minecraft.network.chat.Component.empty());
+			sign.setText(text, true);
+			sign.setWaxed(true);
+			sign.setChanged();
+			level.sendBlockUpdated(where, level.getBlockState(where),
+					level.getBlockState(where), 3);
 		}
 	}
 
@@ -596,13 +632,24 @@ public final class Ship {
 				set(level, new BlockPos(x + dx, y + dy, z), Blocks.OBSIDIAN);
 			}
 		}
-		// And the portal itself, lit.
-		for (int dx = -1; dx <= 1; dx++) {
-			for (int dy = 0; dy <= 3; dy++) {
-				level.setBlockAndUpdate(new BlockPos(x + dx, y + dy, z),
-						Blocks.NETHER_PORTAL.defaultBlockState().setValue(
-								net.minecraft.world.level.block.NetherPortalBlock.AXIS,
-								net.minecraft.core.Direction.Axis.X));
+		// Clear the inside, then light it the way anybody lights a portal --
+		// with a fire on the bottom row. Placing portal blocks by hand looked
+		// right and did nothing: the first one to be updated found itself in
+		// a frame the game had not recognised and took itself out again.
+		fill(level, x - 1, y, z, x + 1, y + 3, z, Blocks.AIR);
+		level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.FIRE.defaultBlockState());
+
+		// And if the fire did not take -- an old world with something in the
+		// way, say -- put the portal in by hand as a fallback.
+		if (!level.getBlockState(new BlockPos(x, y, z)).is(Blocks.NETHER_PORTAL)) {
+			for (int dx = -1; dx <= 1; dx++) {
+				for (int dy = 0; dy <= 3; dy++) {
+					level.setBlock(new BlockPos(x + dx, y + dy, z),
+							Blocks.NETHER_PORTAL.defaultBlockState().setValue(
+									net.minecraft.world.level.block.NetherPortalBlock.AXIS,
+									net.minecraft.core.Direction.Axis.X),
+							net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+				}
 			}
 		}
 		set(level, new BlockPos(x - 3, y + 1, z), Blocks.SHROOMLIGHT);
@@ -646,6 +693,62 @@ public final class Ship {
 	 * walking to it and the door was scenery. Now there is a gangway under
 	 * it, running west to the edge of the island, with a rail either side.
 	 */
+	/**
+	 * The outside of the ship.
+	 *
+	 * From the town it was a black box eighteen storeys high. This puts a
+	 * hull on it: a keel under floor 1, a nose rising over the top, running
+	 * lights up the corners and a band of grey at every deck line, so it
+	 * reads as a ship rather than as a tower.
+	 */
+	private static void furnishHull(ServerLevel level) {
+		int r = Places.ROOM + 1;
+		int x = Places.SHIP_X;
+		int z = Places.SHIP_Z;
+		int top = Places.floorY(Places.TOP_FLOOR) + 8;
+
+		// A deck line at every storey, all the way round.
+		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+			int y = Places.floorY(floor);
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.abs(dx) != r && Math.abs(dz) != r) {
+						continue;
+					}
+					set(level, new BlockPos(x + dx, y, z + dz), Blocks.GRAY_CONCRETE);
+				}
+			}
+		}
+
+		// Running lights up the four corners.
+		for (int y = Places.GROUND; y <= top; y += 4) {
+			for (int dx = -r; dx <= r; dx += r * 2) {
+				for (int dz = -r; dz <= r; dz += r * 2) {
+					set(level, new BlockPos(x + dx, y + 2, z + dz), Blocks.SEA_LANTERN);
+				}
+			}
+		}
+
+		// The keel: three courses narrowing under the bottom floor.
+		for (int step = 1; step <= 3; step++) {
+			int width = r - step;
+			fill(level, x - width, Places.GROUND - step, z - width,
+					x + width, Places.GROUND - step, z + width, Blocks.BLACK_CONCRETE);
+		}
+
+		// And the nose, narrowing over the top.
+		for (int step = 1; step <= 5; step++) {
+			int width = r - step * 2;
+			if (width < 1) {
+				break;
+			}
+			fill(level, x - width, top + step, z - width,
+					x + width, top + step, z + width,
+					step % 2 == 0 ? Blocks.GRAY_CONCRETE : Blocks.BLACK_CONCRETE);
+		}
+		set(level, new BlockPos(x, top + 6, z), Blocks.SEA_LANTERN);
+	}
+
 	private static void furnishGangway(ServerLevel level) {
 		int y = Places.GROUND;
 		int z = Places.SHIP_Z;
@@ -1021,6 +1124,16 @@ public final class Ship {
 				.is(Blocks.POLISHED_ANDESITE)) {
 			furnishGangway(level);
 		}
+		if (!level.getBlockState(new BlockPos(Places.SHIP_X, Places.GROUND - 1,
+				Places.SHIP_Z)).is(Blocks.BLACK_CONCRETE)) {
+			furnishHull(level);
+		}
+		if (!level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE + 1,
+				Places.floorY(1) + 2, Places.LIFT_Z + 2)).is(Blocks.OAK_WALL_SIGN)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				nameOnTheWall(level, floor);
+			}
+		}
 
 		// The television used to stand in the lift's corner. Anything left of
 		// it there comes out.
@@ -1081,6 +1194,9 @@ public final class Ship {
 		if (!level.getBlockState(Places.panel(Places.TOP_FLOOR)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
 			}
 		}
 
@@ -1102,6 +1218,9 @@ public final class Ship {
 						Places.floorY(1) + 4, Places.LIFT_Z + 2)).is(Blocks.QUARTZ_BLOCK)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
 			}
 		}
 
@@ -1155,6 +1274,9 @@ public final class Ship {
 						Places.floorY(1) + 4, Places.LIFT_Z + 2)).is(Blocks.QUARTZ_BLOCK)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
 			}
 		}
 
@@ -1219,6 +1341,9 @@ public final class Ship {
 		if (!level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
 			}
 			ShipLifeMod.LOGGER.info("Moved the lifts to the near corner.");
 		}
@@ -1248,6 +1373,9 @@ public final class Ship {
 		if (!level.getBlockState(Places.liftDoorEast(1)).is(Blocks.OAK_DOOR)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 				liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
 				BlockPos wasPanel = new BlockPos(Places.SHIP_X - Places.ROOM + 1,
 						Places.floorY(floor) + 1, Places.SHIP_Z - Places.ROOM + 1);
 				set(level, wasPanel, Blocks.AIR);

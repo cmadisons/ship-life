@@ -106,6 +106,9 @@ public final class Events {
 		String today = running(player);
 		page.setItem(4, Book.entry(Items.CLOCK, Cal.date(), ChatFormatting.AQUA,
 				today == null ? "No event today." : "Today: " + today,
+				Cal.eventTomorrow() == null
+						? "Nothing tomorrow."
+						: "Tomorrow: " + Cal.eventTomorrow(),
 				"A day is 20 real minutes.",
 				"You have " + State.event(player) + " event tickets."));
 

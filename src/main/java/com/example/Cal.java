@@ -125,6 +125,20 @@ public final class Cal {
 	 * rest of a quiet week -- but only a quiet week: a week with anything else
 	 * in it belongs to that, and the days around it are days off.
 	 */
+	/**
+	 * What is on tomorrow, if anything.
+	 *
+	 * An event you find out about on the day is an event you can miss by
+	 * being asleep. The board and the intercom say this a day ahead.
+	 */
+	public static String eventTomorrow() {
+		String dated = dated(dayNumber() + 1);
+		if (dated != null) {
+			return dated;
+		}
+		return busyWeek(dayNumber() + 1) ? null : "Quest Day";
+	}
+
 	public static String eventToday() {
 		String dated = dated(dayNumber());
 		if (dated != null) {
