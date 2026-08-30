@@ -695,11 +695,11 @@ public final class Ship {
 					continue;
 				}
 				boolean doorway = dz == 2 && dx == 0;
-				for (int dy = 0; dy <= 2; dy++) {
+				for (int dy = 0; dy <= 3; dy++) {
 					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
-					// The door is two high, so the third block above it is
-					// wall like the rest -- an open top read as a gap.
-					set(level, pos, doorway && dy < 2 ? Blocks.AIR : Blocks.QUARTZ_BRICKS);
+					// Four high, and the doorway is open above the door --
+					// the walls carry on over it at the top course only.
+					set(level, pos, doorway && dy < 3 ? Blocks.AIR : Blocks.QUARTZ_BRICKS);
 				}
 			}
 		}
@@ -798,8 +798,9 @@ public final class Ship {
 		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
 				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)
 				|| !level.getBlockState(Places.TOILET.east(2)).is(Blocks.QUARTZ_BRICKS)
-				|| !level.getBlockState(Places.TOILET.south(2).above(2))
-						.is(Blocks.QUARTZ_BRICKS)) {
+				|| !level.getBlockState(Places.TOILET.east(2).above(3))
+						.is(Blocks.QUARTZ_BRICKS)
+				|| !level.getBlockState(Places.TOILET.south(2).above(2)).isAir()) {
 			toilet(level, Places.TOILET);
 		}
 
