@@ -687,6 +687,22 @@ public final class Ship {
 		// The old back, west of the bowl, goes back to being floor.
 		fill(level, x - 1, y + 1, z, x - 1, y + 3, z, Blocks.AIR);
 
+		// The stall: three walls of white brick three high, and a door on the
+		// side you walk in from.
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dz = -2; dz <= 2; dz++) {
+				if (Math.abs(dx) != 2 && Math.abs(dz) != 2) {
+					continue;
+				}
+				boolean doorway = dz == 2 && dx == 0;
+				for (int dy = 0; dy <= 2; dy++) {
+					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
+					set(level, pos, doorway ? Blocks.AIR : Blocks.QUARTZ_BRICKS);
+				}
+			}
+		}
+		door(level, new BlockPos(x, y, z + 2), Direction.NORTH);
+
 		set(level, where, Blocks.CAULDRON);
 
 		// Where the handle used to be: the middle of the cistern, and then the
@@ -706,6 +722,7 @@ public final class Ship {
 		toilet(level, Places.TOILET);
 		set(level, Places.FRIDGE, Blocks.IRON_BLOCK);
 		set(level, Places.FRIDGE.above(), Blocks.IRON_BLOCK);
+		set(level, Places.FRIDGE.above(2), Blocks.IRON_BLOCK);
 		// A screen on the wall: three across and two high, with a frame, so it
 		// looks like a television from the other side of the room rather than
 		// like two dark blocks.
@@ -777,13 +794,14 @@ public final class Ship {
 		// The toilet was a cauldron on its own, then it had a low back, and
 		// then it had no handle.
 		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
-				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)) {
+				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)
+				|| !level.getBlockState(Places.TOILET.east(2)).is(Blocks.QUARTZ_BRICKS)) {
 			toilet(level, Places.TOILET);
 		}
 
 		// The television used to stand in the lift's corner. Anything left of
 		// it there comes out.
-		for (int dx = -7; dx <= -5; dx++) {
+		for (int dx = -7; dx <= -3; dx++) {
 			for (int dy = 0; dy <= 2; dy++) {
 				for (int dz = -9; dz <= -8; dz++) {
 					BlockPos pos = new BlockPos(Places.SHIP_X + dx, Places.floorY(5) + 1 + dy,

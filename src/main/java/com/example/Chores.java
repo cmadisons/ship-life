@@ -287,8 +287,16 @@ public final class Chores {
 			Quests.finishPart(player);
 			return InteractionResult.SUCCESS;
 		}
-		if (pos.equals(Places.FRIDGE) && Quests.on(player, 4, 2)) {
-			toggleMeter(player, "fridge");
+		if (pos.equals(Places.FRIDGE) || pos.equals(Places.FRIDGE.above())
+				|| pos.equals(Places.FRIDGE.above(2))) {
+			// While the moldy food is still in there, opening it is the
+			// quest. Afterwards it is a fridge: five shelves, and whatever
+			// you put on them stays there.
+			if (Quests.on(player, 4, 2)) {
+				toggleMeter(player, "fridge");
+			} else {
+				Fridge.open(player);
+			}
 			return InteractionResult.SUCCESS;
 		}
 
