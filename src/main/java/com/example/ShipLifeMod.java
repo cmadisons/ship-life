@@ -52,6 +52,7 @@ public class ShipLifeMod implements ModInitializer {
 		// First, before a world can be loaded: everything the game remembers.
 		State.register();
 		Fridge.register();
+		Telly.register();
 		Person.register();
 		Made.register();
 		Ticker.register();

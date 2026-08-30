@@ -230,6 +230,12 @@ public final class Chores {
 			}
 		}
 
+		// --- the television ---------------------------------------------------
+		if (Telly.isScreen(pos)) {
+			Telly.watch(player, level);
+			return InteractionResult.SUCCESS;
+		}
+
 		// --- the handle on the cistern ----------------------------------------
 		//
 		// It flushes: the sound, the water, and nothing else. In particular it

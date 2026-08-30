@@ -733,9 +733,9 @@ public final class Ship {
 				Blocks.POLISHED_BLACKSTONE);
 		fill(level, Places.TV.getX() - 1, Places.TV.getY() + 1, Places.TV.getZ(),
 				Places.TV.getX() + 1, Places.TV.getY() + 2, Places.TV.getZ(),
-				Blocks.BLACK_CONCRETE);
-		set(level, Places.TV, Blocks.BLACK_CONCRETE);
-		set(level, Places.TV.above(), Blocks.BLACK_CONCRETE);
+				Blocks.GRAY_CONCRETE);
+		set(level, Places.TV, Blocks.GRAY_CONCRETE);
+		set(level, Places.TV.above(), Blocks.GRAY_CONCRETE);
 
 		// A record player next to it. This is Minecraft's own jukebox, so a
 		// disc goes in it and the disc plays -- nothing here had to make that
@@ -823,8 +823,8 @@ public final class Ship {
 		}
 
 		// The TV, its screen, and the record player that came after it.
-		if (!level.getBlockState(Places.TV).is(Blocks.BLACK_CONCRETE)
-				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.BLACK_CONCRETE)
+		if (!level.getBlockState(Places.TV).is(Blocks.GRAY_CONCRETE)
+				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.GRAY_CONCRETE)
 				|| !level.getBlockState(Places.JUKEBOX).is(Blocks.JUKEBOX)) {
 			furnishYourRoom(level);
 		}
