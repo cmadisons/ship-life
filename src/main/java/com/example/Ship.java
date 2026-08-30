@@ -164,9 +164,9 @@ public final class Ship {
 					BlockPos pos = new BlockPos(x + dx, y + dy, z + dz);
 					boolean window = dy >= 3 && dy <= 4
 							&& Math.abs(dx) >= r && Math.abs(dz) % 4 == 0;
-					// The windows are metal. It is a space ship, and the walls
-					// of one are not made of glass.
-					set(level, pos, window ? Blocks.IRON_BLOCK : Blocks.BLACK_CONCRETE);
+					// Glass again, so there is something to look out of. Only
+					// the lift stays metal all the way round.
+					set(level, pos, window ? Blocks.GLASS : Blocks.BLACK_CONCRETE);
 				}
 			}
 		}
@@ -186,8 +186,9 @@ public final class Ship {
 
 		liftCar(level, floor, ship);
 
-		// A sign of sorts: the floor number spelled out in the floor itself.
-		set(level, new BlockPos(x - r + 2, y, z), Blocks.LIGHT_BLUE_CONCRETE);
+		// There used to be a light blue block here, meant as a marker. It only
+		// ever read as one odd block in the floor.
+		set(level, new BlockPos(x - r + 2, y, z), Blocks.BLACK_CONCRETE);
 
 		if (floor == 1 && ship == 1) {
 			// The way in from the walkway.
@@ -705,6 +706,15 @@ public final class Ship {
 		toilet(level, Places.TOILET);
 		set(level, Places.FRIDGE, Blocks.IRON_BLOCK);
 		set(level, Places.FRIDGE.above(), Blocks.IRON_BLOCK);
+		// A screen on the wall: three across and two high, with a frame, so it
+		// looks like a television from the other side of the room rather than
+		// like two dark blocks.
+		fill(level, Places.TV.getX() - 1, Places.TV.getY(), Places.TV.getZ() - 1,
+				Places.TV.getX() + 1, Places.TV.getY() + 2, Places.TV.getZ() - 1,
+				Blocks.POLISHED_BLACKSTONE);
+		fill(level, Places.TV.getX() - 1, Places.TV.getY() + 1, Places.TV.getZ(),
+				Places.TV.getX() + 1, Places.TV.getY() + 2, Places.TV.getZ(),
+				Blocks.BLACK_CONCRETE);
 		set(level, Places.TV, Blocks.BLACK_CONCRETE);
 		set(level, Places.TV.above(), Blocks.BLACK_CONCRETE);
 
@@ -771,8 +781,9 @@ public final class Ship {
 			toilet(level, Places.TOILET);
 		}
 
-		// The TV, and the record player that came after it.
+		// The TV, its screen, and the record player that came after it.
 		if (!level.getBlockState(Places.TV).is(Blocks.BLACK_CONCRETE)
+				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.BLACK_CONCRETE)
 				|| !level.getBlockState(Places.JUKEBOX).is(Blocks.JUKEBOX)) {
 			furnishYourRoom(level);
 		}
@@ -839,19 +850,23 @@ public final class Ship {
 			}
 		}
 
-		// The windows were glass before they were metal.
+		// The windows went metal for a while. They are glass again, and the
+		// blue marker block in each floor is gone.
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int y = Places.floorY(floor);
-			for (int dx = -Places.ROOM; dx <= Places.ROOM; dx++) {
-				for (int dz = -Places.ROOM; dz <= Places.ROOM; dz++) {
-					if (Math.abs(dx) != Places.ROOM && Math.abs(dz) != Places.ROOM) {
+			set(level, new BlockPos(Places.SHIP_X - Places.ROOM + 2, y, Places.SHIP_Z),
+					Blocks.BLACK_CONCRETE);
+			for (int dx = -Places.ROOM - 1; dx <= Places.ROOM + 1; dx++) {
+				for (int dz = -Places.ROOM - 1; dz <= Places.ROOM + 1; dz++) {
+					if (Math.abs(dx) < Places.ROOM && Math.abs(dz) < Places.ROOM) {
 						continue;
 					}
+					boolean window = Math.abs(dx) >= Places.ROOM && Math.abs(dz) % 4 == 0;
 					for (int dy = 3; dy <= 4; dy++) {
 						BlockPos pos = new BlockPos(Places.SHIP_X + dx, y + dy,
 								Places.SHIP_Z + dz);
-						if (level.getBlockState(pos).is(Blocks.GLASS)) {
-							set(level, pos, Blocks.IRON_BLOCK);
+						if (window && level.getBlockState(pos).is(Blocks.IRON_BLOCK)) {
+							set(level, pos, Blocks.GLASS);
 						}
 					}
 				}
@@ -888,19 +903,23 @@ public final class Ship {
 			}
 		}
 
-		// The windows were glass before they were metal.
+		// The windows went metal for a while. They are glass again, and the
+		// blue marker block in each floor is gone.
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int y = Places.floorY(floor);
-			for (int dx = -Places.ROOM; dx <= Places.ROOM; dx++) {
-				for (int dz = -Places.ROOM; dz <= Places.ROOM; dz++) {
-					if (Math.abs(dx) != Places.ROOM && Math.abs(dz) != Places.ROOM) {
+			set(level, new BlockPos(Places.SHIP_X - Places.ROOM + 2, y, Places.SHIP_Z),
+					Blocks.BLACK_CONCRETE);
+			for (int dx = -Places.ROOM - 1; dx <= Places.ROOM + 1; dx++) {
+				for (int dz = -Places.ROOM - 1; dz <= Places.ROOM + 1; dz++) {
+					if (Math.abs(dx) < Places.ROOM && Math.abs(dz) < Places.ROOM) {
 						continue;
 					}
+					boolean window = Math.abs(dx) >= Places.ROOM && Math.abs(dz) % 4 == 0;
 					for (int dy = 3; dy <= 4; dy++) {
 						BlockPos pos = new BlockPos(Places.SHIP_X + dx, y + dy,
 								Places.SHIP_Z + dz);
-						if (level.getBlockState(pos).is(Blocks.GLASS)) {
-							set(level, pos, Blocks.IRON_BLOCK);
+						if (window && level.getBlockState(pos).is(Blocks.IRON_BLOCK)) {
+							set(level, pos, Blocks.GLASS);
 						}
 					}
 				}
