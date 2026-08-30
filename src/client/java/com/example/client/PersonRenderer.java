@@ -16,10 +16,12 @@ import net.minecraft.resources.Identifier;
  * two legs the player is built from -- so a skin drawn for a player fits one
  * of these without a single measurement changing.
  *
- * Which skin is chosen by the name over their head, which is already sent to
- * the client for the label, so nobody had to invent a second way of saying
- * who somebody is. A name nobody has a picture for gets the front desk
- * uniform, which is the right guess for anyone new on a ship.
+ * Which skin is chosen by the label over their head and the colour of it,
+ * both of which the client already has for drawing the label -- so nobody had
+ * to invent a second way of saying who somebody is. The colour is what tells
+ * two people with the same job apart: both friends are labelled Friend, and
+ * Ben's is aqua where Izzy's is purple. Anyone new gets the front desk
+ * uniform, which is the right guess on a ship.
  */
 public class PersonRenderer extends HumanoidMobRenderer<Person, HumanoidRenderState,
 		HumanoidModel<HumanoidRenderState>> {

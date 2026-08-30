@@ -55,15 +55,25 @@ public final class Friends {
 							|| !(entity instanceof Person) || entity.getCustomName() == null) {
 						return InteractionResult.PASS;
 					}
-					switch (entity.getCustomName().getString()) {
-						case Person.BEN -> ben(who, level);
-						case Person.IZZY -> izzy(who, level);
-						case Person.CHARLIE -> Chores.charlie(who);
-						case Person.COOK -> Buffet.serve(who);
-						case Person.DESK, Person.LOBBY -> Chores.security(who);
-						default -> {
-							return InteractionResult.PASS;
+					// Two people can share a label -- both friends are called
+					// Friend -- so which floor they are standing on is what
+					// says which of them this is.
+					String label = entity.getCustomName().getString();
+					int floor = Places.floorAt(entity.getY());
+					if (label.equals(Person.BEN)) {
+						if (floor >= 16) {
+							izzy(who, level);
+						} else {
+							ben(who, level);
 						}
+					} else if (label.equals(Person.CHARLIE)) {
+						Chores.charlie(who);
+					} else if (label.equals(Person.COOK)) {
+						Buffet.serve(who);
+					} else if (label.equals(Person.DESK)) {
+						Chores.security(who);
+					} else {
+						return InteractionResult.PASS;
 					}
 					return InteractionResult.SUCCESS;
 				});

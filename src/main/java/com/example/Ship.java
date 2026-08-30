@@ -781,6 +781,22 @@ public final class Ship {
 			toilet(level, Places.TOILET);
 		}
 
+		// The television used to stand in the lift's corner. Anything left of
+		// it there comes out.
+		for (int dx = -7; dx <= -5; dx++) {
+			for (int dy = 0; dy <= 2; dy++) {
+				for (int dz = -9; dz <= -8; dz++) {
+					BlockPos pos = new BlockPos(Places.SHIP_X + dx, Places.floorY(5) + 1 + dy,
+							Places.SHIP_Z + dz);
+					if (level.getBlockState(pos).is(Blocks.BLACK_CONCRETE)
+							|| level.getBlockState(pos).is(Blocks.POLISHED_BLACKSTONE)
+							|| level.getBlockState(pos).is(Blocks.JUKEBOX)) {
+						set(level, pos, Blocks.AIR);
+					}
+				}
+			}
+		}
+
 		// The TV, its screen, and the record player that came after it.
 		if (!level.getBlockState(Places.TV).is(Blocks.BLACK_CONCRETE)
 				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.BLACK_CONCRETE)

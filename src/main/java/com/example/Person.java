@@ -80,13 +80,21 @@ public class Person extends PathfinderMob {
 		// Standing in a doorway is their job. Nothing shoves them out of it.
 	}
 
-	/** The names, which are also which skin each one wears. */
-	public static final String CHARLIE = "Charlie";
-	public static final String BEN = "Ben";
-	public static final String IZZY = "Izzy";
-	public static final String DESK = "Maria";
-	public static final String LOBBY = "Sam";
-	public static final String COOK = "Gus";
+	/**
+	 * What each one is called.
+	 *
+	 * Their jobs, not their names: the two on the desk are Staff, Charlie is
+	 * the Manager, Ben and Izzy are Friends. Which means two people can share
+	 * a label, so the colour of the label is what tells their skins apart --
+	 * see PersonRenderer -- and where they are standing is what tells the
+	 * game which of them you just talked to.
+	 */
+	public static final String CHARLIE = "Manager";
+	public static final String BEN = "Friend";
+	public static final String IZZY = "Friend";
+	public static final String DESK = "Staff";
+	public static final String LOBBY = "Staff";
+	public static final String COOK = "Cook";
 
 	/**
 	 * Everyone, in their place.
@@ -98,9 +106,9 @@ public class Person extends PathfinderMob {
 		place(level, Places.CHAIR, CHARLIE, ChatFormatting.YELLOW);
 		sit(level, Places.CHAIR, CHARLIE);
 		place(level, Places.DESK.north(), DESK, ChatFormatting.WHITE);
-		place(level, Places.DOOR.east(2), LOBBY, ChatFormatting.WHITE);
+		place(level, Places.DOOR.east(2), LOBBY, ChatFormatting.GRAY);
 		place(level, Places.BEN.south(), BEN, ChatFormatting.AQUA);
-		place(level, Places.IZZY.south(), IZZY, ChatFormatting.AQUA);
+		place(level, Places.IZZY.south(), IZZY, ChatFormatting.LIGHT_PURPLE);
 		place(level, Places.BUFFET_COOK.east(), COOK, ChatFormatting.GOLD);
 	}
 
