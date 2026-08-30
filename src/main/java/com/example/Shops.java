@@ -456,17 +456,15 @@ public final class Shops {
 	 * offer it any more -- the upgrade is worth having for Ben.
 	 */
 	private static void upgradePassport(ServerPlayer player, ServerLevel level) {
-		if (State.tally(player, State.SHIPS) > 1) {
+		if (State.hasFloor(player, 15)) {
 			player.sendSystemMessage(Component.literal(
 					"Your passport is already upgraded. Floor 15 is yours.")
 					.withStyle(ChatFormatting.GRAY));
-			State.unlock(player, 15);
 			return;
 		}
 		if (!spend(player, PASSPORT_COST)) {
 			return;
 		}
-		player.setAttached(State.SHIPS, 2);
 		// Floor 15 comes with the upgrade rather than being bought: the first
 		// thing a better passport gets you is somebody to knock on.
 		State.unlock(player, 15);

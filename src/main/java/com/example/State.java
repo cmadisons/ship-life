@@ -40,7 +40,7 @@ public final class State {
 	 */
 	public static void register() {
 		// Touching the class is the point; this line is just proof it happened.
-		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 31);
+		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 30);
 	}
 
 	private static <T> AttachmentType<T> of(String name, T start, Codec<T> codec) {
@@ -87,9 +87,6 @@ public final class State {
 
 	/** Side quests you are carrying, as "stat:target:tickets" separated by commas. */
 	public static final AttachmentType<String> SIDE = of("side_quests", "", Codec.STRING);
-
-	/** How many ships your passport is good for. One until it is upgraded. */
-	public static final AttachmentType<Integer> SHIPS = of("ships", 1, Codec.INT);
 
 	/** The in-game month you last took the floor 11 reward in. Zero for never. */
 	public static final AttachmentType<Integer> REWARD_MONTH = of("reward_month", 0, Codec.INT);
@@ -272,13 +269,33 @@ public final class State {
 		player.setAttached(FLOORS, player.getAttachedOrCreate(FLOORS) | (1 << floor));
 	}
 
-	/** Has this one-off message already been sent? Marks it sent if not. */
-	public static boolean firstTime(ServerPlayer player, int which) {
+	/**
+	 * The things that only happen once.
+	 *
+	 * These were bare numbers -- firstTime(player, 2) -- which said nothing
+	 * about what the two meant and made adding a third a matter of counting
+	 * bits by hand. They are still one saved number underneath, because that
+	 * number is in every world already; what changed is that they have names.
+	 */
+	public enum Once {
+		/** Arriving in the world for the first time. */
+		ARRIVED,
+		/** Being told what creative mode means here. */
+		CREATIVE_NOTE,
+		/** Ben handing over the armour and the bombs. */
+		BENS_GIFT,
+		/** Izzy handing over the boots. */
+		IZZYS_BOOTS,
+	}
+
+	/** Has this one-off happened yet? Marks it done if not. */
+	public static boolean firstTime(ServerPlayer player, Once which) {
 		int seen = player.getAttachedOrCreate(CALLS);
-		if ((seen & (1 << which)) != 0) {
+		int bit = 1 << which.ordinal();
+		if ((seen & bit) != 0) {
 			return false;
 		}
-		player.setAttached(CALLS, seen | (1 << which));
+		player.setAttached(CALLS, seen | bit);
 		return true;
 	}
 }

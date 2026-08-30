@@ -1,8 +1,5 @@
 package com.example;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -32,12 +29,6 @@ import net.minecraft.world.InteractionResult;
 public final class Buffet {
 	private Buffet() {
 	}
-
-	/** How long the cook makes you wait before another plate: fifteen seconds. */
-	private static final int WAIT = 300;
-
-	/** When each player was last served. */
-	private static final Map<UUID, Long> SERVED = new HashMap<>();
 
 	public static void register() {
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
@@ -142,14 +133,6 @@ public final class Buffet {
 		if (index < 0 || index >= MENU.length) {
 			return;
 		}
-		long now = player.level().getGameTime();
-		Long last = SERVED.get(player.getUUID());
-		if (last != null && now - last < WAIT) {
-			say(player, "\"Finish what you have got and come back.\"");
-			return;
-		}
-		SERVED.put(player.getUUID(), now);
-
 		Dish dish = MENU[index];
 		player.heal(dish.heals());
 		player.getFoodData().eat(10, 1.0f);
@@ -170,17 +153,13 @@ public final class Buffet {
 		player.closeContainer();
 	}
 
+	/**
+	 * A plate, whenever you ask for one.
+	 *
+	 * There was a fifteen second wait on this, which only ever meant standing
+	 * in front of a buffet not being served. It is a buffet.
+	 */
 	public static void serve(ServerPlayer player) {
-		// The wait is there so a buffet is not a free stack of beef. It is not
-		// there to send you away hungry, so an empty pocket goes to the front.
-		long now = player.level().getGameTime();
-		Long last = SERVED.get(player.getUUID());
-		if (last != null && now - last < WAIT && carrying(player)) {
-			say(player, "\"Finish what you have got and come back.\"");
-			return;
-		}
-		SERVED.put(player.getUUID(), now);
-
 		player.getInventory().add(Kit.meal());
 		player.level().playSound(null, player.blockPosition(),
 				SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 0.7f, 1.2f);

@@ -81,8 +81,9 @@ public final class Made {
 		weedWhacker = item("weed_whacker");
 		lawnMower = item("lawn_mower");
 		plunger = item("plunger");
-		// Ben hands you three at once, so this one has to stack.
-		bomb = item("bomb", 8);
+		// Ben hands you three at once, and Izzy will sell you more, so these
+		// stack like anything else you carry a lot of.
+		bomb = item("bomb", 64);
 		benArmour = armour("ben_armour",
 				net.minecraft.world.item.equipment.ArmorType.CHESTPLATE);
 		benBoots = armour("ben_boots", net.minecraft.world.item.equipment.ArmorType.BOOTS);

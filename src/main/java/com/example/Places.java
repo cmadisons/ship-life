@@ -85,6 +85,22 @@ public final class Places {
 	/** The top floor the ship has. */
 	public static final int TOP_FLOOR = 16;
 
+	/**
+	 * A position as this ship reads it.
+	 *
+	 * There was a second ship two hundred blocks east once, and everything
+	 * that happened over there was shifted back here before it was read.
+	 * There is one ship now, so there is nothing to shift -- these stay only
+	 * because a hundred call sites say them, and they cost nothing.
+	 */
+	public static BlockPos local(BlockPos pos) {
+		return pos;
+	}
+
+	public static double localX(double x) {
+		return x;
+	}
+
 	/** The y of a floor's own floor. */
 	public static int floorY(int floor) {
 		return GROUND + (floor - 1) * FLOOR_HEIGHT;
@@ -96,37 +112,7 @@ public final class Places {
 		return floor >= 1 && floor <= TOP_FLOOR ? floor : 0;
 	}
 
-	/**
-	 * How far east the second ship stands.
-	 *
-	 * Ship 2 is the same ship again, floor for floor, so rather than a second
-	 * set of coordinates for everything it is built at an offset and anything
-	 * that happens over there is shifted back here before it is read. One
-	 * arcade, one pool, one set of positions -- see {@link #local}.
-	 */
-	public static final int SHIP_TWO_OFFSET = 200;
-
-	/** Which ship a position is on, 1 or 2. */
-	public static int shipOf(double x) {
-		return x > SHIP_X + SHIP_TWO_OFFSET - ROOM - 4 ? 2 : 1;
-	}
-
-	/** The same spot, as ship 1 would number it. */
-	public static BlockPos local(BlockPos pos) {
-		return shipOf(pos.getX()) == 2 ? pos.offset(-SHIP_TWO_OFFSET, 0, 0) : pos;
-	}
-
-	/** The same x, as ship 1 would number it. */
-	public static double localX(double x) {
-		return shipOf(x) == 2 ? x - SHIP_TWO_OFFSET : x;
-	}
-
-	/** A ship-1 spot, moved to whichever ship you mean. */
-	public static BlockPos onShip(BlockPos pos, int ship) {
-		return ship == 2 ? pos.offset(SHIP_TWO_OFFSET, 0, 0) : pos;
-	}
-
-	/** Ben's door on floor 15. He is the first friend you make. */
+	/** Ben's door, on floor 15. */
 	public static final BlockPos BEN = new BlockPos(SHIP_X, floorY(15) + 1, SHIP_Z - 8);
 
 	/** Izzy's door, on floor 16. */
@@ -170,10 +156,6 @@ public final class Places {
 		return new BlockPos(LIFT_X + LIFT_SIZE - 1, floorY(floor) + 1, LIFT_Z + 2);
 	}
 
-	/** Where the second door used to be, before there was only one. */
-	public static BlockPos oldDoorSouth(int floor) {
-		return new BlockPos(LIFT_X + 2, floorY(floor) + 1, LIFT_Z + LIFT_SIZE - 1);
-	}
 
 	/** The plate each side of the door: step on one and it opens. */
 	public static BlockPos[] liftPlates(int floor) {
@@ -184,15 +166,7 @@ public final class Places {
 		};
 	}
 
-	/** Where the button used to be, before the car was built round it. */
-	public static BlockPos oldPanel(int floor) {
-		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z - ROOM + 1);
-	}
 
-	/** Where the lift used to be, which is a door now. */
-	public static BlockPos oldLift(int floor) {
-		return new BlockPos(SHIP_X - ROOM + 1, floorY(floor) + 1, SHIP_Z);
-	}
 
 	/** The way in, at the bottom of the gangway. */
 	public static final BlockPos DOOR = new BlockPos(SHIP_X - ROOM - 1, GROUND + 1, SHIP_Z);

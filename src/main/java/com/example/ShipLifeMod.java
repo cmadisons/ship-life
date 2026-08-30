@@ -223,13 +223,13 @@ public class ShipLifeMod implements ModInitializer {
 			player.setGameMode(GameType.SURVIVAL);
 		}
 
-		if (building && State.firstTime(player, 1)) {
+		if (building && State.firstTime(player, State.Once.CREATIVE_NOTE)) {
 			player.sendSystemMessage(Component.literal(
 					"Creative: the ship and the world are yours to change. Nothing "
 					+ "will be put back.").withStyle(ChatFormatting.LIGHT_PURPLE));
 		}
 
-		if (!State.firstTime(player, 0)) {
+		if (!State.firstTime(player, State.Once.ARRIVED)) {
 			// Coming back. Only move them if where they left off is thin air --
 			// joining used to drop you into the void beside the island.
 			if (!standingOnSomething(player)) {

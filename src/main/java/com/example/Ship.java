@@ -94,13 +94,9 @@ public final class Ship {
 
 	// ------------------------------------------------------------------- ship
 
-	/**
-	 * The second ship: the same fourteen floors again, two hundred blocks east.
-	 *
-	 * It is built the moment it is bought rather than with the first ship,
-	 * because most worlds will never buy it and a second empty tower is a lot
-	 * of blocks to lay down on the chance.
-	 */
+	/** How far east the second ship stood, back when there was one. */
+	private static final int WAS_EAST = 200;
+
 	/**
 	 * Pull ship 2 down.
 	 *
@@ -110,10 +106,10 @@ public final class Ship {
 	 * back to air, once, the first time a world with one in it is loaded.
 	 */
 	public static void clearSecond(ServerLevel level) {
-		int x = Places.SHIP_X + Places.SHIP_TWO_OFFSET;
+		int x = Places.SHIP_X + WAS_EAST;
 		int z = Places.SHIP_Z;
 		int r = Places.ROOM + 1;
-		if (!level.getBlockState(Places.onShip(Places.panel(1), 2)).is(Made.elevatorButton)) {
+		if (!level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
 			return;
 		}
 		fill(level, x - r, Places.GROUND, z - r,
@@ -140,13 +136,10 @@ public final class Ship {
 		furnishYourRoom(level);
 	}
 
+	
 	private static void buildFloor(ServerLevel level, int floor) {
-		buildFloor(level, floor, 1);
-	}
-
-	private static void buildFloor(ServerLevel level, int floor, int ship) {
 		int y = Places.floorY(floor);
-		int x = Places.SHIP_X + (ship == 2 ? Places.SHIP_TWO_OFFSET : 0);
+		int x = Places.SHIP_X;
 		int z = Places.SHIP_Z;
 		int r = Places.ROOM;
 
@@ -183,16 +176,17 @@ public final class Ship {
 		// other floor it opened onto the black concrete of the hull, which is
 		// a door to nowhere.
 		if (floor == 1) {
-			door(level, Places.onShip(Places.oldLift(floor), ship));
+			door(level, new BlockPos(Places.SHIP_X - Places.ROOM + 1,
+					Places.floorY(floor) + 1, Places.SHIP_Z));
 		}
 
-		liftCar(level, floor, ship);
+		liftCar(level, floor);
 
 		// There used to be a light blue block here, meant as a marker. It only
 		// ever read as one odd block in the floor.
 		set(level, new BlockPos(x - r + 2, y, z), Blocks.BLACK_CONCRETE);
 
-		if (floor == 1 && ship == 1) {
+		if (floor == 1) {
 			// The way in from the walkway.
 			set(level, new BlockPos(x - r, y + 1, z), Blocks.AIR);
 			set(level, new BlockPos(x - r, y + 2, z), Blocks.AIR);
@@ -451,10 +445,10 @@ public final class Ship {
 	 * A pressure plate sits each side of both doors. The button still works;
 	 * the plates are for when your hands are full.
 	 */
-	private static void liftCar(ServerLevel level, int floor, int ship) {
+	private static void liftCar(ServerLevel level, int floor) {
 		int y = Places.floorY(floor);
 		int n = Places.LIFT_SIZE;
-		int x0 = Places.LIFT_X + (ship == 2 ? Places.SHIP_TWO_OFFSET : 0);
+		int x0 = Places.LIFT_X;
 		int z0 = Places.LIFT_Z;
 
 		for (int dx = 0; dx < n; dx++) {
@@ -503,20 +497,21 @@ public final class Ship {
 			}
 		}
 
-		set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
+		set(level, Places.panel(floor), Made.elevatorButton);
 		// Iron over the button. A redstone lamp up there was never wired to
 		// anything, so it was a light that never lit.
-		set(level, Places.onShip(Places.panel(floor), ship).above(), Blocks.IRON_BLOCK);
+		set(level, Places.panel(floor).above(), Blocks.IRON_BLOCK);
 		set(level, new BlockPos(x0 + 2, y + n - 1, z0 + 2), Blocks.SEA_LANTERN);
 
 		// One door, the far one from the button.
-		ironDoor(level, Places.onShip(Places.liftDoorEast(floor), ship), Direction.EAST);
-		BlockPos wasDoor = Places.onShip(Places.oldDoorSouth(floor), ship);
+		ironDoor(level, Places.liftDoorEast(floor), Direction.EAST);
+		BlockPos wasDoor = new BlockPos(Places.LIFT_X + 2,
+				Places.floorY(floor) + 1, Places.LIFT_Z + Places.LIFT_SIZE - 1);
 		set(level, wasDoor, Blocks.QUARTZ_BLOCK);
 		set(level, wasDoor.above(), Blocks.QUARTZ_BLOCK);
 
 		for (BlockPos plate : Places.liftPlates(floor)) {
-			BlockPos at = Places.onShip(plate, ship);
+			BlockPos at = plate;
 			set(level, at.below(), Blocks.POLISHED_ANDESITE);
 			set(level, at, Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE);
 		}
@@ -883,21 +878,39 @@ public final class Ship {
 			}
 		}
 
-		// Rooms whose fittings came after the world did. Each one is asked
-		// for by a block that only that room has.
-		// The giant chairs came after most worlds did.
-		if (!level.getBlockState(Places.CHAIR.below()).is(Blocks.BLACK_WOOL)) {
+		// Rooms whose fittings came after the world did.
+		//
+		// One check a room, not one a fitting: this used to ask about the
+		// chairs and then the sofa and then the seats and then the TV, and
+		// call the same two methods four times over between them.
+		boolean lobbyMissing = !level.getBlockState(Places.CHAIR.below()).is(Blocks.BLACK_WOOL)
+				|| !level.getBlockState(Places.sofaSeats()[0]).is(Blocks.BLACK_WOOL)
+				|| !level.getBlockState(Places.LOBBY_MAP)
+						.is(Blocks.LIGHT_BLUE_GLAZED_TERRACOTTA);
+		boolean roomMissing = !level.getBlockState(Places.WINDOW_SEATS[0]).is(Blocks.SPRUCE_STAIRS)
+				|| !level.getBlockState(Places.SHOWER).is(Blocks.IRON_TRAPDOOR)
+				|| !level.getBlockState(Places.TV).is(Blocks.GRAY_CONCRETE)
+				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.GRAY_CONCRETE)
+				|| !level.getBlockState(Places.JUKEBOX).is(Blocks.JUKEBOX)
+				|| !level.getBlockState(Places.WARDROBE).is(Blocks.SPRUCE_PLANKS);
+		boolean loosMissing = !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)
+				|| !level.getBlockState(Places.TOILET.east(2).above(3)).is(Blocks.QUARTZ_BRICKS)
+				|| !level.getBlockState(Places.TOILET.south(2).above(2)).isAir();
+
+		if (lobbyMissing) {
 			furnishLobby(level);
 		}
-		// The toilet was a cauldron on its own, then it had a low back, and
-		// then it had no handle.
-		if (!level.getBlockState(Places.TOILET.north().above(3)).is(Blocks.QUARTZ_BRICKS)
-				|| !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)
-				|| !level.getBlockState(Places.TOILET.east(2)).is(Blocks.QUARTZ_BRICKS)
-				|| !level.getBlockState(Places.TOILET.east(2).above(3))
-						.is(Blocks.QUARTZ_BRICKS)
-				|| !level.getBlockState(Places.TOILET.south(2).above(2)).isAir()) {
+		if (roomMissing) {
+			furnishYourRoom(level);
+		}
+		if (roomMissing || loosMissing) {
 			toilet(level, Places.TOILET);
+		}
+		if (!level.getBlockState(Places.GYM).is(Blocks.ANVIL)) {
+			furnishGym(level);
+		}
+		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
+			furnishBalcony(level);
 		}
 
 		// The television used to stand in the lift's corner. Anything left of
@@ -919,33 +932,11 @@ public final class Ship {
 			}
 		}
 
-		// The gym, the balcony, the sofa and the seats all came later.
-		if (!level.getBlockState(Places.GYM).is(Blocks.ANVIL)) {
-			furnishGym(level);
-		}
-		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
-			furnishBalcony(level);
-		}
-		if (!level.getBlockState(Places.sofaSeats()[0]).is(Blocks.BLACK_WOOL)) {
-			furnishLobby(level);
-		}
-		if (!level.getBlockState(Places.WINDOW_SEATS[0]).is(Blocks.SPRUCE_STAIRS)
-				|| !level.getBlockState(Places.SHOWER).is(Blocks.IRON_TRAPDOOR)) {
-			furnishYourRoom(level);
-			toilet(level, Places.TOILET);
-		}
-
-		// The TV, its screen, and the record player that came after it.
-		if (!level.getBlockState(Places.TV).is(Blocks.GRAY_CONCRETE)
-				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.GRAY_CONCRETE)
-				|| !level.getBlockState(Places.JUKEBOX).is(Blocks.JUKEBOX)) {
-			furnishYourRoom(level);
-		}
-
 		// The doors to nowhere, in the wall where the lift used to be. Floor
 		// 1 keeps its one; the rest opened onto the hull.
 		for (int floor = 2; floor <= Places.TOP_FLOOR; floor++) {
-			BlockPos was = Places.oldLift(floor);
+			BlockPos was = new BlockPos(Places.SHIP_X - Places.ROOM + 1,
+					Places.floorY(floor) + 1, Places.SHIP_Z);
 			if (level.getBlockState(was).getBlock()
 					instanceof net.minecraft.world.level.block.DoorBlock) {
 				set(level, was, Blocks.BLACK_CONCRETE);
@@ -980,7 +971,7 @@ public final class Ship {
 		// just been given.
 		if (!level.getBlockState(Places.panel(Places.TOP_FLOOR)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				liftCar(level, floor, 1);
+				liftCar(level, floor);
 			}
 		}
 
@@ -1001,7 +992,7 @@ public final class Ship {
 				|| !level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE,
 						Places.floorY(1) + 4, Places.LIFT_Z + 2)).is(Blocks.QUARTZ_BLOCK)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				liftCar(level, floor, 1);
+				liftCar(level, floor);
 			}
 		}
 
@@ -1054,7 +1045,7 @@ public final class Ship {
 				|| !level.getBlockState(new BlockPos(Places.LIFT_X + Places.LIFT_SIZE,
 						Places.floorY(1) + 4, Places.LIFT_Z + 2)).is(Blocks.QUARTZ_BLOCK)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				liftCar(level, floor, 1);
+				liftCar(level, floor);
 			}
 		}
 
@@ -1118,19 +1109,7 @@ public final class Ship {
 		// The lift moved to the near left corner, and left a door behind.
 		if (!level.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				for (int ship = 1; ship <= 2; ship++) {
-					BlockPos was = Places.onShip(Places.oldLift(floor), ship);
-					if (!level.getBlockState(was.offset(2, 0, 0)).isAir()
-							&& ship == 2) {
-						continue;             // ship 2 was never built here
-					}
-					set(level, Places.onShip(Places.panel(floor), ship), Made.elevatorButton);
-					set(level, Places.onShip(Places.panel(floor), ship).above(),
-							Blocks.IRON_BLOCK);
-					set(level, Places.onShip(Places.lift(floor), ship), Blocks.AIR);
-					set(level, Places.onShip(Places.lift(floor), ship).above(), Blocks.AIR);
-					door(level, was);
-				}
+				liftCar(level, floor);
 			}
 			ShipLifeMod.LOGGER.info("Moved the lifts to the near corner.");
 		}
@@ -1159,9 +1138,11 @@ public final class Ship {
 		// The lift was a button on a wall before it was a car you walk into.
 		if (!level.getBlockState(Places.liftDoorEast(1)).is(Blocks.OAK_DOOR)) {
 			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				liftCar(level, floor, 1);
-				set(level, Places.oldPanel(floor), Blocks.AIR);
-				set(level, Places.oldPanel(floor).above(), Blocks.AIR);
+				liftCar(level, floor);
+				BlockPos wasPanel = new BlockPos(Places.SHIP_X - Places.ROOM + 1,
+						Places.floorY(floor) + 1, Places.SHIP_Z - Places.ROOM + 1);
+				set(level, wasPanel, Blocks.AIR);
+				set(level, wasPanel.above(), Blocks.AIR);
 			}
 			ShipLifeMod.LOGGER.info("Built a lift car on all {} floors.", Places.TOP_FLOOR);
 		}

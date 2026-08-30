@@ -28,7 +28,8 @@ public final class Floors {
 			case 13 -> "The Keg";
 			case 14 -> "Passports";
 			case 15 -> "Ben's Room";
-			default -> "Izzy's Room";
+			case 16 -> "Izzy's Room";
+			default -> "Floor " + floor;
 		};
 	}
 
@@ -44,7 +45,8 @@ public final class Floors {
 			case 11, 12, 13 -> "1000 event tickets, all three";
 			case 14 -> "the 4.9% reward on floor 11";
 			case 15 -> "upgrade your passport on floor 14";
-			default -> "1500 event tickets paid, 6 bombs used, wave 3 and a boss";
+			case 16 -> "1500 event tickets paid, 6 bombs used, wave 3 and a boss";
+			default -> "nothing opens this one yet";
 		};
 	}
 }

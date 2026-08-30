@@ -369,9 +369,4 @@ public final class Fight {
 		SPAWNED.clear();
 	}
 
-	/** Anything the player has to be alive to see. */
-	public static void announce(ServerPlayer player, LivingEntity target) {
-		player.sendSystemMessage(Component.literal(target.getName().getString()
-				+ " is still up.").withStyle(ChatFormatting.GRAY));
-	}
 }

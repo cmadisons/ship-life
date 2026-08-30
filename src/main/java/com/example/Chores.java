@@ -393,8 +393,7 @@ public final class Chores {
 	 */
 	private static void spill(ServerPlayer player, boolean fridge) {
 		ServerLevel level = (ServerLevel) player.level();
-		BlockPos from = Places.onShip(fridge ? Places.FRIDGE : Places.TOILET,
-				Places.shipOf(player.getX()));
+		BlockPos from = fridge ? Places.FRIDGE : Places.TOILET;
 		java.util.List<net.minecraft.world.entity.item.ItemEntity> dropped =
 				new java.util.ArrayList<>();
 		java.util.Random random = new java.util.Random();

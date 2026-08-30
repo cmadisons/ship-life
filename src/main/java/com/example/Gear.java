@@ -234,11 +234,6 @@ public final class Gear {
 				.withStyle(ChatFormatting.GREEN));
 	}
 
-	/** How many clouds are out. Used by anything that wants to say so. */
-	public static int clouds() {
-		return CLOUDS.size();
-	}
-
 	private static void gasTick() {
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (CLOUDS.isEmpty()) {

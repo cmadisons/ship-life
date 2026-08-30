@@ -63,12 +63,25 @@ public final class Kit {
 		return custom != null && custom.getString().equals(name);
 	}
 
-	/** Take back the chapter 1 tools -- there is nothing left to use them on. */
+	/**
+	 * Take back the tools there is nothing left to use.
+	 *
+	 * The sponge, the towel, the mower and the whacker go when chapter 1 is
+	 * behind you; the plunger and the mop go when Charlie's quest is, since
+	 * that is the last blocked toilet on the ship.
+	 */
 	public static void dropChores(ServerPlayer player) {
 		player.getInventory().clearOrCountMatchingItems(
 				stack -> is(stack, SPONGE) || is(stack, TOWEL)
 						|| is(stack, "Dirty " + SPONGE) || is(stack, "Dirty " + TOWEL)
 						|| is(stack, MOWER) || is(stack, WHACKER),
+				-1, player.inventoryMenu.getCraftSlots());
+	}
+
+	/** The plunger and the mop, once the bathroom quest is done with. */
+	public static void dropBathroom(ServerPlayer player) {
+		player.getInventory().clearOrCountMatchingItems(
+				stack -> is(stack, PLUNGER) || is(stack, MOP),
 				-1, player.inventoryMenu.getCraftSlots());
 	}
 

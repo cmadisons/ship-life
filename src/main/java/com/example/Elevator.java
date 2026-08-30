@@ -193,28 +193,28 @@ public final class Elevator {
 			return;
 		}
 		player.closeContainer();
-		ride(player, floor, Places.shipOf(player.getX()));
+		ride(player, floor);
 	}
 
 	/** Doors close, the car moves, doors open. */
-	public static void ride(ServerPlayer player, int floor, int ship) {
+	public static void ride(ServerPlayer player, int floor) {
 		ServerLevel level = (ServerLevel) player.level();
 		BlockPos from = player.blockPosition();
 
 		level.playSound(null, from, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 0.8f, 1.0f);
 		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, RIDE + 10, 0, true, false, false));
 		Hud.busy(player, RIDE + 10);
-		player.sendOverlayMessage(Component.literal("▲  Ship " + ship + ", floor " + floor
+		player.sendOverlayMessage(Component.literal("▲  Floor " + floor
 				+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
 
 		// The whirr while it moves, then the doors at the far end.
 		Ticker.after(20, () -> level.playSound(null, from,
 				SoundEvents.ELYTRA_FLYING, SoundSource.BLOCKS, 0.5f, 0.8f));
 		Ticker.after(RIDE, () -> {
-			BlockPos to = Places.onShip(Places.lift(floor), ship);
+			BlockPos to = Places.lift(floor);
 			player.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
 			level.playSound(null, to, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8f, 1.0f);
-			player.sendOverlayMessage(Component.literal("Ship " + ship + ", floor " + floor
+			player.sendOverlayMessage(Component.literal("Floor " + floor
 					+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
 
 			// Quest 3: pressing the button for floor 5 is the whole part.

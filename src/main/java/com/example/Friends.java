@@ -103,7 +103,7 @@ public final class Friends {
 	 * down a hole and Ben will not replace it.
 	 */
 	private static boolean gift(ServerPlayer player) {
-		if (!State.firstTime(player, 2)) {
+		if (!State.firstTime(player, State.Once.BENS_GIFT)) {
 			return false;
 		}
 		player.sendSystemMessage(Component.literal(
@@ -174,7 +174,7 @@ public final class Friends {
 
 	/** The boots, handed over once. */
 	private static boolean bootsFor(ServerPlayer player) {
-		if (!State.firstTime(player, 3)) {
+		if (!State.firstTime(player, State.Once.IZZYS_BOOTS)) {
 			return false;
 		}
 		player.sendSystemMessage(Component.literal(

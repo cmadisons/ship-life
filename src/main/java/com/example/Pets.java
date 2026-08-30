@@ -175,6 +175,15 @@ public final class Pets {
 	 * whole reason you are allowed more than one.
 	 */
 	public static boolean buy(ServerPlayer player, Kind kind) {
+		// A second cat does nothing at all: the floor it opens is open. So
+		// the counter says so rather than taking ten tickets for a pet that
+		// is already yours.
+		if (kind == Kind.CAT && owned(player, kind) > 0) {
+			player.sendSystemMessage(Component.literal(
+					"You have a cat, and a second one does nothing -- floor 6 is "
+					+ "already open.").withStyle(ChatFormatting.GRAY));
+			return false;
+		}
 		if (State.arcade(player) < PRICE) {
 			player.sendSystemMessage(Component.literal("That costs " + PRICE
 					+ " tickets and you have " + State.arcade(player) + ".")

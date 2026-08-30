@@ -115,9 +115,6 @@ public final class Skip {
 		if (!Kit.is(player.getInventory().getItem(Slots.PASSPORT_SLOT), Kit.PASSPORT)) {
 			player.getInventory().setItem(Slots.PASSPORT_SLOT, Kit.passport());
 		}
-		// Floor 15 is meant to come with the passport upgrade, so a passport
-		// that does not know about it would leave that floor half open.
-		player.setAttached(State.SHIPS, 2);
 
 		if (opened == 0) {
 			source.sendFailure(Component.literal("Every floor is already open."));

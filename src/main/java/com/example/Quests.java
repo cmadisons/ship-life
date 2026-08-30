@@ -159,6 +159,16 @@ public final class Quests {
 		// The whole quest is done.
 		player.setAttached(State.PART, 0);
 		player.setAttached(State.QUEST, State.quest(player) + 1);
+
+		// Chapter 1's tools go when chapter 1 does, and the plunger and mop
+		// go when the bathroom quest does. Carrying a mop around floor 10 was
+		// never the idea.
+		if (State.quest(player) == 1) {
+			Kit.dropChores(player);
+		}
+		if (State.quest(player) == 5) {
+			Kit.dropBathroom(player);
+		}
 		player.sendSystemMessage(Component.literal("Quest done: ")
 				.withStyle(ChatFormatting.GREEN)
 				.append(Component.literal(quest.name()).withStyle(ChatFormatting.WHITE)));
