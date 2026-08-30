@@ -189,18 +189,32 @@ public final class Chores {
 		}
 
 		// --- the weeds --------------------------------------------------------
-		if (Kit.is(held, Kit.WHACKER) && Quests.on(player, 0, 1)) {
+		//
+		// Holding the whacker is the whole condition. It used to also want you
+		// to be on that exact part of that exact quest, so picking the whacker
+		// up at any other moment got you a tool that did nothing to a weed.
+		// The quest still only counts while the quest is on.
+		if (Kit.is(held, Kit.WHACKER)) {
 			for (int i = 0; i < 10; i++) {
-				if (pos.equals(Places.weed(i)) || pos.equals(Places.weed(i).below())) {
-					if (level.getBlockState(Places.weed(i)).isAir()) {
-						return InteractionResult.SUCCESS;
-					}
-					level.setBlockAndUpdate(Places.weed(i),
-							net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-					level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.8f, 1.2f);
-					Quests.did(player);
+				if (!pos.equals(Places.weed(i)) && !pos.equals(Places.weed(i).below())
+						&& !pos.equals(Places.weed(i).above())) {
+					continue;
+				}
+				if (level.getBlockState(Places.weed(i)).isAir()) {
+					say(player, "That one is already out.");
 					return InteractionResult.SUCCESS;
 				}
+				level.setBlockAndUpdate(Places.weed(i),
+						net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+				level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS,
+						0.8f, 1.2f);
+				level.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
+						Places.weed(i).getX() + 0.5, Places.weed(i).getY() + 0.3,
+						Places.weed(i).getZ() + 0.5, 6, 0.25, 0.2, 0.25, 0.0);
+				if (Quests.on(player, 0, 1)) {
+					Quests.did(player);
+				}
+				return InteractionResult.SUCCESS;
 			}
 		}
 
