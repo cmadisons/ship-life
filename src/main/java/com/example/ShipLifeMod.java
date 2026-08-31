@@ -244,6 +244,11 @@ public class ShipLifeMod implements ModInitializer {
 		// too, because a world you are building in still wants the floors and
 		// the people the mod has grown since. This one only ever adds.
 		Ship.catchUp(level);
+		for (ServerLevel each : level.getServer().getAllLevels()) {
+			if (isShipLife(each)) {
+				Kart.sweep(each);
+			}
+		}
 		Person.everyone(level);
 
 		// The hearts the gym gave you are not saved with you -- the lifts are

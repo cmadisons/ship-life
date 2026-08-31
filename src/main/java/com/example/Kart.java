@@ -74,7 +74,13 @@ public final class Kart {
 	public static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			for (ServerLevel level : server.getAllLevels()) {
-				if (!ShipLifeMod.isShipLife(level)) {
+				// The Nether of a Ship Life world counts as a Ship Life world, and
+				// the track is not out there. Without this the upkeep looked for
+				// karts at floor 6's coordinates in the Nether, found nothing
+				// because there is no floor 6 there, and spawned five more every
+				// two seconds for ever.
+				if (!ShipLifeMod.isShipLife(level)
+						|| level.dimension() != net.minecraft.world.level.Level.OVERWORLD) {
 					continue;
 				}
 				if (server.getTickCount() % 40 == 0) {
@@ -215,6 +221,42 @@ public final class Kart {
 		}
 	}
 
+	/**
+	 * Sweep up karts that were spawned where no track is.
+	 *
+	 * Worlds that ran the broken upkeep have a drift of minecarts and armour
+	 * stands in the Nether, five more for every two seconds anybody was in
+	 * one. They are cleared wherever they are not on the track.
+	 */
+	public static void sweep(ServerLevel level) {
+		boolean track = level.dimension() == net.minecraft.world.level.Level.OVERWORLD
+				&& (level.getBlockState(Places.KART_LINE).is(Blocks.RAIL)
+						|| level.getBlockState(Places.KART_LINE).is(Blocks.POWERED_RAIL));
+		AABB keep = floorSix();
+		int gone = 0;
+		for (Minecart kart : level.getEntitiesOfClass(Minecart.class,
+				new AABB(-30_000_000, level.getMinY(), -30_000_000,
+						30_000_000, level.getMaxY(), 30_000_000),
+				cart -> cart.getPassengers().stream().anyMatch(ArmorStand.class::isInstance))) {
+			if (track && keep.contains(kart.getX(), kart.getY(), kart.getZ())) {
+				continue;
+			}
+			kart.getPassengers().forEach(net.minecraft.world.entity.Entity::discard);
+			kart.discard();
+			gone++;
+		}
+		if (gone > 0) {
+			ShipLifeMod.LOGGER.info("Cleared {} kart(s) that were off the track.", gone);
+		}
+	}
+
+	/** The box the track lives in. */
+	private static AABB floorSix() {
+		return new AABB(
+				Places.SHIP_X - Places.ROOM, Places.floorY(6), Places.SHIP_Z - Places.ROOM,
+				Places.SHIP_X + Places.ROOM, Places.floorY(6) + 6, Places.SHIP_Z + Places.ROOM);
+	}
+
 	// ----------------------------------------------------------- the rivals
 
 	/**
@@ -225,9 +267,13 @@ public final class Kart {
 	 * round a track does not read as a race.
 	 */
 	private static void keepRivalsRunning(ServerLevel level) {
-		AABB floor = new AABB(
-				Places.SHIP_X - Places.ROOM, Places.floorY(6), Places.SHIP_Z - Places.ROOM,
-				Places.SHIP_X + Places.ROOM, Places.floorY(6) + 6, Places.SHIP_Z + Places.ROOM);
+		// No rail, no race. Belt and braces with the dimension check: nothing
+		// puts a kart anywhere the track has not actually been laid.
+		if (!level.getBlockState(Places.KART_LINE).is(Blocks.RAIL)
+				&& !level.getBlockState(Places.KART_LINE).is(Blocks.POWERED_RAIL)) {
+			return;
+		}
+		AABB floor = floorSix();
 		List<Minecart> karts = level.getEntitiesOfClass(Minecart.class, floor,
 				cart -> cart.getPassengers().stream().anyMatch(ArmorStand.class::isInstance));
 
