@@ -79,6 +79,15 @@ public final class Places {
 	/** How far a floor reaches from the middle. */
 	public static final int ROOM = 12;
 
+	/**
+	 * How far out ship 2's walls stand.
+	 *
+	 * Twenty-five blocks wider and longer than this one: forty-nine across
+	 * where the first ship is twenty-five. Everything in it sits in the same
+	 * place, with a great deal more room around it.
+	 */
+	public static final int ROOM_TWO = ROOM + 12;
+
 	/** How tall one floor is, floor to floor. */
 	public static final int FLOOR_HEIGHT = 8;
 

@@ -125,7 +125,12 @@ public final class Ship {
 	 * somebody comes through the portal on 18.
 	 */
 	public static void buildInTheNether(ServerLevel nether) {
-		if (nether.getBlockState(Places.panel(1)).is(Made.elevatorButton)) {
+		// Built once -- unless what is standing there is the old narrow one,
+		// in which case it is built again at the size it should be.
+		boolean wideEnough = nether.getBlockState(new net.minecraft.core.BlockPos(
+				Places.SHIP_X + Places.ROOM_TWO, Places.floorY(1), Places.SHIP_Z))
+				.is(Blocks.BLACK_CONCRETE);
+		if (nether.getBlockState(Places.panel(1)).is(Made.elevatorButton) && wideEnough) {
 			return;
 		}
 		buildShip(nether);
@@ -146,14 +151,19 @@ public final class Ship {
 		int x = Places.SHIP_X;
 		int z = Places.SHIP_Z;
 
-		// Clear the lobby's furniture out: this floor is something else here.
-		fill(level, x - 11, y + 1, z - 11, x + 11, y + 6, z + 11, Blocks.AIR);
+		int r = roomOf(level) - 1;
 
-		// The pool: sunk four deep, tiled, and filled.
-		fill(level, x - 8, y - 4, z - 6, x + 8, y - 1, z + 6, Blocks.WATER);
-		for (int dx = -9; dx <= 9; dx++) {
-			for (int dz = -7; dz <= 7; dz++) {
-				boolean inside = Math.abs(dx) <= 8 && Math.abs(dz) <= 6;
+		// Clear the lobby's furniture out: this floor is something else here.
+		fill(level, x - r, y + 1, z - r, x + r, y + 6, z + r, Blocks.AIR);
+
+		// The pool: sunk four deep, tiled, and filled. It is as big as the
+		// floor it is in, which on this ship is a great deal bigger.
+		int poolX = r - 4;
+		int poolZ = r - 6;
+		fill(level, x - poolX, y - 4, z - poolZ, x + poolX, y - 1, z + poolZ, Blocks.WATER);
+		for (int dx = -poolX - 1; dx <= poolX + 1; dx++) {
+			for (int dz = -poolZ - 1; dz <= poolZ + 1; dz++) {
+				boolean inside = Math.abs(dx) <= poolX && Math.abs(dz) <= poolZ;
 				set(level, new BlockPos(x + dx, y - 5, z + dz),
 						inside ? Blocks.PRISMARINE_BRICKS : Blocks.PRISMARINE);
 				if (!inside) {
@@ -162,18 +172,19 @@ public final class Ship {
 				}
 			}
 		}
-		fill(level, x - 8, y, z - 6, x + 8, y, z + 6, Blocks.AIR);
+		fill(level, x - poolX, y, z - poolZ, x + poolX, y, z + poolZ, Blocks.AIR);
 
 		// The diving board: a plank walk on two legs over the deep end.
+		int board = x - poolX - 2;
 		for (int dz = -1; dz <= 1; dz++) {
-			fill(level, x - 11, y + 1, z + dz, x - 11, y + 3, z + dz, Blocks.PRISMARINE);
+			fill(level, board, y + 1, z + dz, board, y + 3, z + dz, Blocks.PRISMARINE);
 		}
-		for (int dx = 0; dx <= 4; dx++) {
-			set(level, new BlockPos(x - 11 + dx, y + 4, z), Blocks.OAK_PLANKS);
-			set(level, new BlockPos(x - 11 + dx, y + 4, z - 1), Blocks.OAK_SLAB);
-			set(level, new BlockPos(x - 11 + dx, y + 4, z + 1), Blocks.OAK_SLAB);
+		for (int dx = 0; dx <= 5; dx++) {
+			set(level, new BlockPos(board + dx, y + 4, z), Blocks.OAK_PLANKS);
+			set(level, new BlockPos(board + dx, y + 4, z - 1), Blocks.OAK_SLAB);
+			set(level, new BlockPos(board + dx, y + 4, z + 1), Blocks.OAK_SLAB);
 		}
-		set(level, new BlockPos(x - 12, y + 5, z), Blocks.SEA_LANTERN);
+		set(level, new BlockPos(board - 1, y + 5, z), Blocks.SEA_LANTERN);
 
 		// The hot tub: warm water, bubbles up the middle, a fountain over it.
 		fill(level, Places.HOT_TUB.getX() - 2, y, Places.HOT_TUB.getZ() - 2,
@@ -238,11 +249,23 @@ public final class Ship {
 	}
 
 	
+	/**
+	 * How wide the ship is in this level.
+	 *
+	 * One ship is twenty-five across; the one in the Nether is forty-nine.
+	 * Everything else about them is the same, so this one number is the whole
+	 * difference as far as the building goes.
+	 */
+	static int roomOf(ServerLevel level) {
+		return level.dimension() == net.minecraft.world.level.Level.NETHER
+				? Places.ROOM_TWO : Places.ROOM;
+	}
+
 	private static void buildFloor(ServerLevel level, int floor) {
 		int y = Places.floorY(floor);
 		int x = Places.SHIP_X;
 		int z = Places.SHIP_Z;
-		int r = Places.ROOM;
+		int r = roomOf(level);
 
 		// The hull is two blocks thick, and the second block goes on the
 		// outside -- putting it inside would take a block off every room and
@@ -738,6 +761,12 @@ public final class Ship {
 		set(level, new BlockPos(x + 3, y + 1, z), Blocks.SHROOMLIGHT);
 
 		// The flint and steel lives up here, on a stand beside the frame.
+		// Whoever built this ship left one, and it stays left: take another
+		// whenever you want one.
+		set(level, Places.FLINT_STAND, Blocks.POLISHED_BLACKSTONE);
+		set(level, Places.FLINT_STAND.above(), Blocks.LANTERN);
+
+		// The flint and steel lives up here, on a stand beside the frame.
 		// Whoever built this ship left one, and it stays left: take it as
 		// often as you like.
 		set(level, Places.FLINT_STAND, Blocks.POLISHED_BLACKSTONE);
@@ -794,7 +823,7 @@ public final class Ship {
 	 * reads as a ship rather than as a tower.
 	 */
 	private static void furnishHull(ServerLevel level) {
-		int r = Places.ROOM + 1;
+		int r = roomOf(level) + 1;
 		int x = Places.SHIP_X;
 		int z = Places.SHIP_Z;
 		int top = Places.floorY(Places.TOP_FLOOR) + 8;
