@@ -80,8 +80,19 @@ public final class Gym {
 		}
 		Hud.busy(player, 20);
 		player.sendOverlayMessage(Component.literal("Lift " + done + "  --  "
-				+ (PER_HEART - done % PER_HEART) + " to the next heart")
+				+ (PER_HEART - done % PER_HEART) + " to the next heart  ·  "
+				+ hearts(player) + "/" + MOST_HEARTS + " hearts")
 				.withStyle(ChatFormatting.GRAY));
+
+		// The board on the wall: what you have done, and what is left.
+		if (done % 25 == 0) {
+			player.sendSystemMessage(Component.literal(done + " lifts. "
+					+ (hearts(player) >= MOST_HEARTS
+							? "Nobody on this ship has done more."
+							: (MOST_HEARTS - hearts(player)) + " hearts still in it."))
+					.withStyle(ChatFormatting.LIGHT_PURPLE));
+			Log.write(player, done + " lifts in the gym");
+		}
 	}
 
 	/** How many hearts the gym has given them. */

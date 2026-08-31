@@ -59,6 +59,24 @@ public final class Fishing {
 						Places.FISHING.getZ() + 0.5) < 36.0;
 	}
 
+	/** What comes up that nobody wanted. */
+	private static net.minecraft.world.item.ItemStack junk() {
+		return switch (RANDOM.nextInt(6)) {
+			case 0 -> Kit.make(net.minecraft.world.item.Items.LEATHER_BOOTS,
+					"A Wet Boot", ChatFormatting.GRAY, "Off the bottom of the pond.");
+			case 1 -> Kit.make(net.minecraft.world.item.Items.STICK,
+					"A Bit of Rail", ChatFormatting.GRAY, "Off the track on 6, probably.");
+			case 2 -> Kit.make(net.minecraft.world.item.Items.PAPER,
+					"A Soggy Ticket", ChatFormatting.GRAY, "Nobody is honouring this.");
+			case 3 -> Kit.make(net.minecraft.world.item.Items.BOWL,
+					"A Bowl from the Buffet", ChatFormatting.GRAY, "The cook will want it back.");
+			case 4 -> Kit.make(net.minecraft.world.item.Items.STRING,
+					"Tangled Line", ChatFormatting.GRAY, "Somebody else's, once.");
+			default -> Kit.make(net.minecraft.world.item.Items.LILY_PAD,
+					"Pond Weed", ChatFormatting.GRAY, "It grows fast out here.");
+		};
+	}
+
 	private static void bite(ServerPlayer player, ServerLevel level) {
 		long now = level.getGameTime();
 		Long last = LAST.get(player.getUUID());
@@ -69,6 +87,19 @@ public final class Fishing {
 
 		level.playSound(null, player.blockPosition(), SoundEvents.FISHING_BOBBER_SPLASH,
 				SoundSource.PLAYERS, 0.7f, 1.4f);
+
+		// One cast in five brings up something nobody wanted. It is a ship in
+		// space with a pond on the balcony; of course there is junk in it.
+		if (RANDOM.nextInt(5) == 0) {
+			net.minecraft.world.item.ItemStack junk = junk();
+			if (!player.getInventory().add(junk)) {
+				player.drop(junk, false);
+			}
+			player.sendSystemMessage(Component.literal("You pull up "
+					+ junk.getHoverName().getString() + ". Somebody's, once.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
 
 		// One cast in eight brings up dinner instead of tickets.
 		if (RANDOM.nextInt(8) == 0) {

@@ -132,7 +132,7 @@ public final class Hud {
 				String.valueOf(colourFor(blocks).getColor() == null
 						? 0xFFFFFF : colourFor(blocks).getColor()),
 				String.valueOf(x), String.valueOf(y), String.valueOf(z),
-				Cal.clock(),
+				Cal.clock() + "  " + Log.rank(player),
 				Cal.weekday() + " " + Cal.dayOfMonth() + " " + Cal.month(),
 				State.dollars(State.money(player)),
 				String.valueOf(State.arcade(player)),

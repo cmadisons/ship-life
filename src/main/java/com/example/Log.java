@@ -75,6 +75,33 @@ public final class Log {
 		return out;
 	}
 
+	/**
+	 * What the ship calls you.
+	 *
+	 * Worked out from how much of it you have done rather than kept anywhere,
+	 * so it can never disagree with the rest of the game. It sits on the HUD
+	 * beside the clock.
+	 */
+	public static String rank(ServerPlayer player) {
+		int done = count(player);
+		if (done >= FEATS.length) {
+			return "Captain";
+		}
+		if (done >= 12) {
+			return "First Mate";
+		}
+		if (done >= 9) {
+			return "Bosun";
+		}
+		if (done >= 6) {
+			return "Able Seaman";
+		}
+		if (done >= 3) {
+			return "Deckhand";
+		}
+		return "Passenger";
+	}
+
 	// ------------------------------------------------------- what you have done
 
 	/** One thing worth having done. */

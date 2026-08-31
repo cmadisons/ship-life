@@ -85,6 +85,14 @@ public final class Comforts {
 				intercom(who, level);
 				return InteractionResult.SUCCESS;
 			}
+			if (pos.equals(Places.TELESCOPE) || pos.equals(Places.TELESCOPE.above())) {
+				telescope(who, level);
+				return InteractionResult.SUCCESS;
+			}
+			if (pos.equals(Places.GUEST_BELL)) {
+				ringForSomebody(who, level);
+				return InteractionResult.SUCCESS;
+			}
 			return InteractionResult.PASS;
 		});
 	}
@@ -312,6 +320,75 @@ public final class Comforts {
 								? "  Nothing tomorrow either."
 								: "  Tomorrow: " + next + ".")
 						.withStyle(ChatFormatting.GRAY)));
+	}
+
+	/**
+	 * The telescope on the balcony: it tells you what you are looking at.
+	 *
+	 * Which way you are facing is the whole of it. The ship is west, the town
+	 * is west of that, the Nether is straight down through eighteen floors,
+	 * and everything else out there is space.
+	 */
+	private static void telescope(ServerPlayer player, ServerLevel level) {
+		level.playSound(null, Places.TELESCOPE, SoundEvents.SPYGLASS_USE,
+				SoundSource.BLOCKS, 0.8f, 1.0f);
+		float facing = player.getYRot();
+		String seen;
+		if (player.getXRot() > 45) {
+			seen = "Straight down. Eighteen floors of ship, and then nothing.";
+		} else if (player.getXRot() < -45) {
+			seen = "Stars. They do not move, and neither do we, whatever the brochure said.";
+		} else if (facing > -45 && facing < 45) {
+			seen = "The far rail, and past it the dark.";
+		} else if (facing >= 45 && facing < 135) {
+			seen = "The hull, all the way up. Eighteen decks and the nose over the top.";
+		} else if (facing >= -135 && facing <= -45) {
+			seen = "Open space, and something a long way off that might be moving.";
+		} else {
+			seen = "The town: three houses, a lawn, and the walkway you came in on.";
+		}
+		player.sendSystemMessage(Component.literal("Through the telescope: ")
+				.withStyle(ChatFormatting.GRAY)
+				.append(Component.literal(seen).withStyle(ChatFormatting.WHITE)));
+	}
+
+	/**
+	 * The bell in your room: somebody comes round.
+	 *
+	 * The guest cabin is your room with a friend in it. Ring the bell and
+	 * whoever you know best turns up for a while -- Izzy if you have met her,
+	 * Ben if not -- and stands about the way a guest does.
+	 */
+	private static void ringForSomebody(ServerPlayer player, ServerLevel level) {
+		level.playSound(null, Places.GUEST_BELL, SoundEvents.BELL_BLOCK,
+				SoundSource.BLOCKS, 0.8f, 1.0f);
+
+		boolean izzy = Friends.knows(player, Friends.IZZY);
+		boolean ben = Friends.knows(player, Friends.BEN);
+		if (!ben && !izzy) {
+			player.sendSystemMessage(Component.literal(
+					"Nobody to ring for yet. Ben is on 15.").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		BlockPos spot = Places.GUEST_BELL.south(2);
+		String who = izzy ? Person.IZZY : Person.BEN;
+		ChatFormatting colour = izzy ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.AQUA;
+
+		// One guest at a time, and they go home when you next ring.
+		for (Person guest : level.getEntitiesOfClass(Person.class,
+				new net.minecraft.world.phys.AABB(spot).inflate(6.0))) {
+			if (guest.getCustomName() != null
+					&& guest.getCustomName().getString().equals(who)) {
+				guest.discard();
+				player.sendSystemMessage(Component.literal("They head back upstairs.")
+						.withStyle(ChatFormatting.GRAY));
+				return;
+			}
+		}
+		Person.place(level, spot, who, colour);
+		player.sendSystemMessage(Component.literal(
+				"Somebody comes round. Ring again when you want the room back.")
+				.withStyle(ChatFormatting.WHITE));
 	}
 
 	static SimpleContainer blank() {

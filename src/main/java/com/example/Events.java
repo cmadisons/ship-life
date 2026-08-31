@@ -45,7 +45,46 @@ public final class Events {
 					"The ship flies to a Star Wars planet."),
 	};
 
+	/**
+	 * Fireworks off the balcony, on the days something is on.
+	 *
+	 * Not on Quest Day, which is most days and would make them wallpaper --
+	 * only on the five that come round rarely enough to be worth marking.
+	 */
+	private static void fireworks() {
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % 200 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				for (ServerPlayer player : level.players()) {
+					String on = running(player);
+					if (on == null || on.equals("Quest Day")) {
+						continue;
+					}
+					// Only if somebody is out there to see them.
+					if (player.blockPosition().distSqr(Places.BALCONY) > 400) {
+						continue;
+					}
+					net.minecraft.world.item.ItemStack rocket =
+							new net.minecraft.world.item.ItemStack(Items.FIREWORK_ROCKET);
+					net.minecraft.world.entity.projectile.FireworkRocketEntity shot =
+							new net.minecraft.world.entity.projectile.FireworkRocketEntity(
+									level, Places.BALCONY.getX() + 3.5,
+									Places.BALCONY.getY() + 1.0,
+									Places.BALCONY.getZ() + 0.5, rocket);
+					level.addFreshEntity(shot);
+				}
+			}
+		});
+	}
+
 	public static void register() {
+		fireworks();
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (player instanceof ServerPlayer who && world instanceof ServerLevel level
 					&& ShipLifeMod.isShipLife(level)

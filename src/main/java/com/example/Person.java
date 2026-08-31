@@ -157,6 +157,8 @@ public class Person extends PathfinderMob {
 						|| two.getCustomName() == null) {
 					continue;
 				}
+				// Two of the same person stood on each other is a mistake; the
+				// same person in two rooms is a guest, and stays.
 				if (one.getCustomName().getString().equals(two.getCustomName().getString())
 						&& one.distanceToSqr(two) < 16.0) {
 					two.discard();

@@ -141,31 +141,34 @@ one off when it is done, add to it whenever something comes up.
 
 ## Add (round two)
 
+The struck-through ones are done.
+
+
 1. Chapter 5, and an ending the whole game builds to
 2. A job on the ship that pays money, not tickets
 3. A friend on ship 2 who only exists over there
-4. Boss drops -- something to carry away, not just tickets
+4. ~~Boss drops -- something to carry away, not just tickets~~ **done**
 5. A quest that sends you into the Nether ship
 6. A shop on ship 2 that sells what the overworld one does not
-7. Enchanting for the plant set
-8. A pet that follows you into the Nether
-9. A locker in your room for the things you are not carrying
-10. A second racer, so floor 6 is a field and not a duel
-11. A diving board over the pool
-12. Achievements with names, listed in the book
-13. A ship's log that writes down what you did each day
-14. Weather in the town -- rain on the island
+7. ~~Enchanting for the plant set~~ **done**
+8. ~~A pet that follows you into the Nether~~ **done**
+9. ~~A locker in your room for the things you are not carrying~~ **done**
+10. ~~A second racer, so floor 6 is a field and not a duel~~ **done**
+11. ~~A diving board over the pool~~ **done**
+12. ~~Achievements with names, listed in the book~~ **done**
+13. ~~A ship's log that writes down what you did each day~~ **done**
+14. ~~Weather in the town -- rain on the island~~ **done**
 15. A tram along the gangway
-16. A pet shop trade-in: two of a kind for something better
-17. A boss rush: all five, one after another, for a big payout
-18. Fireworks off the balcony on event days
+16. ~~A pet shop trade-in: two of a kind for something better~~ **done**
+17. ~~A boss rush: all five, one after another, for a big payout~~ **done**
+18. ~~Fireworks off the balcony on event days~~ **done**
 19. A second buffet on ship 2, run by somebody else
-20. A gym leaderboard against the racer's time
-21. Ranks -- deckhand to captain -- shown on the HUD
+20. ~~A gym leaderboard against the racer's time~~ **done**
+21. ~~Ranks -- deckhand to captain -- shown on the HUD~~ **done**
 22. A key that opens one locked floor of your choosing
-23. Fishing that pulls up junk as well as tickets
-24. A telescope on the balcony that names what you are looking at
-25. A guest cabin you can invite somebody into
+23. ~~Fishing that pulls up junk as well as tickets~~ **done**
+24. ~~A telescope on the balcony that names what you are looking at~~ **done**
+25. ~~A guest cabin you can invite somebody into~~ **done**
 
 ## Take away (round two)
 
@@ -198,7 +201,7 @@ one off when it is done, add to it whenever something comes up.
 ## Change (round two)
 
 1. The Nether ship has no way back except the portal you came through
-2. Ship 2 is identical -- nothing over there is its own
+2. ~~Ship 2 is identical~~ **done**: its floor 1 is the pool deck
 3. Mana only does one thing
 4. The gym caps at ten hearts with nothing after
 5. Fishing pays the same wherever you cast

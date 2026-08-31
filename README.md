@@ -44,6 +44,10 @@ that -- and chapters past 4.
 
 - **Floor 17, the weapon store** — a sword and a bow at 100 event tickets each, and the teleport pair at 250. Right-click either teleport weapon and you are wherever you were pointing, up to thirty-two blocks, for twenty-five mana out of a hundred that comes back four a second. The floor opens when you are wearing the whole plant set and own every floor below it; floor 18 opens once you are carrying a sword and a bow.
 
+- **Ship 2, through the portal on 18** — the same ship in the Nether, except its floor 1, which is the pool done properly: a diving board over the deep end, a hot tub with a fountain, a locker and a changing stall.
+- **The bench on 17** — two boss drops buys a piece of work on whatever plant armour you are wearing.
+- **The book's second page** — the ship's log a line a day, and fifteen named things to have done. What they add up to is your rank, which sits on the HUD.
+
 ### The commands
 
 `/shiplife` skips chapter 1 -- it pays the hundred dollars, takes the chore
