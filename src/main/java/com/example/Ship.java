@@ -1545,6 +1545,45 @@ public final class Ship {
 			}
 		}
 
+		// Fittings that came after the world did. These used to sit in
+		// repair(), which does not run for anyone in creative -- so the
+		// people most likely to be looking round the ship were the ones
+		// who never got the pool, the track or the lift cars.
+		// The pool used to be a glass tank standing on the floor.
+		if (!level.getBlockState(new BlockPos(Places.SHIP_X, Places.floorY(3), Places.SHIP_Z))
+				.is(Blocks.WATER)) {
+			furnishPool(level);
+			ShipLifeMod.LOGGER.info("Sank the pool into the floor of floor 3.");
+		}
+		// The lift was a button on a wall before it was a car you walk into.
+		if (!level.getBlockState(Places.liftDoorEast(1)).is(Blocks.OAK_DOOR)) {
+			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
+				liftCar(level, floor);
+
+		// The floor's name on the wall, where you step out of the lift.
+		nameOnTheWall(level, floor);
+				BlockPos wasPanel = new BlockPos(Places.SHIP_X - Places.ROOM + 1,
+						Places.floorY(floor) + 1, Places.SHIP_Z - Places.ROOM + 1);
+				set(level, wasPanel, Blocks.AIR);
+				set(level, wasPanel.above(), Blocks.AIR);
+			}
+			ShipLifeMod.LOGGER.info("Built a lift car on all {} floors.", Places.TOP_FLOOR);
+		}
+		// Floor 6 was a strip of concrete before the karts had a loop to run.
+		// A corner that is not a curve means the loop was laid before the
+		// shapes were spelled out, and is a ring of disconnected sleepers.
+		BlockPos corner = new BlockPos(Places.SHIP_X - Places.KART_HALF_WIDTH,
+				Places.KART_Y, Places.SHIP_Z - Places.KART_HALF_DEPTH);
+		if (!level.getBlockState(corner).is(Blocks.RAIL)
+				|| level.getBlockState(corner).getValue(RailBlock.SHAPE) != RailShape.SOUTH_EAST) {
+			furnishRace(level);
+			ShipLifeMod.LOGGER.info("Laid the kart track round floor 6.");
+		}
+		// Floor 4 was an empty room until the buffet was built into it.
+		if (!level.getBlockState(Places.BUFFET_COOK).is(Blocks.SMOKER)) {
+			furnishBuffet(level);
+			ShipLifeMod.LOGGER.info("Laid the buffet out on floor 4.");
+		}
 		// Ship 2 came out of the lift, so it comes out of the world.
 		clearSecond(level);
 	}
@@ -1656,41 +1695,6 @@ public final class Ship {
 		furnishGym(level);
 		furnishBalcony(level);
 			ShipLifeMod.LOGGER.info("Put the arcade into a world built before it.");
-		}
-		// The pool used to be a glass tank standing on the floor.
-		if (!level.getBlockState(new BlockPos(Places.SHIP_X, Places.floorY(3), Places.SHIP_Z))
-				.is(Blocks.WATER)) {
-			furnishPool(level);
-			ShipLifeMod.LOGGER.info("Sank the pool into the floor of floor 3.");
-		}
-		// The lift was a button on a wall before it was a car you walk into.
-		if (!level.getBlockState(Places.liftDoorEast(1)).is(Blocks.OAK_DOOR)) {
-			for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-				liftCar(level, floor);
-
-		// The floor's name on the wall, where you step out of the lift.
-		nameOnTheWall(level, floor);
-				BlockPos wasPanel = new BlockPos(Places.SHIP_X - Places.ROOM + 1,
-						Places.floorY(floor) + 1, Places.SHIP_Z - Places.ROOM + 1);
-				set(level, wasPanel, Blocks.AIR);
-				set(level, wasPanel.above(), Blocks.AIR);
-			}
-			ShipLifeMod.LOGGER.info("Built a lift car on all {} floors.", Places.TOP_FLOOR);
-		}
-		// Floor 6 was a strip of concrete before the karts had a loop to run.
-		// A corner that is not a curve means the loop was laid before the
-		// shapes were spelled out, and is a ring of disconnected sleepers.
-		BlockPos corner = new BlockPos(Places.SHIP_X - Places.KART_HALF_WIDTH,
-				Places.KART_Y, Places.SHIP_Z - Places.KART_HALF_DEPTH);
-		if (!level.getBlockState(corner).is(Blocks.RAIL)
-				|| level.getBlockState(corner).getValue(RailBlock.SHAPE) != RailShape.SOUTH_EAST) {
-			furnishRace(level);
-			ShipLifeMod.LOGGER.info("Laid the kart track round floor 6.");
-		}
-		// Floor 4 was an empty room until the buffet was built into it.
-		if (!level.getBlockState(Places.BUFFET_COOK).is(Blocks.SMOKER)) {
-			furnishBuffet(level);
-			ShipLifeMod.LOGGER.info("Laid the buffet out on floor 4.");
 		}
 		int replaced = 0;
 		for (int i = 0; i < 5; i++) {
