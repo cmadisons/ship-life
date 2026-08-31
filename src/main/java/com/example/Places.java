@@ -286,6 +286,10 @@ public final class Places {
 	public static final BlockPos MAGMA_DOOR =
 			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z - 10);
 
+	/** The button on floor 10 that starts all five, one after another. */
+	public static final BlockPos RUSH_BUTTON =
+			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z + 10);
+
 	/** Where a boss comes in. */
 	public static final BlockPos BOSS_SPOT =
 			new BlockPos(SHIP_X, floorY(10) + 1, SHIP_Z + 4);
@@ -295,6 +299,20 @@ public final class Places {
 
 	/** The bench beside the weapon counter, for putting work into the set. */
 	public static final BlockPos BENCH = new BlockPos(SHIP_X + 4, floorY(17) + 1, SHIP_Z - 8);
+
+	/**
+	 * Ship 2's floor 1: the pool that is better than the pool.
+	 *
+	 * These are all in the Nether, at the same coordinates as the overworld
+	 * ship, so what tells them apart is which level you are standing in.
+	 */
+	public static final BlockPos DIVING_BOARD =
+			new BlockPos(SHIP_X - 7, GROUND + 4, SHIP_Z);
+	public static final BlockPos HOT_TUB = new BlockPos(SHIP_X + 8, GROUND + 1, SHIP_Z + 7);
+	public static final BlockPos POOL_LOCKER =
+			new BlockPos(SHIP_X - 9, GROUND + 1, SHIP_Z + 8);
+	public static final BlockPos POOL_WARDROBE =
+			new BlockPos(SHIP_X - 9, GROUND + 1, SHIP_Z - 8);
 
 	/** The telescope on the balcony. */
 	public static final BlockPos TELESCOPE =

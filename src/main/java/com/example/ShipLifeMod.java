@@ -154,6 +154,28 @@ public class ShipLifeMod implements ModInitializer {
 			}
 		});
 
+		// Weather over the town. The island had none at all: the sky was the
+		// same blue every day of a game about days. One ship day in four it
+		// rains, and it stops when the day does.
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (server.getTickCount() % 600 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!isShipLife(level)
+						|| level.dimension() != net.minecraft.world.level.Level.OVERWORLD) {
+					continue;
+				}
+				boolean wet = Math.floorMod(Cal.dayNumber() * 31L, 4L) == 0;
+				var weather = level.getWeatherData();
+				if (wet != weather.isRaining()) {
+					weather.setRaining(wet);
+					weather.setRainTime(wet ? 12000 : 0);
+					weather.setClearWeatherTime(wet ? 0 : 12000);
+				}
+			}
+		});
+
 		LOGGER.info("Ship Life is aboard.");
 	}
 
@@ -211,6 +233,7 @@ public class ShipLifeMod implements ModInitializer {
 		Gear.openSeventeen(player);
 		Weapons.openEighteen(player);
 		Comforts.trophies(player, level);
+		Log.check(player);
 
 		// Where the world puts people who have not chosen a bed. Set on every
 		// join rather than only on a fresh world, so worlds made before this

@@ -40,7 +40,7 @@ public final class State {
 	 */
 	public static void register() {
 		// Touching the class is the point; this line is just proof it happened.
-		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 33);
+		ShipLifeMod.LOGGER.info("Ship Life remembers {} things about you.", 35);
 	}
 
 	private static <T> AttachmentType<T> of(String name, T start, Codec<T> codec) {
@@ -109,6 +109,10 @@ public final class State {
 
 	/** The best five at each cabinet, as "snake:12,9,4|pacman:...|galaga:...". */
 	public static final AttachmentType<String> TOP_FIVE = of("top_five", "", Codec.STRING);
+
+	/** The ship's log, a line a day, and how many things you have done. */
+	public static final AttachmentType<String> LOG = of("log", "", Codec.STRING);
+	public static final AttachmentType<Integer> FEATS = of("feats", 0, Codec.INT);
 
 	/** Mana, for the teleport weapons off floor 17. */
 	public static final AttachmentType<Integer> MANA = of("mana", 100, Codec.INT);

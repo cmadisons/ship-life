@@ -245,6 +245,34 @@ public final class Pets {
 		return true;
 	}
 
+	/**
+	 * Two of a kind in, one fed to the top out.
+	 *
+	 * A second of something doubled its boost, which is the same as a fed one
+	 * at x2 -- so this takes the pair and gives back one that is already
+	 * there, and the pet food you would have spent stays in your pocket.
+	 */
+	public static void trade(ServerPlayer player, Kind kind) {
+		if (owned(player, kind) < 2) {
+			return;
+		}
+		player.setAttached(OWNED[kind.ordinal()], owned(player, kind) - 1);
+
+		// Fed to the top: eight helpings is 1.1 to the seventh, which caps.
+		java.util.List<String> parts = new java.util.ArrayList<>();
+		for (String part : State.petFood(player).split(",")) {
+			if (!part.isEmpty() && !part.startsWith(kind.name() + ":")) {
+				parts.add(part);
+			}
+		}
+		parts.add(kind.name() + ":8");
+		State.petFood(player, String.join(",", parts));
+
+		player.sendSystemMessage(Component.literal("Two " + kind.label
+				+ "s traded in. The one you have left is as good as they get.")
+				.withStyle(ChatFormatting.LIGHT_PURPLE));
+	}
+
 	/** Hand one over without charging arcade tickets for it. */
 	public static void grant(ServerPlayer player, Kind kind) {
 		player.setAttached(OWNED[kind.ordinal()], owned(player, kind) + 1);

@@ -129,7 +129,89 @@ public final class Ship {
 			return;
 		}
 		buildShip(nether);
+		poolDeck(nether);
 		ShipLifeMod.LOGGER.info("Built ship 2 in the Nether.");
+	}
+
+	/**
+	 * Ship 2's floor 1: a pool deck, not a lobby.
+	 *
+	 * The overworld ship's floor 1 is a desk and two chairs. Over here it is
+	 * the pool done properly -- a big one with a diving board over the deep
+	 * end, a hot tub with a fountain in it, a locker and a changing stall
+	 * with a wardrobe in it, all on the same floor.
+	 */
+	private static void poolDeck(ServerLevel level) {
+		int y = Places.GROUND;
+		int x = Places.SHIP_X;
+		int z = Places.SHIP_Z;
+
+		// Clear the lobby's furniture out: this floor is something else here.
+		fill(level, x - 11, y + 1, z - 11, x + 11, y + 6, z + 11, Blocks.AIR);
+
+		// The pool: sunk four deep, tiled, and filled.
+		fill(level, x - 8, y - 4, z - 6, x + 8, y - 1, z + 6, Blocks.WATER);
+		for (int dx = -9; dx <= 9; dx++) {
+			for (int dz = -7; dz <= 7; dz++) {
+				boolean inside = Math.abs(dx) <= 8 && Math.abs(dz) <= 6;
+				set(level, new BlockPos(x + dx, y - 5, z + dz),
+						inside ? Blocks.PRISMARINE_BRICKS : Blocks.PRISMARINE);
+				if (!inside) {
+					fill(level, x + dx, y - 4, z + dz, x + dx, y, z + dz,
+							Blocks.PRISMARINE);
+				}
+			}
+		}
+		fill(level, x - 8, y, z - 6, x + 8, y, z + 6, Blocks.AIR);
+
+		// The diving board: a plank walk on two legs over the deep end.
+		for (int dz = -1; dz <= 1; dz++) {
+			fill(level, x - 11, y + 1, z + dz, x - 11, y + 3, z + dz, Blocks.PRISMARINE);
+		}
+		for (int dx = 0; dx <= 4; dx++) {
+			set(level, new BlockPos(x - 11 + dx, y + 4, z), Blocks.OAK_PLANKS);
+			set(level, new BlockPos(x - 11 + dx, y + 4, z - 1), Blocks.OAK_SLAB);
+			set(level, new BlockPos(x - 11 + dx, y + 4, z + 1), Blocks.OAK_SLAB);
+		}
+		set(level, new BlockPos(x - 12, y + 5, z), Blocks.SEA_LANTERN);
+
+		// The hot tub: warm water, bubbles up the middle, a fountain over it.
+		fill(level, Places.HOT_TUB.getX() - 2, y, Places.HOT_TUB.getZ() - 2,
+				Places.HOT_TUB.getX() + 2, y, Places.HOT_TUB.getZ() + 2,
+				Blocks.POLISHED_BLACKSTONE);
+		fill(level, Places.HOT_TUB.getX() - 1, y, Places.HOT_TUB.getZ() - 1,
+				Places.HOT_TUB.getX() + 1, y, Places.HOT_TUB.getZ() + 1, Blocks.WATER);
+		set(level, Places.HOT_TUB.below(), Blocks.SOUL_SAND);
+		set(level, Places.HOT_TUB.above(2), Blocks.WATER);
+		set(level, Places.HOT_TUB.above(3), Blocks.SEA_LANTERN);
+		for (int dx = -1; dx <= 1; dx += 2) {
+			set(level, Places.HOT_TUB.offset(dx, 1, 0), Blocks.PRISMARINE_WALL);
+		}
+
+		// The locker, and the changing stall with a wardrobe in it.
+		set(level, Places.POOL_LOCKER, Blocks.BARREL);
+		set(level, Places.POOL_LOCKER.above(), Blocks.LANTERN);
+
+		int wx = Places.POOL_WARDROBE.getX();
+		int wz = Places.POOL_WARDROBE.getZ();
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				if (dx == 0 && dz == 0) {
+					continue;
+				}
+				boolean doorway = dz == 1 && dx == 0;
+				for (int dy = 1; dy <= 3; dy++) {
+					set(level, new BlockPos(wx + dx, y + dy, wz + dz),
+							doorway && dy < 3 ? Blocks.AIR : Blocks.QUARTZ_BRICKS);
+				}
+			}
+		}
+		door(level, new BlockPos(wx, y + 1, wz + 1), Direction.NORTH);
+		set(level, Places.POOL_WARDROBE, Blocks.SPRUCE_PLANKS);
+		set(level, Places.POOL_WARDROBE.above(), Blocks.SPRUCE_TRAPDOOR);
+
+		// And a sign on the wall, since every floor has one.
+		nameOnTheWall(level, 1);
 	}
 
 	private static void buildShip(ServerLevel level) {
@@ -876,6 +958,10 @@ public final class Ship {
 		set(level, Places.WATCHER_DOOR.above(), Blocks.SOUL_LANTERN);
 		set(level, Places.MAGMA_DOOR, Blocks.MAGMA_BLOCK);
 		set(level, Places.MAGMA_DOOR.above(), Blocks.SHROOMLIGHT);
+
+		// And the button that lets all five out, one after another.
+		set(level, Places.RUSH_BUTTON, Blocks.GOLD_BLOCK);
+		set(level, Places.RUSH_BUTTON.above(), Blocks.REDSTONE_LAMP);
 		fill(level, Places.SHIP_X - 9, Places.floorY(10), Places.SHIP_Z - 9,
 				Places.SHIP_X + 9, Places.floorY(10), Places.SHIP_Z + 9,
 				Blocks.POLISHED_BLACKSTONE);
@@ -1194,7 +1280,8 @@ public final class Ship {
 			furnishIzzysRoom(level);
 		}
 		if (!level.getBlockState(Places.FIGHT_BUTTON).is(Blocks.REDSTONE_BLOCK)
-				|| !level.getBlockState(Places.MAGMA_DOOR).is(Blocks.MAGMA_BLOCK)) {
+				|| !level.getBlockState(Places.MAGMA_DOOR).is(Blocks.MAGMA_BLOCK)
+				|| !level.getBlockState(Places.RUSH_BUTTON).is(Blocks.GOLD_BLOCK)) {
 			furnishFighting(level);
 		}
 		if (!level.getBlockState(Places.PASSPORT_DESK).is(Blocks.LECTERN)) {

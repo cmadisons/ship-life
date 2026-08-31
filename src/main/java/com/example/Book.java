@@ -165,6 +165,12 @@ public final class Book {
 				State.tally(player, State.RACES) + " races finished",
 				Gym.hearts(player) + " hearts from the gym"));
 
+		page.setItem(37, entry(Items.WRITTEN_BOOK, "The Ship's Log", ChatFormatting.GOLD,
+				Log.lines(player).toArray(new String[0])));
+		page.setItem(39, entry(Items.NETHER_STAR, "Things Done  --  "
+				+ Log.count(player) + " / " + Log.FEATS.length, ChatFormatting.LIGHT_PURPLE,
+				Log.feats(player).toArray(new String[0])));
+
 		page.setItem(45, entry(Items.WRITABLE_BOOK, "Back", ChatFormatting.YELLOW,
 				"Back to the quests."));
 		page.setItem(49, entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));

@@ -13,7 +13,7 @@ public final class Floors {
 
 	public static String name(int floor) {
 		return switch (floor) {
-			case 1 -> "Lobby";
+			case 1 -> "Lobby";               // and the pool deck, on ship 2
 			case 2 -> "Arcade";
 			case 3 -> "Swimming Pool";
 			case 4 -> "Buffet";

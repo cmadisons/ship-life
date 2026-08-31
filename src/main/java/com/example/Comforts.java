@@ -60,11 +60,15 @@ public final class Comforts {
 				shower(who, level);
 				return InteractionResult.SUCCESS;
 			}
-			if (pos.equals(Places.LOCKER)) {
+			// The locker in your room, and the one on ship 2's pool deck --
+			// the same locker, since what is in it is saved on you.
+			if (pos.equals(Places.LOCKER) || pos.equals(Places.POOL_LOCKER)) {
 				Fridge.openLocker(who);
 				return InteractionResult.SUCCESS;
 			}
-			if (pos.equals(Places.WARDROBE) || pos.equals(Places.WARDROBE.above())) {
+			if (pos.equals(Places.WARDROBE) || pos.equals(Places.WARDROBE.above())
+					|| pos.equals(Places.POOL_WARDROBE)
+					|| pos.equals(Places.POOL_WARDROBE.above())) {
 				wardrobe(who);
 				return InteractionResult.SUCCESS;
 			}
