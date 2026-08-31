@@ -98,6 +98,92 @@ public final class Ship {
 	private static final int WAS_EAST = 200;
 
 	/**
+	 * The maze on floor 2 of ship 2.
+	 *
+	 * Carved rather than drawn: the whole square goes solid first and a
+	 * depth-first walk knocks the walls out, which is the one way to be sure
+	 * every cell can be reached and there is exactly one route between any
+	 * two. The seed is fixed, so it is the same maze in every world -- which
+	 * it has to be, because thirty seconds is a time you learn rather than a
+	 * time you find.
+	 *
+	 * It is laid east and south of the lift so the car and both its doors
+	 * stay clear, and the lift car goes back on top afterwards in case the
+	 * two ever overlap.
+	 */
+	private static void maze(ServerLevel level) {
+		int y = Places.floorY(2);
+		int n = Places.MAZE_CELLS;
+
+		// Solid to start with, and a floor under it.
+		for (int dx = 0; dx < Places.MAZE_BLOCKS; dx++) {
+			for (int dz = 0; dz < Places.MAZE_BLOCKS; dz++) {
+				set(level, new BlockPos(Places.MAZE_X + dx, y, Places.MAZE_Z + dz),
+						Blocks.POLISHED_BLACKSTONE);
+				for (int dy = 1; dy <= Places.MAZE_HEIGHT; dy++) {
+					set(level, new BlockPos(Places.MAZE_X + dx, y + dy, Places.MAZE_Z + dz),
+							Blocks.POLISHED_BLACKSTONE_BRICKS);
+				}
+			}
+		}
+
+		// The walk. A stack rather than recursion, so a big maze cannot
+		// overflow anything.
+		boolean[][] seen = new boolean[n][n];
+		java.util.Deque<int[]> stack = new java.util.ArrayDeque<>();
+		java.util.Random random = new java.util.Random(20260831L);
+		stack.push(new int[] { 0, 0 });
+		seen[0][0] = true;
+		hollow(level, Places.mazeCell(0, 0));
+
+		int[][] steps = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+		while (!stack.isEmpty()) {
+			int[] at = stack.peek();
+			java.util.List<int[]> open = new java.util.ArrayList<>();
+			for (int[] step : steps) {
+				int i = at[0] + step[0];
+				int j = at[1] + step[1];
+				if (i >= 0 && i < n && j >= 0 && j < n && !seen[i][j]) {
+					open.add(new int[] { i, j });
+				}
+			}
+			if (open.isEmpty()) {
+				stack.pop();
+				continue;
+			}
+			int[] next = open.get(random.nextInt(open.size()));
+			seen[next[0]][next[1]] = true;
+			hollow(level, Places.mazeCell(next[0], next[1]));
+			// And the wall between the two.
+			hollow(level, new BlockPos(
+					(Places.mazeCell(at[0], at[1]).getX() + Places.mazeCell(next[0], next[1]).getX()) / 2,
+					y + 1,
+					(Places.mazeCell(at[0], at[1]).getZ() + Places.mazeCell(next[0], next[1]).getZ()) / 2));
+			stack.push(next);
+		}
+
+		// The green corner and the red one, and a light over the red so you can
+		// see which way you are trying to get to over the top of the walls.
+		set(level, Places.mazeStart().below(), Blocks.LIME_CONCRETE);
+		set(level, Places.mazeEnd().below(), Blocks.RED_CONCRETE);
+		set(level, Places.mazeEnd().above(Places.MAZE_HEIGHT), Blocks.SEA_LANTERN);
+
+		// A way in through the outside wall, at the green corner.
+		hollow(level, new BlockPos(Places.MAZE_X, y + 1, Places.MAZE_Z + 1));
+
+		// The lift comes last, in case the maze was laid over any of it.
+		liftCar(level, 2);
+		ShipLifeMod.LOGGER.info("Cut the maze into floor 2 of ship 2.");
+	}
+
+	/** Knock a cell or a wall out, floor to ceiling. */
+	private static void hollow(ServerLevel level, BlockPos bottom) {
+		for (int dy = 0; dy < Places.MAZE_HEIGHT; dy++) {
+			set(level, bottom.above(dy), Blocks.AIR);
+		}
+	}
+
+	/**
 	 * Pull ship 2 down.
 	 *
 	 * It was this ship again floor for floor with nothing new on it and no
@@ -134,11 +220,17 @@ public final class Ship {
 		boolean wayHome = nether.getBlockState(Places.PORTAL_TWO).is(Blocks.NETHER_PORTAL);
 		if (nether.getBlockState(Places.panel(1)).is(Made.elevatorButton)
 				&& wideEnough && wayHome) {
+			// The maze came after the ship did, so a ship 2 that is already
+			// standing gets floor 2 cut without the rest being touched.
+			if (!nether.getBlockState(Places.mazeStart().below()).is(Blocks.LIME_CONCRETE)) {
+				maze(nether);
+			}
 			return;
 		}
 		clearTheNether(nether);
 		buildShip(nether);
 		poolDeck(nether);
+		maze(nether);
 		ShipLifeMod.LOGGER.info("Built ship 2 in the Nether.");
 	}
 

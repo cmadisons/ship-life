@@ -121,6 +121,37 @@ public final class Places {
 		return floor >= 1 && floor <= TOP_FLOOR ? floor : 0;
 	}
 
+	// ------------------------------------------- the maze, floor 2 of ship 2
+
+	/**
+	 * The maze on floor 2 of the ship in the Nether.
+	 *
+	 * Ten cells square with a wall between each, which is twenty-one blocks.
+	 * It sits east and south of the lift so the car and its two doors are
+	 * clear of it -- you walk out of the lift and along to the way in.
+	 */
+	public static final int MAZE_CELLS = 10;
+	public static final int MAZE_BLOCKS = MAZE_CELLS * 2 + 1;
+	public static final int MAZE_X = SHIP_X - 4;
+	public static final int MAZE_Z = SHIP_Z - 4;
+
+	/** How tall the hedges are. */
+	public static final int MAZE_HEIGHT = 3;
+
+	/** The middle of a cell, in blocks. */
+	public static BlockPos mazeCell(int i, int j) {
+		return new BlockPos(MAZE_X + 1 + i * 2, floorY(2) + 1, MAZE_Z + 1 + j * 2);
+	}
+
+	/** Where the clock starts, and where it stops. */
+	public static BlockPos mazeStart() {
+		return mazeCell(0, 0);
+	}
+
+	public static BlockPos mazeEnd() {
+		return mazeCell(MAZE_CELLS - 1, MAZE_CELLS - 1);
+	}
+
 	/** Ben's door, on floor 15. */
 	public static final BlockPos BEN = new BlockPos(SHIP_X, floorY(15) + 1, SHIP_Z - 8);
 
