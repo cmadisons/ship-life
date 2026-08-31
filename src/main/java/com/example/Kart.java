@@ -167,6 +167,11 @@ public final class Kart {
 	public static final int RIVAL_TICKS = 1900;          // one minute thirty-five
 	public static final int BEATING_VIC_PAYS = 60;
 
+	/** The other one on the grid, and what beating both is worth. */
+	public static final String SECOND = "The other racer";
+	public static final int SECOND_TICKS = 2200;         // one minute fifty
+	public static final int FIELD_PAYS = 100;
+
 	private static void finished(ServerPlayer player, int ticks) {
 		player.level().playSound(null, player.blockPosition(),
 				SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.8f, 1.4f);
@@ -174,15 +179,26 @@ public final class Kart {
 		player.sendSystemMessage(Component.literal(LAPS + " laps in " + Pool.time(ticks) + ".")
 				.withStyle(ChatFormatting.GREEN));
 
-		// Vic's time, which is the race behind the race.
-		if (ticks < RIVAL_TICKS) {
-			player.sendSystemMessage(Component.literal(RIVAL + " does five laps in "
-					+ Pool.time(RIVAL_TICKS) + ". You just beat them.")
-					.withStyle(ChatFormatting.LIGHT_PURPLE));
-			Events.payTickets(player, BEATING_VIC_PAYS, "you beat the racer");
-		} else {
-			player.sendSystemMessage(Component.literal(RIVAL + " does it in "
-					+ Pool.time(RIVAL_TICKS) + ".").withStyle(ChatFormatting.GRAY));
+		// Two of them out there now, so a race has a finishing order.
+		int place = 1;
+		if (ticks > RIVAL_TICKS) {
+			place++;
+		}
+		if (ticks > SECOND_TICKS) {
+			place++;
+		}
+		player.sendSystemMessage(Component.literal("You finished " + place
+				+ switch (place) {
+					case 1 -> "st";
+					case 2 -> "nd";
+					default -> "rd";
+				} + ".  " + RIVAL + ": " + Pool.time(RIVAL_TICKS)
+				+ "  ·  " + SECOND + ": " + Pool.time(SECOND_TICKS))
+				.withStyle(place == 1 ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GRAY));
+		if (place == 1) {
+			Events.payTickets(player, FIELD_PAYS, "you won the race");
+		} else if (place == 2) {
+			Events.payTickets(player, BEATING_VIC_PAYS, "you beat one of them");
 		}
 
 		if (ticks > TARGET_TICKS) {

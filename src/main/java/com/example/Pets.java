@@ -135,6 +135,30 @@ public final class Pets {
 		}
 	}
 
+	/**
+	 * Your pets, wherever you have gone.
+	 *
+	 * An entity cannot follow you through a portal, so they are put back
+	 * beside you on the other side: one of each kind you own, in the level
+	 * you have arrived in. It is the same pets as far as the game is
+	 * concerned, because what you own is a number on you, not the animal.
+	 */
+	public static void bringThemAlong(ServerPlayer player, ServerLevel where) {
+		for (Kind kind : Kind.values()) {
+			if (owned(player, kind) == 0) {
+				continue;
+			}
+			boolean already = !where.getEntitiesOfClass(
+					net.minecraft.world.entity.Mob.class,
+					player.getBoundingBox().inflate(24.0),
+					mob -> mob.getCustomName() != null
+							&& mob.getCustomName().getString().equals(kind.label)).isEmpty();
+			if (!already) {
+				spawn(player, kind);
+			}
+		}
+	}
+
 	public static int owned(ServerPlayer player, Kind kind) {
 		return player.getAttachedOrCreate(OWNED[kind.ordinal()]);
 	}
@@ -294,7 +318,7 @@ public final class Pets {
 	}
 
 	/** Put the animal in the world, tamed, so it comes with you. */
-	private static void spawn(ServerPlayer player, Kind kind) {
+	static void spawn(ServerPlayer player, Kind kind) {
 		ServerLevel level = (ServerLevel) player.level();
 		BlockPos at = player.blockPosition();
 		net.minecraft.world.entity.Mob pet = model(kind).spawn(level, at,

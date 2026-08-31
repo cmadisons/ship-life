@@ -60,6 +60,10 @@ public final class Shops {
 				return InteractionResult.PASS;
 			}
 			BlockPos pos = Places.local(hit.getBlockPos());
+			if (at(pos, Places.BENCH)) {
+				Bench.open(who);
+				return InteractionResult.SUCCESS;
+			}
 			if (at(pos, Places.WEAPONS)) {
 				Weapons.shop(who);
 				return InteractionResult.SUCCESS;

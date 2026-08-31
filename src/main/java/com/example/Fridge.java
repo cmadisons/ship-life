@@ -113,6 +113,49 @@ public final class Fridge {
 		player.setAttached(INSIDE, keep);
 	}
 
+	/** What is in your locker, saved with you the same way. */
+	public static final AttachmentType<List<ItemStack>> LOCKER =
+			AttachmentRegistry.<List<ItemStack>>builder()
+					.initializer(ArrayList::new)
+					.persistent(ItemStack.CODEC.listOf())
+					.copyOnDeath()
+					.buildAndRegister(ShipLifeMod.id("locker"));
+
+	/** How much a locker holds. */
+	public static final int LOCKER_SIZE = 27;
+
+	/**
+	 * The locker in your room: somewhere to put what you are not carrying.
+	 *
+	 * Twenty-seven slots and it takes anything, where the fridge takes five
+	 * and makes food better. Saved on you, like the fridge, so nothing the
+	 * ship does to the room can empty it.
+	 */
+	public static void openLocker(ServerPlayer player) {
+		SimpleContainer shelves = new SimpleContainer(LOCKER_SIZE) {
+			@Override
+			public void setChanged() {
+				super.setChanged();
+				List<ItemStack> keep = new ArrayList<>();
+				for (int slot = 0; slot < getContainerSize(); slot++) {
+					keep.add(getItem(slot).copy());
+				}
+				player.setAttached(LOCKER, keep);
+			}
+		};
+		List<ItemStack> saved = player.getAttachedOrCreate(LOCKER);
+		for (int slot = 0; slot < LOCKER_SIZE && slot < saved.size(); slot++) {
+			shelves.setItem(slot, saved.get(slot).copy());
+		}
+		player.level().playSound(null, Places.LOCKER, SoundEvents.BARREL_OPEN,
+				SoundSource.BLOCKS, 0.7f, 1.0f);
+		player.openMenu(new SimpleMenuProvider(
+				(id, inventory, who) -> new net.minecraft.world.inventory.ChestMenu(
+						net.minecraft.world.inventory.MenuType.GENERIC_9x3,
+						id, inventory, shelves, 3),
+				Component.literal("Locker").withStyle(ChatFormatting.AQUA)));
+	}
+
 	/**
 	 * Make sure the attachment exists before any world is read.
 	 *

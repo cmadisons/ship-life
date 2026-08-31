@@ -56,6 +56,7 @@ public final class Portals {
 
 		BlockPos lobby = Places.lift(1);
 		player.teleportTo(lobby.getX() + 0.5, lobby.getY(), lobby.getZ() + 0.5);
+		Pets.bringThemAlong(player, nether);
 		nether.playSound(null, lobby, SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS,
 				0.4f, 1.0f);
 		player.sendSystemMessage(Component.literal(
@@ -70,6 +71,7 @@ public final class Portals {
 		}
 		BlockPos back = Places.PORTAL.south(2);
 		player.teleportTo(back.getX() + 0.5, back.getY(), back.getZ() + 0.5);
+		Pets.bringThemAlong(player, overworld);
 		player.sendSystemMessage(Component.literal("Floor 18, and home.")
 				.withStyle(ChatFormatting.AQUA));
 	}

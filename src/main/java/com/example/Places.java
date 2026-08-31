@@ -293,6 +293,13 @@ public final class Places {
 	/** The middle of the portal frame on floor 18. */
 	public static final BlockPos PORTAL = new BlockPos(SHIP_X, floorY(18) + 1, SHIP_Z);
 
+	/** The bench beside the weapon counter, for putting work into the set. */
+	public static final BlockPos BENCH = new BlockPos(SHIP_X + 4, floorY(17) + 1, SHIP_Z - 8);
+
+	/** The telescope on the balcony. */
+	public static final BlockPos TELESCOPE =
+			new BlockPos(SHIP_X + ROOM + 5, GROUND + 1, SHIP_Z + 2);
+
 	/** The counter in the weapon store on floor 17. */
 	public static final BlockPos WEAPONS = new BlockPos(SHIP_X, floorY(17) + 1, SHIP_Z - 8);
 
@@ -368,6 +375,12 @@ public final class Places {
 	/** The balcony off floor 1, and the water you fish in from it. */
 	public static final BlockPos BALCONY = new BlockPos(SHIP_X + ROOM + 4, GROUND + 1, SHIP_Z);
 	public static final BlockPos FISHING = new BlockPos(SHIP_X + ROOM + 6, GROUND, SHIP_Z);
+
+	/** The locker in your room, beside the wardrobe. */
+	public static final BlockPos LOCKER = new BlockPos(SHIP_X - 8, ROOM_Y, SHIP_Z + 4);
+
+	/** The bell in your room. Ring it and somebody comes round. */
+	public static final BlockPos GUEST_BELL = new BlockPos(SHIP_X - 8, ROOM_Y, SHIP_Z);
 
 	/** The record player, beside the TV. Put a disc in and it plays it. */
 	public static final BlockPos JUKEBOX = new BlockPos(SHIP_X - 4, ROOM_Y, SHIP_Z - 8);

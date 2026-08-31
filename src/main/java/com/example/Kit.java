@@ -212,6 +212,40 @@ public final class Kit {
 		return made;
 	}
 
+	/**
+	 * What a boss leaves behind.
+	 *
+	 * Tickets are a number going up. This is a thing in your hand with the
+	 * name of the thing you killed on it, and it is what the bench on floor
+	 * 17 wants when you go to put an enchantment on the plant set.
+	 */
+	public static ItemStack bossDrop(String boss) {
+		return switch (boss) {
+			case "Arachnes" -> make(Items.STRING, "Arachne Silk", ChatFormatting.LIGHT_PURPLE,
+					"Off the spider on floor 10.",
+					"The bench on 17 wants these.");
+			case "Ender Dragon" -> make(Items.DRAGON_BREATH, "Dragon Scale",
+					ChatFormatting.LIGHT_PURPLE, "Off the dragon on floor 10.",
+					"The bench on 17 wants these.");
+			case "Broodmother" -> make(Items.SPIDER_EYE, "Brood Egg",
+					ChatFormatting.LIGHT_PURPLE, "Off the Broodmother.",
+					"The bench on 17 wants these.");
+			case "The Watcher" -> make(Items.ENDER_EYE, "Watcher's Eye",
+					ChatFormatting.LIGHT_PURPLE, "Off the Watcher.",
+					"The bench on 17 wants these.");
+			default -> make(Items.MAGMA_CREAM, "Magma Core",
+					ChatFormatting.LIGHT_PURPLE, "Off the Magma Boss.",
+					"The bench on 17 wants these.");
+		};
+	}
+
+	/** Is this any boss drop? The bench takes them all the same. */
+	public static boolean isDrop(ItemStack stack) {
+		return is(stack, "Arachne Silk") || is(stack, "Dragon Scale")
+				|| is(stack, "Brood Egg") || is(stack, "Watcher's Eye")
+				|| is(stack, "Magma Core");
+	}
+
 	/** The one-use star off floor 7. {@link Star} is what it does. */
 	public static ItemStack star() {
 		ItemStack star = make(Items.NETHER_STAR, STAR, ChatFormatting.AQUA,

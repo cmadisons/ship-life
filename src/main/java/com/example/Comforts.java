@@ -60,6 +60,10 @@ public final class Comforts {
 				shower(who, level);
 				return InteractionResult.SUCCESS;
 			}
+			if (pos.equals(Places.LOCKER)) {
+				Fridge.openLocker(who);
+				return InteractionResult.SUCCESS;
+			}
 			if (pos.equals(Places.WARDROBE) || pos.equals(Places.WARDROBE.above())) {
 				wardrobe(who);
 				return InteractionResult.SUCCESS;

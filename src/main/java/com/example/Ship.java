@@ -667,6 +667,10 @@ public final class Ship {
 					Places.WEAPONS.getZ() - 1), Blocks.LANTERN);
 		}
 		set(level, Places.WEAPONS.above(2), Blocks.SEA_LANTERN);
+
+		// The bench: where boss drops turn into enchantments.
+		counter(level, Places.BENCH, Blocks.ENCHANTING_TABLE);
+		set(level, Places.BENCH.above(2), Blocks.SEA_LANTERN);
 	}
 
 	private static void furnishGym(ServerLevel level) {
@@ -796,6 +800,8 @@ public final class Ship {
 		fill(level, Places.FISHING.getX() - 1, y, Places.FISHING.getZ() - 1,
 				Places.FISHING.getX() + 1, y, Places.FISHING.getZ() + 1, Blocks.WATER);
 		set(level, Places.FISHING.above(2), Blocks.SEA_LANTERN);
+		set(level, Places.TELESCOPE, Blocks.LODESTONE);
+		set(level, Places.TELESCOPE.above(), Blocks.OBSERVER);
 	}
 
 	private static void furnishRace(ServerLevel level) {
@@ -1030,6 +1036,8 @@ public final class Ship {
 
 		// A wardrobe by the bed and a bare wall opposite it for trophies.
 		set(level, Places.WARDROBE, Blocks.SPRUCE_PLANKS);
+		set(level, Places.LOCKER, Blocks.BARREL);
+		set(level, Places.GUEST_BELL, Blocks.BELL);
 		set(level, Places.WARDROBE.above(), Blocks.SPRUCE_TRAPDOOR);
 		fill(level, Places.PHOTOS.getX(), Places.PHOTOS.getY(), Places.PHOTOS.getZ() - 1,
 				Places.PHOTOS.getX(), Places.PHOTOS.getY() + 1, Places.PHOTOS.getZ() + 1,
@@ -1094,7 +1102,8 @@ public final class Ship {
 				|| !level.getBlockState(Places.TV).is(Blocks.GRAY_CONCRETE)
 				|| !level.getBlockState(Places.TV.above(2)).is(Blocks.GRAY_CONCRETE)
 				|| !level.getBlockState(Places.JUKEBOX).is(Blocks.JUKEBOX)
-				|| !level.getBlockState(Places.WARDROBE).is(Blocks.SPRUCE_PLANKS);
+				|| !level.getBlockState(Places.WARDROBE).is(Blocks.SPRUCE_PLANKS)
+				|| !level.getBlockState(Places.LOCKER).is(Blocks.BARREL);
 		boolean loosMissing = !level.getBlockState(Places.FLUSH).is(Blocks.LEVER)
 				|| !level.getBlockState(Places.TOILET.east(2).above(3)).is(Blocks.QUARTZ_BRICKS)
 				|| !level.getBlockState(Places.TOILET.south(2).above(2)).isAir();
@@ -1111,13 +1120,15 @@ public final class Ship {
 		if (!level.getBlockState(Places.GYM).is(Blocks.ANVIL)) {
 			furnishGym(level);
 		}
-		if (!level.getBlockState(Places.WEAPONS).is(Blocks.SMITHING_TABLE)) {
+		if (!level.getBlockState(Places.WEAPONS).is(Blocks.SMITHING_TABLE)
+				|| !level.getBlockState(Places.BENCH).is(Blocks.ENCHANTING_TABLE)) {
 			furnishWeapons(level);
 		}
 		if (!level.getBlockState(Places.PORTAL).is(Blocks.NETHER_PORTAL)) {
 			furnishPortal(level);
 		}
-		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)) {
+		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)
+				|| !level.getBlockState(Places.TELESCOPE).is(Blocks.LODESTONE)) {
 			furnishBalcony(level);
 		}
 		if (!level.getBlockState(new BlockPos(20, Places.GROUND, Places.SHIP_Z))
