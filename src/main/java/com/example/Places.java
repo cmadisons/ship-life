@@ -318,6 +318,10 @@ public final class Places {
 	public static final BlockPos TELESCOPE =
 			new BlockPos(SHIP_X + ROOM + 5, GROUND + 1, SHIP_Z + 2);
 
+	/** The stand beside the portal, with the flint and steel on it. */
+	public static final BlockPos FLINT_STAND =
+			new BlockPos(SHIP_X + 4, floorY(18) + 1, SHIP_Z);
+
 	/** The counter in the weapon store on floor 17. */
 	public static final BlockPos WEAPONS = new BlockPos(SHIP_X, floorY(17) + 1, SHIP_Z - 8);
 

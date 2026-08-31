@@ -27,7 +27,45 @@ public final class Portals {
 	private Portals() {
 	}
 
+	/** How long before the frame will take you again. */
+	private static final int SETTLE = 100;
+
+	private static final java.util.Map<java.util.UUID, Long> WENT =
+			new java.util.HashMap<>();
+
 	public static void register() {
+		// The frame takes you itself.
+		//
+		// It used to be an ordinary nether portal doing an ordinary nether
+		// portal's job, and on this ship it did nothing you could see: the
+		// blocks would not light in a frame the game had just been handed,
+		// and the travel it does is not the travel this wants anyway. So
+		// standing in the frame is the whole mechanism now -- no portal
+		// block, no cooldown of the game's, no linking.
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % 10 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				for (ServerPlayer player : level.players()) {
+					if (!inTheFrame(player)) {
+						WENT.remove(player.getUUID());
+						continue;
+					}
+					Long last = WENT.get(player.getUUID());
+					if (last != null && level.getGameTime() - last < SETTLE) {
+						continue;
+					}
+					WENT.put(player.getUUID(), level.getGameTime());
+					step(player, level);
+				}
+			}
+		});
+
 		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register(
 				(player, origin, destination) -> {
 			if (destination.dimension() == Level.NETHER) {
@@ -37,6 +75,52 @@ public final class Portals {
 				comeBack(player, destination);
 			}
 		});
+	}
+
+	/** Are they standing in the frame on floor 18? */
+	private static boolean inTheFrame(ServerPlayer player) {
+		BlockPos frame = Places.PORTAL;
+		return Math.abs(player.getX() - (frame.getX() + 0.5)) < 2.0
+				&& Math.abs(player.getZ() - (frame.getZ() + 0.5)) < 1.2
+				&& player.getY() >= frame.getY() - 0.5
+				&& player.getY() <= frame.getY() + 3.5;
+	}
+
+	/** Through it: to the Nether from home, and home from the Nether. */
+	private static void step(ServerPlayer player, ServerLevel from) {
+		var server = from.getServer();
+		if (from.dimension() == Level.OVERWORLD) {
+			ServerLevel nether = server.getLevel(Level.NETHER);
+			if (nether == null) {
+				player.sendSystemMessage(Component.literal(
+						"The portal is dark. This world has no Nether.")
+						.withStyle(ChatFormatting.RED));
+				return;
+			}
+			Ship.buildInTheNether(nether);
+			ShipLifeMod.claim(nether);
+			BlockPos lobby = Places.lift(1);
+			player.teleportTo(nether, lobby.getX() + 0.5, lobby.getY(), lobby.getZ() + 0.5,
+					java.util.Set.of(), player.getYRot(), player.getXRot(), true);
+			WENT.put(player.getUUID(), nether.getGameTime());
+			nether.playSound(null, lobby, SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS,
+					0.4f, 1.0f);
+			Pets.bringThemAlong(player, nether);
+			player.sendSystemMessage(Component.literal(
+					"Ship 2, floor 1 -- the pool deck, floating in the Nether.")
+					.withStyle(ChatFormatting.LIGHT_PURPLE));
+			Log.write(player, "went through the portal");
+			return;
+		}
+
+		ServerLevel home = server.overworld();
+		BlockPos back = Places.PORTAL.south(2);
+		player.teleportTo(home, back.getX() + 0.5, back.getY(), back.getZ() + 0.5,
+				java.util.Set.of(), player.getYRot(), player.getXRot(), true);
+		WENT.put(player.getUUID(), home.getGameTime());
+		Pets.bringThemAlong(player, home);
+		player.sendSystemMessage(Component.literal("Floor 18, and home.")
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	/**

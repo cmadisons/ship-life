@@ -736,6 +736,12 @@ public final class Ship {
 		}
 		set(level, new BlockPos(x - 3, y + 1, z), Blocks.SHROOMLIGHT);
 		set(level, new BlockPos(x + 3, y + 1, z), Blocks.SHROOMLIGHT);
+
+		// The flint and steel lives up here, on a stand beside the frame.
+		// Whoever built this ship left one, and it stays left: take it as
+		// often as you like.
+		set(level, Places.FLINT_STAND, Blocks.POLISHED_BLACKSTONE);
+		set(level, Places.FLINT_STAND.above(), Blocks.LANTERN);
 	}
 
 	private static void furnishWeapons(ServerLevel level) {
@@ -1210,7 +1216,9 @@ public final class Ship {
 				|| !level.getBlockState(Places.BENCH).is(Blocks.ENCHANTING_TABLE)) {
 			furnishWeapons(level);
 		}
-		if (!level.getBlockState(Places.PORTAL).is(Blocks.NETHER_PORTAL)) {
+		if (!level.getBlockState(Places.PORTAL).is(Blocks.NETHER_PORTAL)
+				|| !level.getBlockState(Places.FLINT_STAND)
+						.is(Blocks.POLISHED_BLACKSTONE)) {
 			furnishPortal(level);
 		}
 		if (!level.getBlockState(Places.FISHING).is(Blocks.WATER)

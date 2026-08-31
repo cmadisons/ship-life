@@ -85,6 +85,19 @@ public final class Comforts {
 				intercom(who, level);
 				return InteractionResult.SUCCESS;
 			}
+			if (pos.equals(Places.FLINT_STAND) || pos.equals(Places.FLINT_STAND.above())) {
+				// A flint and steel, in case the frame ever needs lighting
+				// again. There is always another on the stand.
+				if (!who.getInventory().add(new ItemStack(Items.FLINT_AND_STEEL))) {
+					who.drop(new ItemStack(Items.FLINT_AND_STEEL), false);
+				}
+				level.playSound(null, Places.FLINT_STAND, SoundEvents.FLINTANDSTEEL_USE,
+						SoundSource.BLOCKS, 0.8f, 1.2f);
+				who.sendSystemMessage(Component.literal(
+						"You take the flint and steel off the stand.")
+						.withStyle(ChatFormatting.AQUA));
+				return InteractionResult.SUCCESS;
+			}
 			if (pos.equals(Places.TELESCOPE) || pos.equals(Places.TELESCOPE.above())) {
 				telescope(who, level);
 				return InteractionResult.SUCCESS;
