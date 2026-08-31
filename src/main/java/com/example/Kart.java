@@ -47,6 +47,9 @@ public final class Kart {
 	/** How many karts are out there without you. */
 	private static final int RIVALS = 5;
 
+	/** Blocks a tick. Vanilla tops out near 0.4, so this is roughly double. */
+	private static final double SPEED = 0.8;
+
 	/** The colours the rival karts come in, so no two beside you match. */
 	private static final net.minecraft.world.level.block.Block[] COLOURS = {
 		Blocks.BLUE_CONCRETE, Blocks.YELLOW_CONCRETE, Blocks.LIME_CONCRETE,
@@ -137,6 +140,8 @@ public final class Kart {
 			return;
 		}
 
+		push(player.getVehicle());
+
 		double z = player.getZ() - Places.SHIP_Z;
 		boolean far = z >= Places.KART_HALF_DEPTH - 1;
 		boolean line = z <= -(Places.KART_HALF_DEPTH - 1);
@@ -177,6 +182,26 @@ public final class Kart {
 	public static final String SECOND = "The other racer";
 	public static final int SECOND_TICKS = 2200;         // one minute fifty
 	public static final int FIELD_PAYS = 100;
+
+	/**
+	 * Keep the kart wound up.
+	 *
+	 * A minecart is built to trundle, and vanilla trims its speed every tick.
+	 * Setting the delta back up at the end of the tick, along whichever way it
+	 * is already pointing, means it goes into the next one at racing pace
+	 * instead of coasting down to a walk.
+	 */
+	private static void push(net.minecraft.world.entity.Entity vehicle) {
+		if (!(vehicle instanceof Minecart kart)) {
+			return;
+		}
+		net.minecraft.world.phys.Vec3 going = kart.getDeltaMovement();
+		double flat = Math.sqrt(going.x * going.x + going.z * going.z);
+		if (flat < 0.02) {
+			return;                       // stopped, and a shove would be a shunt
+		}
+		kart.setDeltaMovement(going.x / flat * SPEED, going.y, going.z / flat * SPEED);
+	}
 
 	private static void finished(ServerPlayer player, int ticks) {
 		player.level().playSound(null, player.blockPosition(),

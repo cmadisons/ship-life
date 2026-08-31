@@ -1066,14 +1066,17 @@ public final class Ship {
 		fill(level, west, y, north, east, y, south, Blocks.BLACK_CONCRETE);
 
 		// The two straights, corners included.
+		// Every straight block is powered rather than every fifth. On a fifth
+		// a kart spends four blocks slowing down for every one speeding up,
+		// which is what made the track feel like a crawl.
 		for (int x = west; x <= east; x++) {
-			rail(level, new BlockPos(x, Places.KART_Y, north), RailShape.EAST_WEST, x % 5 == 0);
-			rail(level, new BlockPos(x, Places.KART_Y, south), RailShape.EAST_WEST, x % 5 == 0);
+			rail(level, new BlockPos(x, Places.KART_Y, north), RailShape.EAST_WEST, true);
+			rail(level, new BlockPos(x, Places.KART_Y, south), RailShape.EAST_WEST, true);
 		}
 		// The two sides.
 		for (int z = north + 1; z <= south - 1; z++) {
-			rail(level, new BlockPos(west, Places.KART_Y, z), RailShape.NORTH_SOUTH, z % 5 == 0);
-			rail(level, new BlockPos(east, Places.KART_Y, z), RailShape.NORTH_SOUTH, z % 5 == 0);
+			rail(level, new BlockPos(west, Places.KART_Y, z), RailShape.NORTH_SOUTH, true);
+			rail(level, new BlockPos(east, Places.KART_Y, z), RailShape.NORTH_SOUTH, true);
 		}
 		// And the four corners, which is what actually joins it up. North is
 		// -z, so the near-left corner turns east and south.
@@ -1574,8 +1577,13 @@ public final class Ship {
 		// shapes were spelled out, and is a ring of disconnected sleepers.
 		BlockPos corner = new BlockPos(Places.SHIP_X - Places.KART_HALF_WIDTH,
 				Places.KART_Y, Places.SHIP_Z - Places.KART_HALF_DEPTH);
+		// A straight that is plain rail means the loop was laid when only every
+		// fifth block was powered, and it wants relaying at full power.
+		BlockPos straight = new BlockPos(Places.SHIP_X + 1, Places.KART_Y,
+				Places.SHIP_Z - Places.KART_HALF_DEPTH);
 		if (!level.getBlockState(corner).is(Blocks.RAIL)
-				|| level.getBlockState(corner).getValue(RailBlock.SHAPE) != RailShape.SOUTH_EAST) {
+				|| level.getBlockState(corner).getValue(RailBlock.SHAPE) != RailShape.SOUTH_EAST
+				|| !level.getBlockState(straight).is(Blocks.POWERED_RAIL)) {
 			furnishRace(level);
 			ShipLifeMod.LOGGER.info("Laid the kart track round floor 6.");
 		}
