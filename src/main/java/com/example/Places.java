@@ -202,9 +202,15 @@ public final class Places {
 
 	private static final int ARCADE_Y = floorY(2) + 1;
 
-	public static final BlockPos SNAKE = new BlockPos(SHIP_X - 5, ARCADE_Y, SHIP_Z - 10);
-	public static final BlockPos PACMAN = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z - 10);
-	public static final BlockPos GALAGA = new BlockPos(SHIP_X + 5, ARCADE_Y, SHIP_Z - 10);
+	/**
+	 * The three cabinets, in a row along the far wall.
+	 *
+	 * Two blocks further from the lift than they used to stand: Snake was up
+	 * against the corner of the car, which is no room to play a game in.
+	 */
+	public static final BlockPos SNAKE = new BlockPos(SHIP_X - 3, ARCADE_Y, SHIP_Z - 10);
+	public static final BlockPos PACMAN = new BlockPos(SHIP_X + 2, ARCADE_Y, SHIP_Z - 10);
+	public static final BlockPos GALAGA = new BlockPos(SHIP_X + 7, ARCADE_Y, SHIP_Z - 10);
 
 	/** The prize counter, facing the cabinets. */
 	public static final BlockPos PRIZES = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z + 8);
@@ -218,7 +224,7 @@ public final class Places {
 	public static final int POOL_END = SHIP_X + 9;
 
 	/** How wide the pool is either side of the middle. */
-	public static final int POOL_HALF_WIDTH = 3;
+	public static final int POOL_HALF_WIDTH = 2;
 
 	/** How deep the pool is cut into floor 3's deck. */
 	public static final int POOL_DEPTH = 4;
@@ -241,24 +247,33 @@ public final class Places {
 	public static final BlockPos POOL_BOARD =
 			new BlockPos(SHIP_X - 11, floorY(3) + 1, SHIP_Z + 8);
 
+	/**
+	 * How far along floor 6 the track sits.
+	 *
+	 * Not the middle of the floor any more. The loop used to run straight
+	 * through the lift's corner, which is no place for a rail: it starts two
+	 * blocks to the right of the car and runs to the far wall from there.
+	 */
+	public static final int KART_X = LIFT_X + LIFT_SIZE + 2 + 7;
+
 	/** Where you get in the kart, in the pits on floor 6. */
 	public static final BlockPos RACE_CAR =
-			new BlockPos(SHIP_X, floorY(6) + 1, SHIP_Z - 9);
+			new BlockPos(KART_X, floorY(6) + 1, SHIP_Z - 9);
 
-	/** How far the track reaches from the middle of floor 6. */
-	public static final int KART_HALF_WIDTH = 9;
-	public static final int KART_HALF_DEPTH = 6;
+	/** How far the track reaches from the middle of the loop. */
+	public static final int KART_HALF_WIDTH = 7;
+	public static final int KART_HALF_DEPTH = 5;
 
 	/** The rails sit on top of the floor. */
 	public static final int KART_Y = floorY(6) + 1;
 
 	/** The start and finish line, in the middle of the near straight. */
 	public static final BlockPos KART_LINE =
-			new BlockPos(SHIP_X, KART_Y, SHIP_Z - KART_HALF_DEPTH);
+			new BlockPos(KART_X, KART_Y, SHIP_Z - KART_HALF_DEPTH);
 
 	/** Where the other karts start from, spread along the near straight. */
 	public static BlockPos kartGrid(int index) {
-		return new BlockPos(SHIP_X - 6 + index * 3, KART_Y, SHIP_Z - KART_HALF_DEPTH);
+		return new BlockPos(KART_X - 6 + index * 3, KART_Y, SHIP_Z - KART_HALF_DEPTH);
 	}
 
 	// ----------------------------------------------------- the buffet, floor 4
@@ -315,13 +330,57 @@ public final class Places {
 	 * These are all in the Nether, at the same coordinates as the overworld
 	 * ship, so what tells them apart is which level you are standing in.
 	 */
+	/**
+	 * How far ship 2's pool reaches from the middle of the floor.
+	 *
+	 * As long and as wide as the floor will let it be: out to two blocks off
+	 * the wall on every side, which on a ship forty-nine across is a pool
+	 * forty-three by forty-three.
+	 */
+	public static final int POOL_TWO_HALF = ROOM_TWO - 3;
+
+	public static int poolTwoStart() {
+		return SHIP_X - POOL_TWO_HALF;
+	}
+
+	public static int poolTwoEnd() {
+		return SHIP_X + POOL_TWO_HALF;
+	}
+
+	/** Are you swimming in ship 2's pool? */
+	public static boolean inPoolTwo(double x, double y, double z) {
+		return y >= GROUND - POOL_DEPTH && y <= GROUND + 2
+				&& x >= poolTwoStart() - 1 && x <= poolTwoEnd() + 1
+				&& z >= SHIP_Z - POOL_TWO_HALF - 1 && z <= SHIP_Z + POOL_TWO_HALF + 1;
+	}
+
+	/** The middle of the portal frame on ship 2's floor 1. */
+	public static final BlockPos PORTAL_TWO = new BlockPos(SHIP_X, GROUND + 1, SHIP_Z - 8);
+
+	/** The stand beside it, with the flint and steel on it. */
+	public static final BlockPos FLINT_STAND_TWO =
+			new BlockPos(SHIP_X - 4, GROUND + 1, SHIP_Z - 8);
+
+	/**
+	 * The corner of ship 2's floor 1 that the pool leaves alone.
+	 *
+	 * The lift comes down into this floor like it does into every other one,
+	 * and the way home stands beside it. A pool as big as the floor would put
+	 * four metres of water where both of them go, so it stops short: this
+	 * strip runs back to the north wall and stays dry deck.
+	 */
+	public static boolean onTheDryDeck(int x, int z) {
+		return x >= LIFT_X - 3 && x <= PORTAL_TWO.getX() + 3
+				&& z <= LIFT_Z + LIFT_SIZE + 3;
+	}
+
 	public static final BlockPos DIVING_BOARD =
-			new BlockPos(SHIP_X - 7, GROUND + 4, SHIP_Z);
-	public static final BlockPos HOT_TUB = new BlockPos(SHIP_X + 8, GROUND + 1, SHIP_Z + 7);
+			new BlockPos(SHIP_X - POOL_TWO_HALF - 1, GROUND + 4, SHIP_Z);
+	public static final BlockPos HOT_TUB = new BlockPos(SHIP_X, GROUND + 1, SHIP_Z - 17);
 	public static final BlockPos POOL_LOCKER =
-			new BlockPos(SHIP_X - 9, GROUND + 1, SHIP_Z + 8);
+			new BlockPos(SHIP_X - 12, GROUND + 1, SHIP_Z - 5);
 	public static final BlockPos POOL_WARDROBE =
-			new BlockPos(SHIP_X - 9, GROUND + 1, SHIP_Z - 8);
+			new BlockPos(SHIP_X - 12, GROUND + 1, SHIP_Z - 20);
 
 	/** The telescope on the balcony. */
 	public static final BlockPos TELESCOPE =

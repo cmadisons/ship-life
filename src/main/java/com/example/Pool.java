@@ -41,6 +41,16 @@ public final class Pool {
 
 	private static final Map<UUID, Swim> SWIMMING = new HashMap<>();
 
+	/** Ship 2's floor 2 wants four laps inside thirty seconds. */
+	public static final int RACE_LAPS = 4;
+	public static final int RACE_TICKS = 600;
+
+	/** How far into a race someone is: laps done, which leg, when they went. */
+	private record Race(int laps, int leg, long started) {
+	}
+
+	private static final Map<UUID, Race> RACING = new HashMap<>();
+
 	public static void register() {
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (player instanceof ServerPlayer who && world instanceof ServerLevel level
@@ -62,7 +72,11 @@ public final class Pool {
 					continue;
 				}
 				for (ServerPlayer player : level.players()) {
-					swim(player);
+					if (level.dimension() == net.minecraft.world.level.Level.NETHER) {
+						race(player, level);
+					} else {
+						swim(player);
+					}
 				}
 			}
 		});
@@ -104,6 +118,78 @@ public final class Pool {
 		} else {
 			say(player, "Coming back -- " + time(now - swim.started()));
 		}
+	}
+
+	/**
+	 * Ship 2's pool, which is a race rather than a lap.
+	 *
+	 * Ship 1's pool asks for one lap and times it. This one asks for four,
+	 * back to back, inside thirty seconds -- and four lengths and back of a
+	 * pool forty-three long is not something you swim on your own. That is
+	 * what the dog and the dolphin are for.
+	 *
+	 * Doing it opens ship 2's floor 2. Ship 2 keeps its own passport, so
+	 * nothing you earned on ship 1 counts for it.
+	 */
+	private static void race(ServerPlayer player, ServerLevel level) {
+		if (!Places.inPoolTwo(player.getX(), player.getY(), player.getZ())
+				|| !player.isInWater()) {
+			RACING.remove(player.getUUID());
+			return;
+		}
+		boolean nearEnd = player.getX() <= Places.poolTwoStart() + 1;
+		boolean farEnd = player.getX() >= Places.poolTwoEnd() - 1;
+		long now = level.getGameTime();
+		Race race = RACING.get(player.getUUID());
+
+		if (race == null) {
+			if (nearEnd) {
+				RACING.put(player.getUUID(), new Race(0, 1, now));
+				say(player, "Go -- " + RACE_LAPS + " laps, thirty seconds.");
+			}
+			return;
+		}
+
+		long left = RACE_TICKS - (now - race.started());
+		if (left <= 0) {
+			RACING.remove(player.getUUID());
+			say(player, "Out of time.");
+			return;
+		}
+
+		if (race.leg() == 1) {
+			if (farEnd) {
+				RACING.put(player.getUUID(), new Race(race.laps(), 2, race.started()));
+			}
+			say(player, race.laps() + "/" + RACE_LAPS + " -- " + time(left) + " left");
+			return;
+		}
+
+		if (!nearEnd) {
+			say(player, race.laps() + "/" + RACE_LAPS + " -- " + time(left) + " left");
+			return;
+		}
+
+		int done = race.laps() + 1;
+		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BELL.value(),
+				SoundSource.PLAYERS, 0.8f, 1.4f);
+		if (done < RACE_LAPS) {
+			RACING.put(player.getUUID(), new Race(done, 1, race.started()));
+			say(player, done + "/" + RACE_LAPS + " -- " + time(left) + " left");
+			return;
+		}
+
+		RACING.remove(player.getUUID());
+		String took = time(RACE_TICKS - left);
+		if (State.hasFloorTwo(player, 2)) {
+			player.sendSystemMessage(Component.literal(RACE_LAPS + " laps in " + took + ".")
+					.withStyle(ChatFormatting.GREEN));
+			return;
+		}
+		State.unlockTwo(player, 2);
+		player.sendSystemMessage(Component.literal(RACE_LAPS + " laps in " + took
+				+ " -- ship 2's floor 2 is open.").withStyle(ChatFormatting.AQUA));
+		Log.write(player, "swam ship 2's four laps");
 	}
 
 	private static void finished(ServerPlayer player, int ticks) {

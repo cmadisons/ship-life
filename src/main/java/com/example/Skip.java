@@ -97,8 +97,8 @@ public final class Skip {
 			source.sendFailure(Component.literal("This is not a Ship Life world."));
 			return 0;
 		}
-		if (!State.hasFloor(player, floor)) {
-			State.unlock(player, floor);
+		if (!State.hasFloor(player, level, floor)) {
+			State.unlock(player, level, floor);
 			player.sendSystemMessage(Component.literal("Floor " + floor + " -- "
 					+ Floors.name(floor) + " -- is open.").withStyle(ChatFormatting.AQUA));
 		}
@@ -144,8 +144,8 @@ public final class Skip {
 
 		int opened = 0;
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-			if (!State.hasFloor(player, floor)) {
-				State.unlock(player, floor);
+			if (!State.hasFloor(player, level, floor)) {
+				State.unlock(player, level, floor);
 				opened++;
 			}
 		}

@@ -188,9 +188,28 @@ public class ShipLifeMod implements ModInitializer {
 	 */
 	private static void onJoin(ServerPlayer player) {
 		ServerLevel level = player.level() instanceof ServerLevel server ? server : null;
-		if (level == null || level.dimension() != net.minecraft.world.level.Level.OVERWORLD) {
+		if (level == null) {
 			return;
 		}
+
+		// Which worlds are ours, worked out again from the world itself.
+		recognise(level.getServer());
+
+		if (level.dimension() != net.minecraft.world.level.Level.OVERWORLD) {
+			// Joining on ship 2, which is in the Nether. The world is already
+			// built and already ours; what is left is the handful of things
+			// that are put back on every arrival.
+			if (isShipLife(level)) {
+				Gym.apply(player);
+				Daily.check(player);
+				Log.check(player);
+				if (!standingOnSomething(player)) {
+					putSomewhereSafe(player);
+				}
+			}
+			return;
+		}
+
 		String key = level.dimension().identifier().toString();
 		boolean known = SHIP_WORLDS.contains(key);
 		boolean fresh = !known && isVoid(level);
@@ -199,6 +218,7 @@ public class ShipLifeMod implements ModInitializer {
 			return;                       // an ordinary world -- leave it alone
 		}
 		SHIP_WORLDS.add(key);
+		claimTheNether(level.getServer());
 
 		if (fresh) {
 			level.getGameRules().set(GameRules.KEEP_INVENTORY, true, level.getServer());
@@ -292,8 +312,9 @@ public class ShipLifeMod implements ModInitializer {
 	 */
 	private static void putSomewhereSafe(ServerPlayer player) {
 		BlockPos to = Places.SPAWN;
+		ServerLevel where = (ServerLevel) player.level();
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
-			if (State.hasFloor(player, floor)) {
+			if (State.hasFloor(player, where, floor)) {
 				to = Places.lift(floor);
 				break;
 			}
@@ -328,6 +349,43 @@ public class ShipLifeMod implements ModInitializer {
 	 */
 	public static void claim(ServerLevel level) {
 		SHIP_WORLDS.add(level.dimension().identifier().toString());
+	}
+
+	/**
+	 * Which worlds are ours, asked of the world rather than of memory.
+	 *
+	 * The answer used to live only in the set above, and the only thing that
+	 * ever filled the set was somebody joining in the overworld. So logging
+	 * out on ship 2 -- which is in the Nether -- and coming back in claimed
+	 * nothing at all: the lift, the HUD, the shops and every command switched
+	 * themselves off, and the game said this was not a Ship Life world.
+	 *
+	 * Now the question is put to the world on the way in, wherever you happen
+	 * to be standing when you arrive.
+	 */
+	private static void recognise(net.minecraft.server.MinecraftServer server) {
+		ServerLevel overworld = server.overworld();
+		String key = overworld.dimension().identifier().toString();
+		if (!SHIP_WORLDS.contains(key) && !isShipBuilt(overworld)) {
+			return;                       // an ordinary world -- leave it alone
+		}
+		SHIP_WORLDS.add(key);
+		claimTheNether(server);
+	}
+
+	/**
+	 * The Nether of a Ship Life world is a Ship Life world.
+	 *
+	 * Ship 2 is the only thing that is ever built out there, and it is built
+	 * the first time anybody comes through the portal -- so waiting for the
+	 * ship before claiming the level is what left the level unclaimed after
+	 * every restart.
+	 */
+	private static void claimTheNether(net.minecraft.server.MinecraftServer server) {
+		ServerLevel nether = server.getLevel(net.minecraft.world.level.Level.NETHER);
+		if (nether != null) {
+			claim(nether);
+		}
 	}
 
 	public static boolean isShipLife(ServerLevel level) {

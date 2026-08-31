@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -132,6 +133,16 @@ public final class State {
 
 	/** Which floors your passport opens, one bit per floor. */
 	public static final AttachmentType<Integer> FLOORS = of("floors", 0, Codec.INT);
+
+	/**
+	 * And the same again for ship 2.
+	 *
+	 * The ship in the Nether is earned over again rather than handed to you
+	 * with the first one's passport. You arrive on its floor 1 -- which is
+	 * why floor 1 is never shut -- and everything above it is closed until
+	 * you have done the thing that opens it.
+	 */
+	public static final AttachmentType<Integer> FLOORS_TWO = of("floors_two", 0, Codec.INT);
 
 	/** Whether the ship has told you where to go yet, one bit per call. */
 	public static final AttachmentType<Integer> CALLS = of("calls", 0, Codec.INT);
@@ -273,6 +284,40 @@ public final class State {
 
 	public static boolean hasFloor(ServerPlayer player, int floor) {
 		return (player.getAttachedOrCreate(FLOORS) & (1 << floor)) != 0;
+	}
+
+	/**
+	 * The same question, of whichever ship you are standing in.
+	 *
+	 * The two ships keep separate passports, so which one to read is a
+	 * question about the level rather than about the player.
+	 */
+	public static boolean hasFloor(ServerPlayer player, ServerLevel level, int floor) {
+		return level.dimension() == net.minecraft.world.level.Level.NETHER
+				? hasFloorTwo(player, floor) : hasFloor(player, floor);
+	}
+
+	/**
+	 * Ship 2's passport.
+	 *
+	 * Floor 1 is set the first time the portal puts you down on it, so it
+	 * doubles as the answer to "have you ever been to ship 2" -- which is
+	 * what the lift asks before it offers to take you between the ships.
+	 */
+	public static boolean hasFloorTwo(ServerPlayer player, int floor) {
+		return (player.getAttachedOrCreate(FLOORS_TWO) & (1 << floor)) != 0;
+	}
+
+	public static void unlockTwo(ServerPlayer player, int floor) {
+		player.setAttached(FLOORS_TWO, player.getAttachedOrCreate(FLOORS_TWO) | (1 << floor));
+	}
+
+	public static void unlock(ServerPlayer player, ServerLevel level, int floor) {
+		if (level.dimension() == net.minecraft.world.level.Level.NETHER) {
+			unlockTwo(player, floor);
+		} else {
+			unlock(player, floor);
+		}
 	}
 
 	public static void unlock(ServerPlayer player, int floor) {

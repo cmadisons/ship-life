@@ -126,16 +126,55 @@ public final class Ship {
 	 */
 	public static void buildInTheNether(ServerLevel nether) {
 		// Built once -- unless what is standing there is the old narrow one,
-		// in which case it is built again at the size it should be.
+		// or the one whose floor 1 had no way home on it, in which case it is
+		// built again the way it should have been.
 		boolean wideEnough = nether.getBlockState(new net.minecraft.core.BlockPos(
 				Places.SHIP_X + Places.ROOM_TWO, Places.floorY(1), Places.SHIP_Z))
 				.is(Blocks.BLACK_CONCRETE);
-		if (nether.getBlockState(Places.panel(1)).is(Made.elevatorButton) && wideEnough) {
+		boolean wayHome = nether.getBlockState(Places.PORTAL_TWO).is(Blocks.NETHER_PORTAL);
+		if (nether.getBlockState(Places.panel(1)).is(Made.elevatorButton)
+				&& wideEnough && wayHome) {
 			return;
 		}
+		clearTheNether(nether);
 		buildShip(nether);
 		poolDeck(nether);
 		ShipLifeMod.LOGGER.info("Built ship 2 in the Nether.");
+	}
+
+	/**
+	 * The Nether, emptied out around ship 2.
+	 *
+	 * Ship 1 floats in a void because the world it stands in has nothing else
+	 * in it. The Nether is a real place, full of rock and lava, and ship 2 was
+	 * buried in it -- so the rock goes. A pocket of nothing the size of the
+	 * ship and as much again in every direction, from the bottom of the world
+	 * to the top of it, and the ship stands in the middle of that.
+	 *
+	 * Nothing but air is written, and air already there is left alone, which
+	 * is most of the pocket above the old Nether ceiling.
+	 */
+	private static void clearTheNether(ServerLevel level) {
+		int reach = Places.ROOM_TWO * 2;
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		var air = Blocks.AIR.defaultBlockState();
+		long taken = 0;
+		for (int x = Places.SHIP_X - reach; x <= Places.SHIP_X + reach; x++) {
+			for (int z = Places.SHIP_Z - reach; z <= Places.SHIP_Z + reach; z++) {
+				for (int y = level.getMinY(); y < level.getMaxY(); y++) {
+					pos.set(x, y, z);
+					if (level.getBlockState(pos).isAir()) {
+						continue;
+					}
+					// Clients only: neighbour updates on a million blocks of
+					// netherrack would be the whole tick and then some.
+					level.setBlock(pos, air,
+							net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+					taken++;
+				}
+			}
+		}
+		ShipLifeMod.LOGGER.info("Cleared {} blocks of Nether out of ship 2's way.", taken);
 	}
 
 	/**
@@ -156,26 +195,45 @@ public final class Ship {
 		// Clear the lobby's furniture out: this floor is something else here.
 		fill(level, x - r, y + 1, z - r, x + r, y + 6, z + r, Blocks.AIR);
 
-		// The pool: sunk four deep, tiled, and filled. It is as big as the
-		// floor it is in, which on this ship is a great deal bigger.
-		int poolX = r - 4;
-		int poolZ = r - 6;
-		fill(level, x - poolX, y - 4, z - poolZ, x + poolX, y - 1, z + poolZ, Blocks.WATER);
-		for (int dx = -poolX - 1; dx <= poolX + 1; dx++) {
-			for (int dz = -poolZ - 1; dz <= poolZ + 1; dz++) {
-				boolean inside = Math.abs(dx) <= poolX && Math.abs(dz) <= poolZ;
+		// Ship 1's floor 1 has a doorway punched in the wall for the gangway.
+		// There is no gangway out here, and a hole in the hull over a pool is
+		// a hole in the hull, so the wall goes back.
+		fill(level, x - r - 1, y + 1, z, x - r, y + 6, z, Blocks.BLACK_CONCRETE);
+
+		// The pool: sunk four deep, tiled, and filled. It runs to two blocks
+		// off the wall on every side -- as long and as wide as the floor will
+		// let it be -- and stops only for the corner the lift comes down into
+		// and the portal stands in.
+		int reach = Places.POOL_TWO_HALF;
+		for (int dx = -reach - 1; dx <= reach + 1; dx++) {
+			for (int dz = -reach - 1; dz <= reach + 1; dz++) {
+				boolean water = Math.abs(dx) <= reach && Math.abs(dz) <= reach
+						&& !Places.onTheDryDeck(x + dx, z + dz);
 				set(level, new BlockPos(x + dx, y - 5, z + dz),
-						inside ? Blocks.PRISMARINE_BRICKS : Blocks.PRISMARINE);
-				if (!inside) {
-					fill(level, x + dx, y - 4, z + dz, x + dx, y, z + dz,
-							Blocks.PRISMARINE);
+						water ? Blocks.PRISMARINE_BRICKS : Blocks.PRISMARINE);
+				if (water) {
+					fill(level, x + dx, y - 4, z + dz, x + dx, y - 1, z + dz, Blocks.WATER);
+					set(level, new BlockPos(x + dx, y, z + dz), Blocks.AIR);
+				} else {
+					fill(level, x + dx, y - 4, z + dz, x + dx, y, z + dz, Blocks.PRISMARINE);
 				}
 			}
 		}
-		fill(level, x - poolX, y, z - poolZ, x + poolX, y, z + poolZ, Blocks.AIR);
+
+		// A line of colour at each end of the length, on the bottom, so the
+		// turn in a lap is somewhere you can see rather than guess.
+		for (int dz = -reach; dz <= reach; dz++) {
+			if (Places.onTheDryDeck(Places.poolTwoStart(), z + dz)) {
+				continue;
+			}
+			set(level, new BlockPos(Places.poolTwoStart(), y - 5, z + dz),
+					Blocks.LIME_CONCRETE);
+			set(level, new BlockPos(Places.poolTwoEnd(), y - 5, z + dz),
+					Blocks.RED_CONCRETE);
+		}
 
 		// The diving board: a plank walk on two legs over the deep end.
-		int board = x - poolX - 2;
+		int board = x - reach - 1;
 		for (int dz = -1; dz <= 1; dz++) {
 			fill(level, board, y + 1, z + dz, board, y + 3, z + dz, Blocks.PRISMARINE);
 		}
@@ -187,6 +245,7 @@ public final class Ship {
 		set(level, new BlockPos(board - 1, y + 5, z), Blocks.SEA_LANTERN);
 
 		// The hot tub: warm water, bubbles up the middle, a fountain over it.
+		// It is on the dry deck with everything else that is not the pool.
 		fill(level, Places.HOT_TUB.getX() - 2, y, Places.HOT_TUB.getZ() - 2,
 				Places.HOT_TUB.getX() + 2, y, Places.HOT_TUB.getZ() + 2,
 				Blocks.POLISHED_BLACKSTONE);
@@ -220,6 +279,16 @@ public final class Ship {
 		door(level, new BlockPos(wx, y + 1, wz + 1), Direction.NORTH);
 		set(level, Places.POOL_WARDROBE, Blocks.SPRUCE_PLANKS);
 		set(level, Places.POOL_WARDROBE.above(), Blocks.SPRUCE_TRAPDOOR);
+
+		// The lift back. Clearing the floor took the car out along with the
+		// furniture, and a floor 1 with no lift in it is a floor you cannot
+		// leave -- which is exactly how ship 2 arrived.
+		liftCar(level, 1);
+
+		// And the way home, standing on the deck beside it. Ship 1 keeps its
+		// portal on floor 18; out here it goes where the portal puts you down,
+		// so getting back is not eighteen floors of lift first.
+		portalFrame(level, Places.PORTAL_TWO, Places.FLINT_STAND_TWO);
 
 		// And a sign on the wall, since every floor has one.
 		nameOnTheWall(level, 1);
@@ -315,8 +384,14 @@ public final class Ship {
 
 		if (floor == 1) {
 			// The way in from the walkway.
-			set(level, new BlockPos(x - r, y + 1, z), Blocks.AIR);
-			set(level, new BlockPos(x - r, y + 2, z), Blocks.AIR);
+			//
+			// Both layers of it. The hull is two blocks thick and only the
+			// inner one was ever cut through, so the door opened onto the
+			// outer course -- a black concrete wall an inch past the handle.
+			for (int dy = 1; dy <= 2; dy++) {
+				set(level, new BlockPos(x - r, y + dy, z), Blocks.AIR);
+				set(level, new BlockPos(x - r - 1, y + dy, z), Blocks.AIR);
+			}
 		}
 	}
 
@@ -457,6 +532,13 @@ public final class Ship {
 	}
 
 	private static void furnishArcade(ServerLevel level) {
+		// The row moved two blocks along, off the corner of the lift. Clear
+		// the whole line first so a world built before the move does not end
+		// up with six cabinets in it.
+		fill(level, Places.SHIP_X - 10, Places.SNAKE.getY(), Places.SNAKE.getZ(),
+				Places.SHIP_X + 10, Places.SNAKE.getY() + 3, Places.SNAKE.getZ(),
+				Blocks.AIR);
+
 		cabinet(level, Places.SNAKE, Blocks.LIME_CONCRETE);
 		cabinet(level, Places.PACMAN, Blocks.YELLOW_CONCRETE);
 		cabinet(level, Places.GALAGA, Blocks.PURPLE_CONCRETE);
@@ -719,9 +801,20 @@ public final class Ship {
 	 * is the way off it.
 	 */
 	private static void furnishPortal(ServerLevel level) {
-		int x = Places.PORTAL.getX();
-		int y = Places.PORTAL.getY();
-		int z = Places.PORTAL.getZ();
+		portalFrame(level, Places.PORTAL, Places.FLINT_STAND);
+	}
+
+	/**
+	 * One lit portal in an obsidian frame, with its flint stand beside it.
+	 *
+	 * Ship 1 keeps its frame on floor 18, which is the way off the ship. Ship
+	 * 2 keeps one on floor 1, where the portal puts you down, so the way home
+	 * is where you arrive.
+	 */
+	private static void portalFrame(ServerLevel level, BlockPos middle, BlockPos stand) {
+		int x = middle.getX();
+		int y = middle.getY();
+		int z = middle.getZ();
 
 		fill(level, x - 3, y - 1, z - 3, x + 3, y - 1, z + 3, Blocks.POLISHED_BLACKSTONE);
 
@@ -760,17 +853,47 @@ public final class Ship {
 		set(level, new BlockPos(x - 3, y + 1, z), Blocks.SHROOMLIGHT);
 		set(level, new BlockPos(x + 3, y + 1, z), Blocks.SHROOMLIGHT);
 
-		// The flint and steel lives up here, on a stand beside the frame.
-		// Whoever built this ship left one, and it stays left: take another
-		// whenever you want one.
-		set(level, Places.FLINT_STAND, Blocks.POLISHED_BLACKSTONE);
-		set(level, Places.FLINT_STAND.above(), Blocks.LANTERN);
+		// The flint and steel lives beside the frame, on a stand. Whoever
+		// built this ship left one, and it stays left: take another whenever
+		// you want one.
+		set(level, stand, Blocks.POLISHED_BLACKSTONE);
+		set(level, stand.above(), Blocks.LANTERN);
+	}
 
-		// The flint and steel lives up here, on a stand beside the frame.
-		// Whoever built this ship left one, and it stays left: take it as
-		// often as you like.
-		set(level, Places.FLINT_STAND, Blocks.POLISHED_BLACKSTONE);
-		set(level, Places.FLINT_STAND.above(), Blocks.LANTERN);
+	/**
+	 * A frame, kept lit.
+	 *
+	 * A portal that has gone out is a floor you cannot leave, and they do go
+	 * out: a splash of water, a rebuild, a world that never lit properly in
+	 * the first place. So the middle of the frame is looked at every so often
+	 * and what is missing is put back -- first the way anybody lights one,
+	 * with a fire on the bottom row, and then by hand if the fire will not
+	 * take.
+	 */
+	public static void keepLit(ServerLevel level, BlockPos middle) {
+		if (level.getBlockState(middle).is(Blocks.NETHER_PORTAL)) {
+			return;
+		}
+		if (!level.getBlockState(middle.below()).is(Blocks.OBSIDIAN)) {
+			return;                       // no frame here yet -- nothing to light
+		}
+		int x = middle.getX();
+		int y = middle.getY();
+		int z = middle.getZ();
+		fill(level, x - 1, y, z, x + 1, y + 3, z, Blocks.AIR);
+		level.setBlockAndUpdate(middle, Blocks.FIRE.defaultBlockState());
+		if (level.getBlockState(middle).is(Blocks.NETHER_PORTAL)) {
+			return;
+		}
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dy = 0; dy <= 3; dy++) {
+				level.setBlock(new BlockPos(x + dx, y + dy, z),
+						Blocks.NETHER_PORTAL.defaultBlockState().setValue(
+								net.minecraft.world.level.block.NetherPortalBlock.AXIS,
+								net.minecraft.core.Direction.Axis.X),
+						net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+			}
+		}
 	}
 
 	private static void furnishWeapons(ServerLevel level) {
@@ -927,8 +1050,17 @@ public final class Ship {
 		int d = Places.KART_HALF_DEPTH;
 		int north = Places.SHIP_Z - d;
 		int south = Places.SHIP_Z + d;
-		int west = Places.SHIP_X - w;
-		int east = Places.SHIP_X + w;
+		int west = Places.KART_X - w;
+		int east = Places.KART_X + w;
+
+		// The loop moved off the lift's corner, so anything left of the old
+		// one goes before the new one is laid.
+		fill(level, Places.SHIP_X - Places.ROOM + 1, y, Places.SHIP_Z - Places.ROOM + 1,
+				Places.SHIP_X + Places.ROOM - 1, Places.KART_Y, Places.SHIP_Z + Places.ROOM - 1,
+				Blocks.AIR);
+		fill(level, Places.SHIP_X - Places.ROOM + 1, y, Places.SHIP_Z - Places.ROOM + 1,
+				Places.SHIP_X + Places.ROOM - 1, y, Places.SHIP_Z + Places.ROOM - 1,
+				Blocks.BLACK_CONCRETE);
 
 		// Tarmac inside the loop, so the track reads as a track.
 		fill(level, west, y, north, east, y, south, Blocks.BLACK_CONCRETE);
@@ -951,7 +1083,7 @@ public final class Ship {
 		rail(level, new BlockPos(east, Places.KART_Y, south), RailShape.NORTH_WEST, false);
 
 		// The line, and the pits behind it.
-		set(level, new BlockPos(Places.SHIP_X, y, north - 1), Blocks.WHITE_CONCRETE);
+		set(level, new BlockPos(Places.KART_X, y, north - 1), Blocks.WHITE_CONCRETE);
 		set(level, Places.RACE_CAR, Blocks.RED_CONCRETE);
 		set(level, Places.RACE_CAR.above(), Blocks.BLACK_CONCRETE);
 		set(level, Places.RACE_CAR.above(2), Blocks.SEA_LANTERN);
@@ -1241,6 +1373,22 @@ public final class Ship {
 		if (!level.getBlockState(Places.GYM).is(Blocks.ANVIL)) {
 			furnishGym(level);
 		}
+		// The pool and the track were never on this list, so any world that
+		// got floor 3 or floor 6 from catchUp rather than from the first build
+		// got the room and nothing in it -- an empty floor where the pool
+		// should be, and no rails to drive on.
+		if (!level.getBlockState(new BlockPos(Places.SHIP_X, Places.floorY(3) - 1,
+				Places.SHIP_Z)).is(Blocks.WATER)) {
+			furnishPool(level);
+			ShipLifeMod.LOGGER.info("Put the pool into floor 3.");
+		}
+		if (!level.getBlockState(new BlockPos(Places.KART_X, Places.KART_Y,
+				Places.SHIP_Z - Places.KART_HALF_DEPTH)).is(Blocks.POWERED_RAIL)
+				&& !level.getBlockState(new BlockPos(Places.KART_X, Places.KART_Y,
+						Places.SHIP_Z - Places.KART_HALF_DEPTH)).is(Blocks.RAIL)) {
+			furnishRace(level);
+			ShipLifeMod.LOGGER.info("Laid the track on floor 6.");
+		}
 		if (!level.getBlockState(Places.WEAPONS).is(Blocks.SMITHING_TABLE)
 				|| !level.getBlockState(Places.BENCH).is(Blocks.ENCHANTING_TABLE)) {
 			furnishWeapons(level);
@@ -1257,6 +1405,17 @@ public final class Ship {
 		if (!level.getBlockState(new BlockPos(20, Places.GROUND, Places.SHIP_Z))
 				.is(Blocks.POLISHED_ANDESITE)) {
 			furnishGangway(level);
+		}
+		// The doorway on floor 1 was cut through the inner hull only, which
+		// left the outer course standing in it. Take it out.
+		if (level.getBlockState(Places.DOOR).is(Blocks.BLACK_CONCRETE)) {
+			for (int dy = 1; dy <= 2; dy++) {
+				set(level, new BlockPos(Places.SHIP_X - Places.ROOM,
+						Places.GROUND + dy, Places.SHIP_Z), Blocks.AIR);
+				set(level, new BlockPos(Places.SHIP_X - Places.ROOM - 1,
+						Places.GROUND + dy, Places.SHIP_Z), Blocks.AIR);
+			}
+			ShipLifeMod.LOGGER.info("Opened the doorway on floor 1.");
 		}
 		if (!level.getBlockState(new BlockPos(Places.SHIP_X, Places.GROUND - 1,
 				Places.SHIP_Z)).is(Blocks.BLACK_CONCRETE)) {

@@ -159,16 +159,19 @@ public final class Elevator {
 			page.setItem(slot, filler.copy());
 		}
 
+		ServerLevel where = (ServerLevel) player.level();
+		boolean second = where.dimension() == net.minecraft.world.level.Level.NETHER;
+
 		int on = Places.floorAt(player.getY());
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int slot = 10 + ((floor - 1) / 7) * 9 + ((floor - 1) % 7);
-			if (State.hasFloor(player, floor)) {
+			if (State.hasFloor(player, where, floor)) {
 				page.setItem(slot, Book.entry(
 						floor == on ? Items.LIME_DYE : Items.WHITE_DYE,
 						"Floor " + floor, ChatFormatting.WHITE,
 						NAMES[floor],
 						floor == on ? "You are here." : "Click to go."));
-			} else if (questFloor(player) == floor) {
+			} else if (!second && questFloor(player) == floor) {
 				page.setItem(slot, Book.entry(Items.IRON_DOOR,
 						"Floor " + floor + " 🔒", ChatFormatting.GRAY,
 						"Locked.",
@@ -177,6 +180,16 @@ public final class Elevator {
 		}
 
 		page.setItem(49, Book.entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
+
+		// The other ship. Once you have stood on ship 2's floor 1 the lift
+		// will take you between the two of them, so getting across is not a
+		// walk to floor 18 and a portal every time.
+		if (State.hasFloorTwo(player, 1)) {
+			page.setItem(53, Book.entry(Items.CRYING_OBSIDIAN,
+					second ? "Ship 1" : "Ship 2", ChatFormatting.LIGHT_PURPLE,
+					second ? "The ship you came from." : "The one in the Nether.",
+					"Click to go."));
+		}
 
 		player.openMenu(new SimpleMenuProvider(
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page, Elevator::click),
@@ -196,13 +209,21 @@ public final class Elevator {
 			player.closeContainer();
 			return;
 		}
+		if (slot == 53) {
+			if (State.hasFloorTwo(player, 1)) {
+				player.closeContainer();
+				Portals.cross(player);
+			}
+			return;
+		}
 		int row = slot / 9;
 		int column = slot % 9;
 		if (row < 1 || row > 3 || column < 1 || column > 7) {
 			return;
 		}
 		int floor = (row - 1) * 7 + column;
-		if (floor < 1 || floor > Places.TOP_FLOOR || !State.hasFloor(player, floor)) {
+		if (floor < 1 || floor > Places.TOP_FLOOR
+				|| !State.hasFloor(player, (ServerLevel) player.level(), floor)) {
 			return;
 		}
 		player.closeContainer();

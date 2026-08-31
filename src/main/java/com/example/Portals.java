@@ -51,7 +51,18 @@ public final class Portals {
 				if (!ShipLifeMod.isShipLife(level)) {
 					continue;
 				}
-				for (ServerPlayer player : level.players()) {
+
+				// Both frames stay lit, so the way off a ship is never a dead
+				// hole in an obsidian ring.
+				Ship.keepLit(level, Places.PORTAL);
+				if (level.dimension() == Level.NETHER) {
+					Ship.keepLit(level, Places.PORTAL_TWO);
+				}
+
+				// A copy, because stepping through takes the player out of
+				// this level's list -- and changing the list underneath the
+				// loop that is walking it crashed the server.
+				for (ServerPlayer player : java.util.List.copyOf(level.players())) {
 					if (!inTheFrame(player)) {
 						WENT.remove(player.getUUID());
 						continue;
@@ -77,13 +88,37 @@ public final class Portals {
 		});
 	}
 
-	/** Are they standing in the frame on floor 18? */
+	/**
+	 * Are they standing in a frame?
+	 *
+	 * Ship 1 has one, on floor 18. Ship 2 has that one and another on floor 1,
+	 * where the portal puts you down, so the way home is where you arrive.
+	 */
 	private static boolean inTheFrame(ServerPlayer player) {
-		BlockPos frame = Places.PORTAL;
+		if (standingIn(player, Places.PORTAL)) {
+			return true;
+		}
+		return player.level().dimension() == Level.NETHER
+				&& standingIn(player, Places.PORTAL_TWO);
+	}
+
+	private static boolean standingIn(ServerPlayer player, BlockPos frame) {
 		return Math.abs(player.getX() - (frame.getX() + 0.5)) < 2.0
 				&& Math.abs(player.getZ() - (frame.getZ() + 0.5)) < 1.2
 				&& player.getY() >= frame.getY() - 0.5
 				&& player.getY() <= frame.getY() + 3.5;
+	}
+
+	/**
+	 * The lift's way across, which is the frame's way across.
+	 *
+	 * Once you have stood on ship 2's floor 1 the lift will take you between
+	 * the ships without walking you back to a portal first.
+	 */
+	public static void cross(ServerPlayer player) {
+		if (player.level() instanceof ServerLevel level && ShipLifeMod.isShipLife(level)) {
+			step(player, level);
+		}
 	}
 
 	/** Through it: to the Nether from home, and home from the Nether. */
@@ -106,6 +141,7 @@ public final class Portals {
 			nether.playSound(null, lobby, SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS,
 					0.4f, 1.0f);
 			Pets.bringThemAlong(player, nether);
+			State.unlockTwo(player, 1);
 			player.sendSystemMessage(Component.literal(
 					"Ship 2, floor 1 -- the pool deck, floating in the Nether.")
 					.withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -141,6 +177,7 @@ public final class Portals {
 		BlockPos lobby = Places.lift(1);
 		player.teleportTo(lobby.getX() + 0.5, lobby.getY(), lobby.getZ() + 0.5);
 		Pets.bringThemAlong(player, nether);
+		State.unlockTwo(player, 1);
 		nether.playSound(null, lobby, SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS,
 				0.4f, 1.0f);
 		player.sendSystemMessage(Component.literal(

@@ -25,8 +25,9 @@ import net.minecraft.world.entity.TamableAnimal;
  * What a pet is for is the boost it gives you: the lion fights alongside you,
  * the dog makes you quicker through water, the cat opens floor 6 for good, and
  * the dolphin does whatever one of the other three feels like that day. They
- * all follow you at once, and two of a kind doubles the boost -- except the
- * cat, whose floor is either open or it isn't.
+ * all follow you at once, and every one of a kind adds to the boost -- two is
+ * double, three is triple, and a hundred is where it stops. The cat is the
+ * exception, whose floor is either open or it isn't.
  *
  * The lion is an ocelot and the dolphin is a dolphin, because those are the
  * models Minecraft has that look like the animal on the tin. Neither can be
@@ -121,7 +122,7 @@ public final class Pets {
 		if (floor != 9 && floor != 10) {
 			return;
 		}
-		double bite = 4.0 * Math.min(2, lions) * strength(player, Kind.LION);
+		double bite = 4.0 * Math.min(BOOST_MAX, lions) * strength(player, Kind.LION);
 		for (net.minecraft.world.entity.monster.Monster prey : level.getEntitiesOfClass(
 				net.minecraft.world.entity.monster.Monster.class,
 				player.getBoundingBox().inflate(8.0),
@@ -238,8 +239,9 @@ public final class Pets {
 					.withStyle(ChatFormatting.AQUA));
 		}
 		player.sendSystemMessage(Component.literal("A " + kind.label + " follows you now. "
-				+ (owned(player, kind) == 2 && kind != Kind.CAT
-						? "Two of a kind: double boost."
+				+ (owned(player, kind) >= 2 && kind != Kind.CAT
+						? owned(player, kind) + " of a kind: " + owned(player, kind)
+								+ "x boost."
 						: kind.what + "."))
 				.withStyle(ChatFormatting.GREEN));
 		return true;
@@ -414,6 +416,26 @@ public final class Pets {
 		return dogs > 0 || Shops.running(player, "swim");
 	}
 
+	/**
+	 * As high as a boost goes.
+	 *
+	 * A third of a kind used to be worth nothing: the power it added was
+	 * counted and then thrown away, because what came out of it was an effect
+	 * that only ever had two settings. Every one you own counts now, and a
+	 * hundred is where it stops.
+	 */
+	public static final int BOOST_MAX = 100;
+
+	/**
+	 * A power turned into an effect level.
+	 *
+	 * One pet is level 1, two is level 2, and so on up to a hundred. The
+	 * game's amplifier counts from nought, so it is one less than the level.
+	 */
+	private static int amplifier(double power) {
+		return Math.min(BOOST_MAX, (int) power) - 1;
+	}
+
 	private static void boosts(ServerPlayer player) {
 		int lions = owned(player, Kind.LION) + owned(player, Kind.SKELETON);
 		int dogs = owned(player, Kind.DOG);
@@ -440,15 +462,18 @@ public final class Pets {
 			dogPower += 1;
 		}
 
-		if (lionPower > 0) {
+		if (lionPower >= 1) {
 			player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40,
-					lionPower >= 2 ? 1 : 0, true, false, false));
+					amplifier(lionPower), true, false, false));
 		}
-		// Every seven seconds, and only when there is water to be quick in.
-		if (dogPower > 0 && player.isInWater()
-				&& player.level().getGameTime() % 140 < 20) {
+		// Every seven seconds, and only when there is water to be quick in --
+		// unless the boost is at the top, in which case it never goes off. A
+		// hundred of something is not a boost that comes and goes.
+		boolean always = dogPower >= BOOST_MAX;
+		if (dogPower >= 1 && player.isInWater()
+				&& (always || player.level().getGameTime() % 140 < 20)) {
 			player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 60,
-					dogPower >= 2 ? 1 : 0, true, false, false));
+					amplifier(dogPower), true, false, false));
 		}
 	}
 }
