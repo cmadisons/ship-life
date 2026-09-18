@@ -200,6 +200,19 @@ public final class Pets {
 	 * whole reason you are allowed more than one.
 	 */
 	public static boolean buy(ServerPlayer player, Kind kind) {
+		return buy(player, kind, 1);
+	}
+
+	/**
+	 * Buy some.
+	 *
+	 * The counter takes what you asked for when you can pay for it, and as
+	 * many as you can pay for when you cannot -- so asking for ten with
+	 * ninety-five tickets in your pocket buys nine rather than nothing at
+	 * all. A hundred of a kind is where the boost stops, so it is where the
+	 * counter stops too.
+	 */
+	public static boolean buy(ServerPlayer player, Kind kind, int want) {
 		// A second cat does nothing at all: the floor it opens is open. So
 		// the counter says so rather than taking ten tickets for a pet that
 		// is already yours.
@@ -209,15 +222,28 @@ public final class Pets {
 					+ "already open.").withStyle(ChatFormatting.GRAY));
 			return false;
 		}
-		if (State.arcade(player) < PRICE) {
+
+		// One cat is the whole cat there is; everything else stops where the
+		// boost does.
+		int room = kind == Kind.CAT ? 1 : BOOST_MAX - owned(player, kind);
+		if (room <= 0) {
+			player.sendSystemMessage(Component.literal("You have " + BOOST_MAX + " of them, "
+					+ "which is as many as count.").withStyle(ChatFormatting.GRAY));
+			return false;
+		}
+		int buying = Math.min(Math.min(Math.max(1, want), room), State.arcade(player) / PRICE);
+		if (buying <= 0) {
 			player.sendSystemMessage(Component.literal("That costs " + PRICE
-					+ " tickets and you have " + State.arcade(player) + ".")
+					+ " tickets each and you have " + State.arcade(player) + ".")
 					.withStyle(ChatFormatting.RED));
 			return false;
 		}
-		State.arcade(player, -PRICE);
-		player.setAttached(OWNED[kind.ordinal()], owned(player, kind) + 1);
-		spawn(player, kind);
+
+		State.arcade(player, -PRICE * buying);
+		player.setAttached(OWNED[kind.ordinal()], owned(player, kind) + buying);
+		for (int i = 0; i < buying; i++) {
+			spawn(player, kind);
+		}
 
 		if (kind == Kind.CAT && !State.hasFloor(player, 6)) {
 			State.unlock(player, 6);
@@ -238,10 +264,13 @@ public final class Pets {
 					"One of every pet. Floor 7 -- the events -- is open.")
 					.withStyle(ChatFormatting.AQUA));
 		}
-		player.sendSystemMessage(Component.literal("A " + kind.label + " follows you now. "
-				+ (owned(player, kind) >= 2 && kind != Kind.CAT
-						? owned(player, kind) + " of a kind: " + owned(player, kind)
-								+ "x boost."
+
+		int now = owned(player, kind);
+		player.sendSystemMessage(Component.literal(
+				(buying == 1 ? "A " + kind.label + " follows you now. "
+						: buying + " " + kind.label + "s follow you now. ")
+				+ (now >= 2 && kind != Kind.CAT
+						? now + " of a kind: " + now + "x boost."
 						: kind.what + "."))
 				.withStyle(ChatFormatting.GREEN));
 		return true;
