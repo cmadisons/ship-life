@@ -346,6 +346,13 @@ public final class State {
 		BENS_GIFT,
 		/** Izzy handing over the boots. */
 		IZZYS_BOOTS,
+		/** Picking how to start: a floor at a time, or every floor open. */
+		START_CHOSEN,
+	}
+
+	/** Has this one-off happened? Only asks -- marks nothing. */
+	public static boolean happened(ServerPlayer player, Once which) {
+		return (player.getAttachedOrCreate(CALLS) & (1 << which.ordinal())) != 0;
 	}
 
 	/** Has this one-off happened yet? Marks it done if not. */

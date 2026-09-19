@@ -11,6 +11,7 @@ what is built so far is listed under [What works today](#what-works-today).
 ## What works today
 
 - **Ship Life world type** on the Create World screen. Whatever mode you pick alongside it, you play survival.
+- **How you start** — the first time you arrive, a page asks: start normally, and the floors open one at a time the way they always have, or 💎 start with every floor open -- all eighteen in the lift and ship 2's too, with the passport in your pocket. Only the floors: chapter 1 is still the dishes, and every quest, shop and pet is still there. Escape is not an answer; it asks again the next time you join, until you have started.
 - The **town** — three houses, the lawn, the bushes — and the **ship**, all fourteen floors, built into an empty void.
 - **Quest Book** locked in slot 9 and the **passport** locked in slot 8, neither of which can be lost.
 - **Chapter 1** — wash the ten dishes with the sponge and the towel, bin them, mow all 121 squares of the lawn and whack the weeds, and find the penny in the second bush. $5.00 + $94.99 + $0.01.

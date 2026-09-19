@@ -307,6 +307,9 @@ public class ShipLifeMod implements ModInitializer {
 					"Your Quest Book is in slot 9. Right-click it any time.")
 					.withStyle(ChatFormatting.GRAY));
 		}
+
+		// A floor at a time, or all of them now. Asked until it is answered.
+		Start.offer(player);
 	}
 
 	/**
