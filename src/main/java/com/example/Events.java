@@ -45,6 +45,148 @@ public final class Events {
 					"The ship flies to a Star Wars planet."),
 	};
 
+	// ------------------------------------------------------------- the music
+
+	/**
+	 * A tune for each event, played on the ship's note blocks.
+	 *
+	 * Floor 7 used to be silent, which made the one day a month something is
+	 * on feel like every other day. Each event now has an instrument and a
+	 * short motif that loops while you are up there, so you know what is on
+	 * before you have read the board -- and a sting when you walk into it.
+	 *
+	 * The notes are note-block numbers, 0 to 24, with -1 for a rest. Anything
+	 * longer than a bar or two becomes wallpaper on a loop, so none of these
+	 * are.
+	 */
+	private record Tune(net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> instrument,
+			int[] notes, int[] sting) {
+	}
+
+	/** How many ticks a note lasts. Five a second is a walking pace. */
+	private static final int NOTE_TICKS = 4;
+
+	private static Tune tune(String event) {
+		return switch (event) {
+			// Low and falling, and it never resolves.
+			case "Spooky Shooter" -> new Tune(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BASS,
+					new int[] { 6, 5, 3, -1, 6, 5, 2, -1 },
+					new int[] { 6, 3, 1 });
+			// Bells, up and back down, the way a carol turns round.
+			case "Christmas" -> new Tune(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL,
+					new int[] { 12, 16, 19, 16, 12, -1, 14, -1 },
+					new int[] { 12, 16, 19 });
+			// Xylophone, bright and skipping, nothing on its mind.
+			case "Summer Break" -> new Tune(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_XYLOPHONE,
+					new int[] { 12, 14, 16, 19, 16, 14, -1, -1 },
+					new int[] { 12, 16, 21 });
+			// A chime that asks a question, for a day that hands you four.
+			case "Quest Day" -> new Tune(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_CHIME,
+					new int[] { 9, 12, 14, -1, 14, 12, 16, -1 },
+					new int[] { 9, 14, 16 });
+			// Electronic and marching, for the day the ship leaves.
+			case "May the Fourth" -> new Tune(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BIT,
+					new int[] { 7, 7, 7, 3, -1, 7, 3, -1 },
+					new int[] { 7, 3, 0 });
+			default -> null;
+		};
+	}
+
+	/** Note-block number to the pitch the sound system wants. */
+	private static float pitch(int note) {
+		return (float) Math.pow(2.0, (note - 12) / 12.0);
+	}
+
+	/**
+	 * The theme, looping on floor 7 while something is on.
+	 *
+	 * Only up there, and only for whoever is up there -- an event tune
+	 * following you round the ship would wear out inside a day.
+	 */
+	private static void music() {
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % NOTE_TICKS != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				for (ServerPlayer player : level.players()) {
+					if (STINGS.containsKey(player.getUUID())) {
+						// The opening notes, and nothing over the top of them.
+						playSting(level, player, server.getTickCount());
+						continue;
+					}
+					if (Places.floorAt(player.getY()) != 7) {
+						continue;
+					}
+					String on = running(player);
+					if (on == null) {
+						continue;
+					}
+					Tune tune = tune(on);
+					if (tune == null) {
+						continue;
+					}
+					int beat = (server.getTickCount() / NOTE_TICKS) % tune.notes().length;
+					int note = tune.notes()[beat];
+					if (note < 0) {
+						continue;
+					}
+					level.playSound(null, player.blockPosition(),
+							tune.instrument().value(),
+							net.minecraft.sounds.SoundSource.RECORDS, 0.4f, pitch(note));
+				}
+			}
+		});
+	}
+
+	/**
+	 * The three notes an event opens on.
+	 *
+	 * An arpeggio rather than a chord, because three note blocks struck
+	 * together on the same instrument come out as one muddy note. The server
+	 * has no timer of its own to hang this on, so the notes are queued
+	 * against the tick counter and played by {@link #music()} on its way
+	 * round.
+	 */
+	private static void sting(ServerPlayer player, String event) {
+		Tune tune = tune(event);
+		if (tune == null) {
+			return;
+		}
+		if (!(player.level() instanceof ServerLevel level)) {
+			return;
+		}
+		STINGS.put(player.getUUID(), new Sting(tune, level.getServer().getTickCount()));
+	}
+
+	/** An opening arpeggio part way through being played. */
+	private record Sting(Tune tune, int startedAt) {
+	}
+
+	private static final java.util.Map<java.util.UUID, Sting> STINGS =
+			new java.util.HashMap<>();
+
+	/** Play whatever note of the opening arpeggio is due, if any. */
+	private static void playSting(ServerLevel level, ServerPlayer player, int tick) {
+		Sting sting = STINGS.get(player.getUUID());
+		if (sting == null) {
+			return;
+		}
+		int step = (tick - sting.startedAt()) / NOTE_TICKS;
+		if (step < 0 || step >= sting.tune().sting().length) {
+			STINGS.remove(player.getUUID());
+			return;
+		}
+		level.playSound(null, player.blockPosition(),
+				sting.tune().instrument().value(),
+				net.minecraft.sounds.SoundSource.RECORDS,
+				0.8f, pitch(sting.tune().sting()[step]));
+	}
+
 	/**
 	 * Fireworks off the balcony, on the days something is on.
 	 *
@@ -85,6 +227,7 @@ public final class Events {
 
 	public static void register() {
 		fireworks();
+		music();
 		UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
 			if (player instanceof ServerPlayer who && world instanceof ServerLevel level
 					&& ShipLifeMod.isShipLife(level)
@@ -221,6 +364,7 @@ public final class Events {
 		if (!name.equals("Quest Day")) {
 			didAnEvent(player, "you went to an event");
 		}
+		sting(player, name);
 		switch (name) {
 			case "Spooky Shooter" -> new Shooter(player, false).open();
 			case "Christmas" -> new Shooter(player, true).open();

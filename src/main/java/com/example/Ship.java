@@ -631,6 +631,7 @@ public final class Ship {
 				Places.SHIP_X + 10, Places.SNAKE.getY() + 3, Places.SNAKE.getZ(),
 				Blocks.AIR);
 
+		cabinet(level, Places.BREAKOUT, Blocks.RED_CONCRETE);
 		cabinet(level, Places.SNAKE, Blocks.LIME_CONCRETE);
 		cabinet(level, Places.PACMAN, Blocks.YELLOW_CONCRETE);
 		cabinet(level, Places.GALAGA, Blocks.PURPLE_CONCRETE);
@@ -1203,6 +1204,10 @@ public final class Ship {
 	private static void furnishFighting(ServerLevel level) {
 		set(level, Places.FIGHT_BUTTON, Blocks.REDSTONE_BLOCK);
 		set(level, Places.FIGHT_BUTTON.above(), Blocks.REDSTONE_LAMP);
+		// The hard switch beside it. Netherite so it reads as the serious one
+		// of the two, with a torch on top you can see from across the room.
+		set(level, Places.HARD_SWITCH, Blocks.NETHERITE_BLOCK);
+		set(level, Places.HARD_SWITCH.above(), Blocks.REDSTONE_TORCH);
 		fill(level, Places.SHIP_X - 9, Places.floorY(9), Places.SHIP_Z - 9,
 				Places.SHIP_X + 9, Places.floorY(9), Places.SHIP_Z + 9,
 				Blocks.POLISHED_BLACKSTONE_BRICKS);

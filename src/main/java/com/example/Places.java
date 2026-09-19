@@ -243,6 +243,15 @@ public final class Places {
 	public static final BlockPos PACMAN = new BlockPos(SHIP_X + 2, ARCADE_Y, SHIP_Z - 10);
 	public static final BlockPos GALAGA = new BlockPos(SHIP_X + 7, ARCADE_Y, SHIP_Z - 10);
 
+	/**
+	 * The fourth cabinet, on the far side of Snake.
+	 *
+	 * The row grew leftwards rather than rightwards because the lift is off
+	 * the right-hand end and Galaga was already the last machine you could
+	 * stand in front of comfortably.
+	 */
+	public static final BlockPos BREAKOUT = new BlockPos(SHIP_X - 8, ARCADE_Y, SHIP_Z - 10);
+
 	/** The prize counter, facing the cabinets. */
 	public static final BlockPos PRIZES = new BlockPos(SHIP_X, ARCADE_Y, SHIP_Z + 8);
 
@@ -326,6 +335,15 @@ public final class Places {
 	/** The button on floor 9 that calls in a wave. */
 	public static final BlockPos FIGHT_BUTTON =
 			new BlockPos(SHIP_X - 10, floorY(9) + 1, SHIP_Z);
+
+	/**
+	 * The hard switch, two along from the wave button.
+	 *
+	 * Within reach of the button so you can change your mind on the way to
+	 * pressing it, but not so close that you throw it by accident.
+	 */
+	public static final BlockPos HARD_SWITCH =
+			new BlockPos(SHIP_X - 10, floorY(9) + 1, SHIP_Z + 2);
 
 	/** The two doors on floor 10, one boss behind each. */
 	public static final BlockPos ARACHNES_DOOR =

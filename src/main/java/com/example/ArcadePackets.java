@@ -66,9 +66,11 @@ public final class ArcadePackets {
 	/**
 	 * What the machines pay.
 	 *
-	 * Three a food on Snake, fifteen a stage on Galaga, and twenty for beating
+	 * Three a food on Snake, fifteen a stage on Galaga, twenty for beating
 	 * your own record on Pac-Man -- which is why that one sends its score and
-	 * the others send what they did.
+	 * the others send what they did -- and on Breakout a ticket a brick with
+	 * twenty-five for the wall, so a run pays something even if you never
+	 * clear one.
 	 */
 	private static void score(ServerPlayer player, String line) {
 		String[] bits = line.split(":");
@@ -89,6 +91,15 @@ public final class ArcadePackets {
 				State.add(player, State.ROUNDS, amount);
 				pay(player, 15 * amount, "stage " + amount + " cleared");
 				remember(player, "galaga", amount);
+			}
+			case "breakout:bricks" -> {
+				State.add(player, State.BRICKS, amount);
+				pay(player, amount, amount + (amount == 1 ? " brick" : " bricks"));
+			}
+			case "breakout:level" -> {
+				State.add(player, State.WALLS, 1);
+				pay(player, 25, "wall " + amount + " cleared");
+				remember(player, "breakout", amount);
 			}
 			case "pacman:score" -> {
 				if (amount > State.best(player)) {

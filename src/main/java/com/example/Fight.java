@@ -26,7 +26,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
  *
  * Floor 9 is waves: press the button and endermen, creepers, ghasts and
  * whatever else the ship keeps down there come at you, one wave harder than
- * the last. Clear a wave and it pays.
+ * the last. Clear a wave and it pays. The switch beside the button asks for a
+ * hard one -- half again as many, half again as tough, and double the money.
  *
  * Floor 10 is Arachnes and the Ender Dragon. Arachnes is a spider the size of
  * the room with her brood around her. The dragon is a Wither wearing the name,
@@ -45,6 +46,37 @@ public final class Fight {
 	/** What clearing wave n is worth. Wave 1 pays 25, wave 20 pays 310. */
 	public static int wavePay(int number) {
 		return Math.min(500, WAVE_PAYS + WAVE_STEP * (number - 1));
+	}
+
+	/** Is this player's hard switch thrown? */
+	public static boolean hard(ServerPlayer player) {
+		return State.tally(player, State.HARD) == 1;
+	}
+
+	/**
+	 * Throw the hard switch, or put it back.
+	 *
+	 * Not while anything is alive. The switch decides what the wave pays and
+	 * the wave is paid for when the last one dies, so a switch you could
+	 * throw mid-fight would be a way of being paid double for an easy wave
+	 * rather than a way of asking for a hard one.
+	 */
+	private static void toggleHard(ServerPlayer player, ServerLevel level) {
+		if (busy()) {
+			player.sendSystemMessage(Component.literal(
+					"Not in the middle of a fight. Finish it or leave the floor.")
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		boolean on = !hard(player);
+		player.setAttached(State.HARD, on ? 1 : 0);
+		player.sendSystemMessage(Component.literal(on
+				? "Hard mode on. Half again as many, half again as tough, and it pays double."
+				: "Hard mode off.")
+				.withStyle(on ? ChatFormatting.RED : ChatFormatting.GRAY));
+		level.playSound(null, player.blockPosition(),
+				SoundEvents.LEVER_CLICK, SoundSource.PLAYERS, 1.0f,
+				on ? 0.6f : 1.2f);
 	}
 
 	/** How far a boss may drift from the room before it is put back. */
@@ -95,6 +127,10 @@ public final class Fight {
 			BlockPos pos = Places.local(hit.getBlockPos());
 			if (pos.equals(Places.FIGHT_BUTTON) || pos.equals(Places.FIGHT_BUTTON.above())) {
 				wave(who, level);
+				return InteractionResult.SUCCESS;
+			}
+			if (pos.equals(Places.HARD_SWITCH) || pos.equals(Places.HARD_SWITCH.above())) {
+				toggleHard(who, level);
 				return InteractionResult.SUCCESS;
 			}
 			if (pos.equals(Places.ARACHNES_DOOR) || pos.equals(Places.ARACHNES_DOOR.above())) {
@@ -177,11 +213,27 @@ public final class Fight {
 						int floor = Places.floorAt(player.getY());
 						if (floor == 9) {
 							State.add(player, State.WAVES, 1);
-							Events.payTickets(player, WAVE_PAYS, "the wave is clear");
+							// The wave just cleared is the one the tally now
+							// stands at. This used to pay a flat 25 forever,
+							// which made wavePay() -- and the number the
+							// button had just promised -- a lie.
+							int number = State.tally(player, State.WAVES);
+							boolean hard = hard(player);
+							if (hard) {
+								State.add(player, State.HARD_WAVES, 1);
+							}
+							int paid = wavePay(number) * (hard ? 2 : 1);
+							Events.payTickets(player, paid, hard
+									? "the hard wave is clear" : "the wave is clear");
+							remember(player, "Wave " + number + (hard ? " (hard)" : ""),
+									"cleared", paid);
 						} else if (floor == 10) {
-							int paid = State.tally(player, State.BOSSES) == 0 ? 150 : 200;
+							// Likewise: bossPay() already knew how to grow
+							// with the count and nothing was calling it.
+							int paid = bossPay(player);
 							State.add(player, State.BOSSES, 1);
 							Events.payTickets(player, paid, "the boss is down");
+							remember(player, lastBoss, "beaten", paid);
 						}
 					}
 				}
@@ -259,8 +311,16 @@ public final class Fight {
 			return;
 		}
 		int number = State.tally(player, State.WAVES) + 1;
+		boolean hard = hard(player);
 		// Wave 30 used to be the size of wave 8. It is not now.
 		int howMany = Math.min(24, 2 + number * 2);
+		if (hard) {
+			// Half again as many, and the cap lifts with it -- a hard wave
+			// that hit the same ceiling as an easy one would stop being hard
+			// at exactly the point you wanted it to start.
+			howMany = Math.min(36, howMany * 3 / 2);
+		}
+		double toughness = (1.0 + number * 0.1) * (hard ? 1.5 : 1.0);
 
 		// What is coming, before it comes. A wave you can see the shape of is
 		// a wave you can plan for.
@@ -274,7 +334,7 @@ public final class Fight {
 				default -> EntityType.VINDICATOR;
 			};
 			coming.merge(kind.getDescription().getString(), 1, Integer::sum);
-			spawn(level, kind, spot(level, 9), 1.0 + number * 0.1, null);
+			spawn(level, kind, spot(level, 9), toughness, hard ? "Hard" : null);
 		}
 		StringBuilder shape = new StringBuilder();
 		for (java.util.Map.Entry<String, Integer> each : coming.entrySet()) {
@@ -285,9 +345,10 @@ public final class Fight {
 		}
 		player.sendSystemMessage(Component.literal("Coming out: " + shape + ".")
 				.withStyle(ChatFormatting.GRAY));
-		showBar(player, "Wave " + number, howMany);
+		showBar(player, (hard ? "Wave " + number + " -- hard" : "Wave " + number), howMany);
 		player.sendSystemMessage(Component.literal("Wave " + number + " -- " + howMany
-				+ " of them. Clearing it pays " + wavePay(number) + " event tickets.")
+				+ " of them" + (hard ? ", hard" : "") + ". Clearing it pays "
+				+ wavePay(number) * (hard ? 2 : 1) + " event tickets.")
 				.withStyle(ChatFormatting.RED));
 		level.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_BASS.value(),
 				SoundSource.PLAYERS, 1.0f, 0.6f);

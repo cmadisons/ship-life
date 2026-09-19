@@ -24,13 +24,13 @@ The struck-through ones are built.
 ~~Fishing off the side of the ship~~ **built**
 ~~A pet that fights beside you on 9~~ **built**
 ~~A wardrobe that changes your clothes~~ **built**
-12. Tetris or Breakout as a fourth cabinet
-13. A photo wall in your room of bosses you have beaten
+~~Tetris or Breakout as a fourth cabinet~~ **built**: Breakout
+~~A photo wall in your room of bosses you have beaten~~ **built**
 ~~A daily log-in reward~~ **built**
 ~~A shop that buys things back for tickets~~ **built**
-16. A hard mode on floor 9 that pays double
+~~A hard mode on floor 9 that pays double~~ **built**
 ~~A map of the whole ship on the lobby wall~~ **built**
-18. Sounds and music for each event
+~~Sounds and music for each event~~ **built**
 ~~An intercom that says what is on today~~ **built**
 ~~A sofa to match the giant chairs~~ **built**
 21. Bomb upgrades — bigger gas, longer lasting

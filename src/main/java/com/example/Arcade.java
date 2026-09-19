@@ -12,10 +12,10 @@ import net.minecraft.world.InteractionResult;
 /**
  * Floor 2: the arcade.
  *
- * Three cabinets along the far wall and a prize counter facing them. Walk up
+ * Four cabinets along the far wall and a prize counter facing them. Walk up
  * to a cabinet and right-click it to play; what it pays is what the machine
- * pays on the real thing -- a ticket per food on Snake, five a round on
- * Galaga, five for a new record on Pac-Man.
+ * pays on the real thing -- three a food on Snake, fifteen a stage on Galaga,
+ * twenty for a new Pac-Man record, and a ticket a brick on Breakout.
  */
 public final class Arcade {
 	private Arcade() {
@@ -30,6 +30,10 @@ public final class Arcade {
 			BlockPos pos = Places.local(hit.getBlockPos());
 			BlockPos base = level.getBlockState(pos.below()).isAir() ? pos : pos.below();
 
+			if (matches(pos, base, Places.BREAKOUT)) {
+				ArcadePackets.open(who, "breakout");
+				return InteractionResult.SUCCESS;
+			}
 			if (matches(pos, base, Places.SNAKE)) {
 				ArcadePackets.open(who, "snake");
 				return InteractionResult.SUCCESS;
@@ -122,15 +126,18 @@ public final class Arcade {
 
 		// The boards, one a machine, so there is something to beat besides
 		// your own best.
-		page.setItem(38, Book.entry(net.minecraft.world.item.Items.LIME_DYE,
+		page.setItem(37, Book.entry(net.minecraft.world.item.Items.LIME_DYE,
 				"Snake -- your best five", ChatFormatting.GREEN,
 				ArcadePackets.board(player, "snake").toArray(new String[0])));
-		page.setItem(40, Book.entry(net.minecraft.world.item.Items.YELLOW_DYE,
+		page.setItem(39, Book.entry(net.minecraft.world.item.Items.YELLOW_DYE,
 				"Pac-Man -- your best five", ChatFormatting.YELLOW,
 				ArcadePackets.board(player, "pacman").toArray(new String[0])));
-		page.setItem(42, Book.entry(net.minecraft.world.item.Items.LIGHT_BLUE_DYE,
+		page.setItem(41, Book.entry(net.minecraft.world.item.Items.LIGHT_BLUE_DYE,
 				"Galaga -- your best five", ChatFormatting.AQUA,
 				ArcadePackets.board(player, "galaga").toArray(new String[0])));
+		page.setItem(43, Book.entry(net.minecraft.world.item.Items.RED_DYE,
+				"Breakout -- your best five", ChatFormatting.RED,
+				ArcadePackets.board(player, "breakout").toArray(new String[0])));
 
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));

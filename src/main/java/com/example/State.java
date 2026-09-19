@@ -85,6 +85,12 @@ public final class State {
 	public static final AttachmentType<Integer> BOSSES = of("bosses_beaten", 0, Codec.INT);
 	public static final AttachmentType<Integer> RACES = of("races_finished", 0, Codec.INT);
 	public static final AttachmentType<Integer> EVENT_EARNED = of("event_earned", 0, Codec.INT);
+	public static final AttachmentType<Integer> BRICKS = of("breakout_bricks", 0, Codec.INT);
+	public static final AttachmentType<Integer> WALLS = of("breakout_walls", 0, Codec.INT);
+	public static final AttachmentType<Integer> HARD_WAVES = of("hard_waves", 0, Codec.INT);
+
+	/** Floor 9's hard switch: 1 when it is thrown. Kept per player. */
+	public static final AttachmentType<Integer> HARD = of("hard_mode", 0, Codec.INT);
 
 	/** Side quests you are carrying, as "stat:target:tickets" separated by commas. */
 	public static final AttachmentType<String> SIDE = of("side_quests", "", Codec.STRING);

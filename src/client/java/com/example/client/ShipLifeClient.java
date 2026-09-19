@@ -2,6 +2,7 @@ package com.example.client;
 
 import com.example.ArcadePackets;
 import com.example.HudPacket;
+import com.example.client.arcade.BreakoutScreen;
 import com.example.client.arcade.GalagaScreen;
 import com.example.client.arcade.PacManScreen;
 import com.example.client.arcade.SnakeScreen;
@@ -35,6 +36,7 @@ public class ShipLifeClient implements ClientModInitializer {
 						case "snake" -> context.client().setScreen(new SnakeScreen());
 						case "pacman" -> context.client().setScreen(new PacManScreen());
 						case "galaga" -> context.client().setScreen(new GalagaScreen());
+						case "breakout" -> context.client().setScreen(new BreakoutScreen());
 						default -> {
 						}
 					}
