@@ -33,7 +33,7 @@ The struck-through ones are built.
 ~~Sounds and music for each event~~ **built**
 ~~An intercom that says what is on today~~ **built**
 ~~A sofa to match the giant chairs~~ **built**
-21. Bomb upgrades — bigger gas, longer lasting
+~~Bomb upgrades — bigger gas, longer lasting~~ **built**: bought off Izzy
 ~~Somebody to race on floor 6, not just a clock~~ **built**
 ~~A balcony you can walk out onto and see space~~ **built**
 24. A trophy for owning every floor
@@ -50,8 +50,8 @@ The struck-through ones are done.
 4. ~~`Fight.announce()` — nothing calls it~~ **done**
 5. ~~`Gear.clouds()` — nothing calls it~~ **done**
 6. ~~The mop and the plunger once chapter 1 is done~~ **done**
-7. The 0.1% forever x2.5 reward — you will never see it
-8. The `REWARD_MONTH` gate now that /11reward exists
+7. ~~The 0.1% forever x2.5 reward — you will never see it~~ **fixed rather than removed**: 1 in 100 on a weekly roll, so it is rare and reachable instead of decoration
+8. The `REWARD_MONTH` gate now that /11reward exists — **left alone**: /11reward is the cheat that skips it; the gate IS the cadence for normal play. It counts weeks now and keeps the old field name so nobody loses their history
 9. The lift's lock icon — it only ever shows floor 2
 10. ~~The Nether and the End~~ **kept**: floor 18 is a portal to the Nether
 11. ~~The fifteen second buffet wait~~ **done**
@@ -79,7 +79,7 @@ The struck-through ones are done.
 2. ~~Pets are ocelots and wolves wearing names~~ **done**
 3. ~~Waves cap at ten mobs — wave 30 is the size of wave 8~~ **done**
 4. ~~Bosses pay a flat 150 and 200 forever~~ **done**
-5. A month is ten real hours — floor 11 is a long wait
+5. ~~A month is ten real hours — floor 11 is a long wait~~ **done**: floor 11 pays weekly, about two and a half real hours
 6. Quest Day's four are all arcade and pool goals
 7. Side quests only ever pay event tickets
 8. ~~The buffet plate is the only healing in the game~~ **done**
@@ -98,7 +98,7 @@ The struck-through ones are done.
 21. Your room has no reason to go back to it
 22. ~~The lift takes the same two seconds to 2 as to 16~~ **done**
 23. ~~Floor 1's gangway door leads nowhere in particular~~ **done**
-24. Izzy has nothing to say after she hands the set over
+24. ~~Izzy has nothing to say after she hands the set over~~ **done**: she sells the bomb upgrades
 25. Charlie has nothing to say after chapter 4
 
 ## Make better
@@ -123,7 +123,7 @@ The struck-through ones are done.
 15. ~~The lift could show each floor number as it passes~~ **done**
 16. ~~The plates could hiss like real lift doors~~ **done**
 17. Charlie could hand out quests on a schedule
-18. Izzy could sell bomb upgrades
+~~Izzy could sell bomb upgrades~~ **built**: wider gas and longer gas, three of each, 150/300/450
 19. ~~The buffet could serve a different dish each day~~ **done**
 20. ~~The shooter's crowd could shuffle while you look~~ **done**
 21. ~~The calendar could warn you the day before an event~~ **done**

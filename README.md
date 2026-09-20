@@ -24,7 +24,7 @@ what is built so far is listed under [What works today](#what-works-today).
 - **Floor 6, the race track** — three lanes, 250 gas, boost for double speed, cars that slow you when you hit them. Five laps in two minutes opens floor 7.
 - **Floor 7, the events** — a board saying what is on today. Spooky Shooter and Christmas (a crowd of 100 and a photograph), Quest Day (four quests, 500 tickets for all four), May the Fourth (lightsaber fights, 25 a fight and 100 a win), and Summer Break, which needs no screen because it doubles what the arcade pays.
 - **Floor 9 and floor 10** — waves that get bigger and pay when you clear them, and a door each for Arachnes and the dragon.
-- **The shops** — floor 8 gives a free quest at a time from a pool of 250, all of them things the game can watch you do; floor 11 hands out one reward a month on the 70 / 25 / 4.9 / 0.1 table; floor 12 sells pet food (x1.1 a time, stopping at x2), the Skeleton and the Shadow; floor 13 is The Keg, three dishes at 25 tickets that last a day each; and the event ticket counter on floor 7 sells floors 11 to 13 together, the Go To Event Star and the x2.5.
+- **The shops** — floor 8 gives a free quest at a time from a pool of 250, all of them things the game can watch you do; floor 11 hands out one reward a week on the 70 / 25 / 4 / 1 table; floor 12 sells pet food (x1.1 a time, stopping at x2), the Skeleton and the Shadow; floor 13 is The Keg, three dishes at 25 tickets that last a day each; and the event ticket counter on floor 7 sells floors 11 to 13 together, the Go To Event Star and the x2.5.
 - **Ben, on floor 15** — the first friend, and the only one who hands you anything: his armour keeps a tenth of every hit off you and saves it for the next swing you land, and his three bombs put green gas on the floor that takes ten a second off everything hostile standing in it and does not lift until they are all dead. What the gas takes goes into the same bank the armour fills. Both are covered in plants -- the armour has its own worn picture, drawn like everything else by tools/make_textures.py. Run out of bombs and Ben sells you three more for 250 event tickets. Izzy has
 the boots that go with the coat, free, and the helmet and leggings for 100 --
 every piece you wear stops another tenth of the hit, so the full set stops four
@@ -54,7 +54,7 @@ that -- and chapters past 4.
 
 `/shiplife` skips chapter 1 -- it pays the hundred dollars, takes the chore
 tools back and stands you in the lobby. `/11reward` rolls another floor 11
-reward with the once-a-month wait taken off, as many times as you like.
+reward with the once-a-week wait taken off, as many times as you like.
 `/skipsidequest` finishes every side quest you are carrying and pays what they
 were worth. `/allfloors` opens all sixteen at once, and
 `/floor1` to `/floor16` ride you to one -- opening it first if it is not yours.
@@ -126,7 +126,7 @@ it, so you keep it, and nothing the mod builds is ever put back afterwards.
 | 8 | 🏪 Store — free quests, 1 at a time | Get 50 arcade tickets |
 | 9 | ⚔️ Fight room | Swim a lap in 30 seconds |
 | 10 | 👹 Boss room | Do an event |
-| 11 | 🎁 A free reward every month you play | 1000 event tickets (buys 11, 12 and 13) |
+| 11 | 🎁 A free reward every week you play | 1000 event tickets (buys 11, 12 and 13) |
 | 12 | 🐾 Pet store | " |
 | 13 | 🍽️ The Keg — a fancy restaurant | " |
 | 14 | 🛂 Passport upgrade -- 250 event tickets, and floor 15 comes with it | 4.9% roll on floor 11 |

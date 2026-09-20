@@ -96,6 +96,9 @@ public final class State {
 	public static final AttachmentType<String> PET_NAMES = of("pet_names", "", Codec.STRING);
 	/** How many Quest Day sets you have finished. Quest Day reads it to get harder. */
 	public static final AttachmentType<Integer> QUEST_DAYS = of("quest_days", 0, Codec.INT);
+	/** Bomb upgrades bought off Izzy: how much wider the gas goes, and how much longer it hangs. */
+	public static final AttachmentType<Integer> BOMB_WIDE = of("bomb_wide", 0, Codec.INT);
+	public static final AttachmentType<Integer> BOMB_LONG = of("bomb_long", 0, Codec.INT);
 
 	/** The name you gave that kind of pet, or "" if you never did. */
 	public static String petName(ServerPlayer player, Pets.Kind kind) {

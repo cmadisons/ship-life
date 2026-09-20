@@ -42,7 +42,8 @@ public final class Skip {
 					// earned yet.
 					.then(Commands.literal("allfloors")
 							.executes(context -> allFloors(context.getSource()))));
-			// Floor 11 hands out one a month, and a month is ten real hours.
+			// Floor 11 hands out one a week, and a week is about two and a half
+			// real hours.
 			// This is the same roll with the wait taken off, as many times as
 			// you want it.
 			dispatcher.register(Commands.literal("11reward")

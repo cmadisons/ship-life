@@ -233,6 +233,22 @@ public final class Friends {
 						cost + " event tickets",
 						"You have " + State.event(player) + ".",
 						afford ? "Click to buy." : "Not enough yet."));
+		// Izzy's other counter: what Ben's bombs can be made into.
+		//
+		// She had one thing to sell and once you owned it there was no reason
+		// to climb to 16 again. The upgrades are hers rather than Ben's
+		// because Ben gives things away and Izzy runs a shop.
+		if (izzy) {
+			page.setItem(29, upgradeEntry(player, State.BOMB_WIDE, Made.bomb,
+					"Wider Gas", "Each one adds " + Gear.WIDER_EACH
+							+ " blocks to how far the cloud spreads."));
+			page.setItem(33, upgradeEntry(player, State.BOMB_LONG,
+					net.minecraft.world.item.Items.CLOCK,
+					"Longer Gas", "Each one keeps the cloud "
+							+ (Gear.LONGER_EACH / 20) + " seconds longer once"
+							+ " there is nothing left in it."));
+		}
+
 		page.setItem(49, Book.entry(net.minecraft.world.item.Items.BARRIER, "Close",
 				ChatFormatting.RED, "Press Escape."));
 		player.openMenu(new net.minecraft.world.SimpleMenuProvider(
@@ -262,9 +278,65 @@ public final class Friends {
 		player.closeContainer();
 	}
 
+	/** What an upgrade costs at level n: 150, 300, 450. */
+	public static int upgradeCost(int have) {
+		return 150 * (have + 1);
+	}
+
+	/** One upgrade on Izzy's counter, priced by how many you already have. */
+	private static net.minecraft.world.item.ItemStack upgradeEntry(ServerPlayer player,
+			net.fabricmc.fabric.api.attachment.v1.AttachmentType<Integer> which,
+			net.minecraft.world.item.Item icon, String name, String what) {
+		int have = State.tally(player, which);
+		if (have >= Gear.UPGRADE_MOST) {
+			return Book.entry(icon, name + "  --  full", ChatFormatting.GOLD,
+					what, "", "All " + Gear.UPGRADE_MOST + " bought.");
+		}
+		int cost = upgradeCost(have);
+		boolean afford = State.event(player) >= cost;
+		return Book.entry(icon, name + "  " + have + "/" + Gear.UPGRADE_MOST,
+				afford ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY,
+				what,
+				"",
+				cost + " event tickets",
+				"You have " + State.event(player) + ".",
+				afford ? "Click to buy." : "Not enough yet.");
+	}
+
+	/** Take the tickets and add a level. */
+	private static void buyUpgrade(ServerPlayer player,
+			net.fabricmc.fabric.api.attachment.v1.AttachmentType<Integer> which, String word) {
+		int have = State.tally(player, which);
+		if (have >= Gear.UPGRADE_MOST) {
+			player.sendSystemMessage(Component.literal(
+					"Izzy: \"That is as far as they go.\"").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		int cost = upgradeCost(have);
+		if (State.event(player) < cost) {
+			player.sendSystemMessage(Component.literal("That is " + cost
+					+ " event tickets and you have " + State.event(player) + ".")
+					.withStyle(ChatFormatting.RED));
+			return;
+		}
+		State.spendEvent(player, cost);
+		State.add(player, which, 1);
+		player.sendSystemMessage(Component.literal("Izzy: \"Right. Your gas goes "
+				+ word + " now.\"").withStyle(ChatFormatting.WHITE));
+		counter(player, true);
+	}
+
 	private static void buySet(ServerPlayer player, int slot) {
 		if (slot == 49) {
 			player.closeContainer();
+			return;
+		}
+		if (slot == 29) {
+			buyUpgrade(player, State.BOMB_WIDE, "wider");
+			return;
+		}
+		if (slot == 33) {
+			buyUpgrade(player, State.BOMB_LONG, "longer");
 			return;
 		}
 		if (slot != 22) {

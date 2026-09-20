@@ -21,7 +21,7 @@ import net.minecraft.world.item.Items;
  * it is a thing you come back to rather than a stack you hoard.
  *
  * Floor 11 is the one that pays you for turning up: a free reward once per
- * in-game month, which is ten real hours, rolled off a table that is mostly
+ * in-game week, which is about two and a half real hours, rolled off a table that is mostly
  * phones and occasionally a floor. The one-in-a-thousand on it is a x2.5 on
  * event tickets that never runs out.
  *
@@ -296,22 +296,35 @@ public final class Shops {
 	// ------------------------------------------------- floor 11: the rewards
 
 	/**
-	 * One free reward a month, and a month is ten real hours.
+	 * One free reward a week, and a week is about two and a half real hours.
 	 *
 	 * Seventy in a hundred is a phone -- being able to call a shop from
 	 * anywhere is the thing you will use most, so it is the thing you get
 	 * most. Four and nine tenths is floor 14. One in a thousand is a x2.5 on
 	 * event tickets that never expires, which is the reason to keep coming.
 	 */
+	/**
+	 * Floor 11 pays once a week, not once a month.
+	 *
+	 * A month is thirty days and a day is twenty real minutes, so monthly
+	 * meant ten hours between rewards -- long enough that most players would
+	 * see the floor pay out twice and never again. It is weekly now: seven
+	 * days, about two and a third hours, which is a session rather than a
+	 * fortnight.
+	 *
+	 * The counter is still REWARD_MONTH because that is what the save calls
+	 * it and renaming a persisted field costs everybody their history for no
+	 * gain. It counts weeks.
+	 */
 	private static void monthlyReward(ServerPlayer player) {
-		int month = (int) (Cal.dayNumber() / Cal.DAYS_IN_MONTH) + 1;
-		if (State.tally(player, State.REWARD_MONTH) >= month) {
+		int week = (int) (Cal.dayNumber() / 7) + 1;
+		if (State.tally(player, State.REWARD_MONTH) >= week) {
 			player.sendSystemMessage(Component.literal(
-					"You have had this month's. The next is " + Cal.DAYS_IN_MONTH
-					+ " days away -- ten real hours.").withStyle(ChatFormatting.GRAY));
+					"You have had this week's. The next is 7 days away"
+					+ " -- about two and a half real hours.").withStyle(ChatFormatting.GRAY));
 			return;
 		}
-		player.setAttached(State.REWARD_MONTH, month);
+		player.setAttached(State.REWARD_MONTH, week);
 		reward(player);
 	}
 
@@ -322,11 +335,15 @@ public final class Shops {
 	 * /11reward can take as many as it likes.
 	 */
 	public static void reward(ServerPlayer player) {
+		// One in a thousand, on a reward you could take twelve times a day of
+		// real playing, was decoration: nobody was ever going to see it. One
+		// in a hundred on a weekly roll is rare and actually reachable, which
+		// is what a jackpot is for.
 		double roll = new java.util.Random().nextDouble() * 100.0;
-		if (roll < 0.1) {
+		if (roll < 1.0) {
 			State.add(player, State.FOREVER, 1);
 			player.sendSystemMessage(Component.literal(
-					"One in a thousand: x2.5 on event tickets, forever.")
+					"One in a hundred: x2.5 on event tickets, forever.")
 					.withStyle(ChatFormatting.LIGHT_PURPLE));
 		} else if (roll < 5.0) {
 			if (State.hasFloor(player, 14)) {
@@ -346,9 +363,9 @@ public final class Shops {
 					.withStyle(ChatFormatting.GREEN));
 		} else if (roll < 60.0) {
 			// Tickets, plainly. Phones used to be seventy in a hundred, which
-			// meant most months you got a phone line you already had.
+			// meant most weeks you got a phone line you already had.
 			int paid = 60 + new java.util.Random().nextInt(140);
-			Events.payTickets(player, paid, "this month's reward");
+			Events.payTickets(player, paid, "this week's reward");
 		} else {
 			int which = new java.util.Random().nextInt(3);
 			String name = switch (which) {

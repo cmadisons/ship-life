@@ -71,8 +71,37 @@ public final class Gear {
 					.copyOnDeath()
 					.buildAndRegister(ShipLifeMod.id("banked_damage"));
 
-	/** A cloud of gas: where it is, who put it there, and when. */
-	private record Cloud(ServerLevel level, Vec3 at, UUID owner, long born) {
+	/** The most of each upgrade Izzy will sell you. */
+	public static final int UPGRADE_MOST = 3;
+
+	/** How much wider each width upgrade makes the gas. */
+	public static final double WIDER_EACH = 1.5;
+
+	/** How much longer each lingering upgrade makes it hang about, in ticks. */
+	public static final int LONGER_EACH = 100;
+
+	/** How wide this player's gas is allowed to get. */
+	public static double reachFor(ServerPlayer player) {
+		return GAS_MOST + WIDER_EACH * Math.min(UPGRADE_MOST,
+				State.tally(player, State.BOMB_WIDE));
+	}
+
+	/** How long this player's gas hangs about once there is nothing left. */
+	public static int lingerFor(ServerPlayer player) {
+		return GAS_LINGER + LONGER_EACH * Math.min(UPGRADE_MOST,
+				State.tally(player, State.BOMB_LONG));
+	}
+
+	/**
+	 * A cloud of gas: where it is, who put it there, when, and how far it is
+	 * allowed to get.
+	 *
+	 * The ceiling and the lingering are carried on the cloud rather than read
+	 * back off the owner, because the owner can log out mid-cloud and the gas
+	 * should finish the job it was thrown for.
+	 */
+	private record Cloud(ServerLevel level, Vec3 at, UUID owner, long born,
+			double most, int linger) {
 		/**
 		 * How far it has spread by now.
 		 *
@@ -81,8 +110,7 @@ public final class Gear {
 		 * fills the room, which is what everybody standing in it will notice.
 		 */
 		double reach() {
-			return Math.min(GAS_MOST,
-					GAS_REACH + (level.getGameTime() - born) * GAS_GROWS);
+			return Math.min(most, GAS_REACH + (level.getGameTime() - born) * GAS_GROWS);
 		}
 	}
 
@@ -266,7 +294,7 @@ public final class Gear {
 				return InteractionResult.SUCCESS;
 			}
 			CLOUDS.add(new Cloud(level, Vec3.atCenterOf(hit.getBlockPos().above()),
-					who.getUUID(), level.getGameTime()));
+					who.getUUID(), level.getGameTime(), reachFor(who), lingerFor(who)));
 			player.getItemInHand(hand).shrink(1);
 			announce(who, level, Vec3.atCenterOf(hit.getBlockPos().above()));
 			used(who);
@@ -277,7 +305,8 @@ public final class Gear {
 	/** Put one down where they are standing. */
 	private static void drop(ServerPlayer player, ServerLevel level) {
 		Vec3 where = player.position();
-		CLOUDS.add(new Cloud(level, where, player.getUUID(), level.getGameTime()));
+		CLOUDS.add(new Cloud(level, where, player.getUUID(), level.getGameTime(),
+				reachFor(player), lingerFor(player)));
 		announce(player, level, where);
 	}
 
@@ -331,7 +360,7 @@ public final class Gear {
 				boolean anythingLeft = !cloud.level().getEntitiesOfClass(Monster.class,
 						new AABB(cloud.at(), cloud.at()).inflate(48.0),
 						LivingEntity::isAlive).isEmpty();
-				if (!anythingLeft && now - cloud.born() > GAS_LINGER) {
+				if (!anythingLeft && now - cloud.born() > cloud.linger()) {
 					CLOUDS.remove(i);
 					if (owner != null) {
 						owner.sendSystemMessage(Component.literal("The gas clears.")
