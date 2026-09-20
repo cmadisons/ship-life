@@ -183,6 +183,34 @@ public final class Kart {
 	public static final int SECOND_TICKS = 2200;         // one minute fifty
 	public static final int FIELD_PAYS = 100;
 
+	/** However well you drive, the racer will not go under this. */
+	private static final int RIVAL_FLOOR = 1200;         // one minute
+	/** How much of a beating the racer takes back off their time each win. */
+	private static final int RIVAL_LEARNS = 20;          // a second
+
+	/**
+	 * What the racer does today.
+	 *
+	 * It used to be 1900 ticks for ever. Beat it once and the track was over:
+	 * there was nothing on floor 6 you had not already done, and the quest
+	 * that sends you there is a one-off. So they learn. Once you have beaten
+	 * them they turn up a second under whatever you managed, which keeps the
+	 * race a race however good you get -- down to a floor of one minute,
+	 * because a rival who is simply faster than anybody is not a rival either.
+	 */
+	public static int rivalTicks(ServerPlayer player) {
+		int best = State.tally(player, State.BEST_RACE);
+		if (best <= 0 || best >= RIVAL_TICKS) {
+			return RIVAL_TICKS;
+		}
+		return Math.max(RIVAL_FLOOR, best - RIVAL_LEARNS);
+	}
+
+	/** The other one is always a few seconds off the front runner. */
+	public static int secondTicks(ServerPlayer player) {
+		return rivalTicks(player) + (SECOND_TICKS - RIVAL_TICKS);
+	}
+
 	/**
 	 * Keep the kart wound up.
 	 *
@@ -210,21 +238,31 @@ public final class Kart {
 		player.sendSystemMessage(Component.literal(LAPS + " laps in " + Pool.time(ticks) + ".")
 				.withStyle(ChatFormatting.GREEN));
 
+		// Whoever you are racing, you are racing the times they turned up with
+		// -- worked out before this run is banked, or you would be racing a
+		// rival who had already seen it.
+		int rival = rivalTicks(player), second = secondTicks(player);
+
 		// Two of them out there now, so a race has a finishing order.
 		int place = 1;
-		if (ticks > RIVAL_TICKS) {
+		if (ticks > rival) {
 			place++;
 		}
-		if (ticks > SECOND_TICKS) {
+		if (ticks > second) {
 			place++;
+		}
+
+		int was = State.tally(player, State.BEST_RACE);
+		if (was <= 0 || ticks < was) {
+			player.setAttached(State.BEST_RACE, ticks);
 		}
 		player.sendSystemMessage(Component.literal("You finished " + place
 				+ switch (place) {
 					case 1 -> "st";
 					case 2 -> "nd";
 					default -> "rd";
-				} + ".  " + RIVAL + ": " + Pool.time(RIVAL_TICKS)
-				+ "  ·  " + SECOND + ": " + Pool.time(SECOND_TICKS))
+				} + ".  " + RIVAL + ": " + Pool.time(rival)
+				+ "  ·  " + SECOND + ": " + Pool.time(second))
 				.withStyle(place == 1 ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GRAY));
 		if (place == 1) {
 			Events.payTickets(player, FIELD_PAYS, "you won the race");

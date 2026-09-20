@@ -52,14 +52,20 @@ public class Shooter extends Game {
 	private final List<Person> crowd = new ArrayList<>();
 	private final boolean christmas;
 	private Person wanted;
-	private int page;
 	private int hits;
 	private int misses;
 
 	public Shooter(ServerPlayer player, boolean christmas) {
 		super(player);
 		this.christmas = christmas;
-		for (int i = 0; i < 100; i++) {
+		// One screenful, not a hundred.
+		//
+		// A hundred meant three pages with two thirds of the crowd off-screen
+		// at any moment, and the game is "find the one in the photo" -- you
+		// cannot look for somebody you cannot see, so the pages turned it into
+		// a memory test with a lot of clicking. Forty-five is what fits at
+		// once, and a crowd you can actually scan reads exactly the same.
+		for (int i = 0; i < CROWD; i++) {
 			crowd.add(make());
 		}
 		pickWanted();
@@ -108,20 +114,18 @@ public class Shooter extends Game {
 			return;
 		}
 		java.util.Collections.shuffle(crowd, random);
-		page = 0;
 		player.sendSystemMessage(Component.literal("The crowd moves about.")
 				.withStyle(ChatFormatting.GRAY));
 	}
 
-	/** How many of the crowd fit on one page of the screen. */
-	private static final int PER_PAGE = COLUMNS * ROWS;
+	/** The whole crowd, and the whole screen. They are the same number. */
+	private static final int CROWD = COLUMNS * ROWS;
 
 	@Override
 	public void draw() {
 		blank();
-		int start = page * PER_PAGE;
-		for (int i = 0; i < PER_PAGE && start + i < crowd.size(); i++) {
-			Person person = crowd.get(start + i);
+		for (int i = 0; i < CROWD && i < crowd.size(); i++) {
+			Person person = crowd.get(i);
 			screen.setItem(i, Book.entry(person.face(), christmas ? "Santa" : "Someone",
 					ChatFormatting.WHITE,
 					"Wearing " + person.hat(),
@@ -129,9 +133,7 @@ public class Shooter extends Game {
 					person.carrying() ? "Holding " + person.holding() : ""));
 		}
 
-		int pages = (crowd.size() + PER_PAGE - 1) / PER_PAGE;
-		button(0, Items.ARROW, "◀ Crowd " + (page + 1) + " of " + pages);
-		button(1, Items.ARROW, "▶ Next");
+		// No page buttons: there is only ever one page now.
 		screen.setItem(45 + 3, Book.entry(wanted.face(), "WANTED", ChatFormatting.RED,
 				"Wearing " + wanted.hat(),
 				"In " + wanted.shirt(),
@@ -146,19 +148,15 @@ public class Shooter extends Game {
 
 	@Override
 	public void press(int button) {
-		switch (button) {
-			case 0 -> page = Math.max(0, page - 1);
-			case 1 -> page = Math.min((crowd.size() - 1) / PER_PAGE, page + 1);
-			case 8 -> player.closeContainer();
-			default -> {
-			}
+		if (button == 8) {
+			player.closeContainer();
 		}
 	}
 
 	/** A click on the crowd itself is a shot. */
 	@Override
 	public void pick(int slot) {
-		int index = page * PER_PAGE + slot;
+		int index = slot;
 		if (index >= crowd.size()) {
 			return;
 		}
@@ -183,7 +181,6 @@ public class Shooter extends Game {
 				return;
 			}
 			pickWanted();
-			page = 0;
 			return;
 		}
 

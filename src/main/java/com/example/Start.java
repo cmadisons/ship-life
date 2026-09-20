@@ -60,13 +60,7 @@ public final class Start {
 	}
 
 	private static void open(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = new ItemStack(Items.GRAY_STAINED_GLASS_PANE);
-		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.GRAY_STAINED_GLASS_PANE);
 		page.setItem(4, Book.entry(Items.PAPER, "How do you want to start?",
 				ChatFormatting.YELLOW,
 				"Pick one. Escape and it asks again",

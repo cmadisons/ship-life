@@ -125,7 +125,7 @@ public final class ArcadePackets {
 	 */
 	public static void remember(ServerPlayer player, String game, int score) {
 		java.util.List<String> games = new java.util.ArrayList<>(
-				java.util.List.of(State.get(player, State.TOP_FIVE).split("\\|")));
+				java.util.List.of(State.topFive(player).split("\\|")));
 		java.util.List<Integer> mine = new java.util.ArrayList<>();
 		games.removeIf(entry -> entry.isEmpty());
 		for (String entry : new java.util.ArrayList<>(games)) {
@@ -148,13 +148,13 @@ public final class ArcadePackets {
 			line.append(i == 0 ? "" : ",").append(mine.get(i));
 		}
 		games.add(line.toString());
-		State.set(player, State.TOP_FIVE, String.join("|", games));
+		State.topFive(player, String.join("|", games));
 	}
 
 	/** The five, in words, for a screen to show. */
 	public static java.util.List<String> board(ServerPlayer player, String game) {
 		java.util.List<String> lines = new java.util.ArrayList<>();
-		for (String entry : State.get(player, State.TOP_FIVE).split("\\|")) {
+		for (String entry : State.topFive(player).split("\\|")) {
 			if (!entry.startsWith(game + ":")) {
 				continue;
 			}

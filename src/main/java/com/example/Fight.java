@@ -106,7 +106,7 @@ public final class Fight {
 	 * what it paid.
 	 */
 	public static void remember(ServerPlayer player, String what, String how, int paid) {
-		State.set(player, State.LAST_FIGHT, what + "|" + how + "|" + paid + "|"
+		State.lastFight(player, what + "|" + how + "|" + paid + "|"
 				+ Cal.date());
 	}
 

@@ -81,13 +81,8 @@ public final class Arcade {
 	 * counter says what is missing rather than pretending it is for sale.
 	 */
 	private static void prizes(ServerPlayer player) {
-		net.minecraft.world.SimpleContainer page = new net.minecraft.world.SimpleContainer(54);
-		net.minecraft.world.item.ItemStack filler = Game.cell(
-				net.minecraft.world.item.Items.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		net.minecraft.world.SimpleContainer page = Book.page(
+				net.minecraft.world.item.Items.LIGHT_GRAY_STAINED_GLASS_PANE);
 		page.setItem(4, Book.entry(net.minecraft.world.item.Items.GOLD_NUGGET,
 				"Your Tickets", ChatFormatting.GOLD,
 				State.arcade(player) + " arcade tickets",

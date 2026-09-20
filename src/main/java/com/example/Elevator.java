@@ -32,13 +32,8 @@ public final class Elevator {
 	private Elevator() {
 	}
 
-	/** What is on each floor, for the panel to say. */
-	private static final String[] NAMES = {
-			"", "Lobby", "Arcade", "Swimming Pool", "Buffet", "Your Room",
-			"Race Track", "Events", "Store", "Fight Room", "Boss Room",
-			"Rewards", "Pet Store", "The Keg", "Passports", "Ben's Room",
-			"Izzy's Room", "Weapon Store", "The Portal"
-	};
+	// What is on each floor is Floors.name's business. This class kept its own
+	// copy of the same eighteen strings, which is one list to forget to update.
 
 	/**
 	 * How long a ride takes.
@@ -152,13 +147,7 @@ public final class Elevator {
 	}
 
 	public static void open(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = new ItemStack(Items.GRAY_STAINED_GLASS_PANE);
-		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.GRAY_STAINED_GLASS_PANE);
 		int on = Places.floorAt(player.getY());
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			int slot = 10 + ((floor - 1) / 7) * 9 + ((floor - 1) % 7);
@@ -166,7 +155,7 @@ public final class Elevator {
 				page.setItem(slot, Book.entry(
 						floor == on ? Items.LIME_DYE : Items.WHITE_DYE,
 						"Floor " + floor, ChatFormatting.WHITE,
-						NAMES[floor],
+						Floors.name(floor),
 						floor == on ? "You are here." : "Click to go."));
 			} else if (questFloor(player) == floor) {
 				page.setItem(slot, Book.entry(Items.IRON_DOOR,
@@ -219,7 +208,7 @@ public final class Elevator {
 		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, takes + 10, 0, true, false, false));
 		Hud.busy(player, takes + 10);
 		player.sendOverlayMessage(Component.literal("▲  Floor " + floor
-				+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
+				+ " -- " + Floors.name(floor)).withStyle(ChatFormatting.AQUA));
 
 		// Every floor it passes, named, on the way. A lift that told you
 		// nothing between the two ends was a loading screen with a sound.
@@ -230,7 +219,7 @@ public final class Elevator {
 			Ticker.after(takes * step / Math.max(1, steps + 1), () -> {
 				Hud.busy(player, 20);
 				player.sendOverlayMessage(Component.literal(
-						(floor > here ? "▲  " : "▼  ") + passing + "  --  " + NAMES[passing])
+						(floor > here ? "▲  " : "▼  ") + passing + "  --  " + Floors.name(passing))
 						.withStyle(passing == floor ? ChatFormatting.AQUA
 								: ChatFormatting.GRAY));
 			});
@@ -244,7 +233,7 @@ public final class Elevator {
 			player.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
 			level.playSound(null, to, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8f, 1.0f);
 			player.sendOverlayMessage(Component.literal("Floor " + floor
-					+ " -- " + NAMES[floor]).withStyle(ChatFormatting.AQUA));
+					+ " -- " + Floors.name(floor)).withStyle(ChatFormatting.AQUA));
 
 			// Quest 3: pressing the button for floor 5 is the whole part.
 			if (floor == 5 && Quests.on(player, 2, 1)) {

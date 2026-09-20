@@ -84,6 +84,8 @@ public final class State {
 	public static final AttachmentType<Integer> WAVES = of("waves_cleared", 0, Codec.INT);
 	public static final AttachmentType<Integer> BOSSES = of("bosses_beaten", 0, Codec.INT);
 	public static final AttachmentType<Integer> RACES = of("races_finished", 0, Codec.INT);
+	/** Your quickest five laps on floor 6, in ticks. Zero until you finish one. */
+	public static final AttachmentType<Integer> BEST_RACE = of("best_race", 0, Codec.INT);
 	public static final AttachmentType<Integer> EVENT_EARNED = of("event_earned", 0, Codec.INT);
 	public static final AttachmentType<Integer> BRICKS = of("breakout_bricks", 0, Codec.INT);
 	public static final AttachmentType<Integer> WALLS = of("breakout_walls", 0, Codec.INT);
@@ -249,12 +251,38 @@ public final class State {
 	}
 
 	/** Put a string away under any of the attachments above. */
-	public static void set(ServerPlayer player, AttachmentType<String> what, String value) {
-		player.setAttached(what, value);
+	/*
+	 * Everything else in here has a named pair -- money(player), event(player,
+	 * n) -- and these three were still going through a generic get/set that
+	 * made the call site name the attachment as well as the player. They have
+	 * names now, and the generic pair is gone with them.
+	 */
+
+	/** The last fight, as "what|how|paid|date". Read back by the television. */
+	public static String lastFight(ServerPlayer player) {
+		return player.getAttachedOrCreate(LAST_FIGHT);
 	}
 
-	public static String get(ServerPlayer player, AttachmentType<String> what) {
-		return player.getAttachedOrCreate(what);
+	public static void lastFight(ServerPlayer player, String line) {
+		player.setAttached(LAST_FIGHT, line);
+	}
+
+	/** The arcade's best five per game, as "game:a,b,c|game:a,b". */
+	public static String topFive(ServerPlayer player) {
+		return player.getAttachedOrCreate(TOP_FIVE);
+	}
+
+	public static void topFive(ServerPlayer player, String line) {
+		player.setAttached(TOP_FIVE, line);
+	}
+
+	/** The ship's log, one day to a line. */
+	public static String log(ServerPlayer player) {
+		return player.getAttachedOrCreate(LOG);
+	}
+
+	public static void log(ServerPlayer player, String lines) {
+		player.setAttached(LOG, lines);
 	}
 
 	public static String starEvent(ServerPlayer player) {

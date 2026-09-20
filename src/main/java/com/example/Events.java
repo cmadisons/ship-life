@@ -279,12 +279,7 @@ public final class Events {
 
 	/** The board on the wall of floor 7. */
 	private static void board(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = Game.cell(Items.GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.GRAY_STAINED_GLASS_PANE);
 		String today = running(player);
 		page.setItem(4, Book.entry(Items.CLOCK, Cal.date(), ChatFormatting.AQUA,
 				today == null ? "No event today." : "Today: " + today,

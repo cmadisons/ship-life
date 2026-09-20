@@ -405,11 +405,6 @@ public final class Comforts {
 	}
 
 	static SimpleContainer blank() {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = Game.cell(Items.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-		return page;
+		return Book.page(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
 	}
 }

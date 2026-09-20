@@ -59,10 +59,10 @@ The struck-through ones are done.
 13. ~~Realms buttons on a single player game~~ **done**
 14. ~~The Buffet cooldown map if the cook replaces it~~ **done**
 15. ~~Buying a second cat, since it does not stack~~ **done**
-16. The hundred person crowd — forty reads the same and is faster
+~~The hundred person crowd — forty reads the same and is faster~~ **done**: 45, which is exactly one screen
 17. Empty rooms on floors nothing uses yet
 18. `Kit.dropChores` once the chores are gone for good
-19. The Shooter's page buttons if the crowd shrinks
+~~The Shooter's page buttons if the crowd shrinks~~ **done**
 20. ~~Ship 2's leftover blocks in old saves~~ **done**
 21. ~~The `firstTime` bit soup — five meanings in one number~~ **done**
 22. ~~Dead entries in `Floors.how` for rules that changed~~ **done**
@@ -172,31 +172,31 @@ The struck-through ones are done.
 
 ## Take away (round two)
 
-1. `Kart.RIVAL_TICKS` being a constant nobody can beat twice
-2. The unused `Fridge.register(HolderLookup)` leftover, if any remains
-3. `Places.BIG_TABLE_TWO` if nothing references it any more
-4. The `Telly.LIT` map, which never has more than one entry
-5. Duplicate `Comforts.blank()` and `Book` filler code
-6. The `WHOLE` field in Fight, if the bar can read it off the wave
+1. ~~`Kart.RIVAL_TICKS` being a constant nobody can beat twice~~ **done**: the racer learns — once beaten they come back a second under your best, down to a one-minute floor
+2. ~~The unused `Fridge.register(HolderLookup)` leftover, if any remains~~ **done**: nothing remained
+3. ~~`Places.BIG_TABLE_TWO` if nothing references it any more~~ **done**: already gone
+4. ~~The `Telly.LIT` map, which never has more than one entry~~ **done**: one `long offAt`
+5. ~~Duplicate `Comforts.blank()` and `Book` filler code~~ **done**: one `Book.page(pane)`, replacing 13 copies of the same loop across 11 classes
+6. The `WHOLE` field in Fight, if the bar can read it off the wave — **left alone**: it is the size the fight *started* at, and bosses set it too, so there is no wave number to read it off
 7. The `Seats.tidy` sweep once seats clean themselves up
 8. `Weapons.REACH` as a magic number -- make it the mana cost's business
 9. The second `UseBlockCallback` in every class that only wants an item
-10. `Places.oldPanel`-style leftovers that crept back in
+10. ~~`Places.oldPanel`-style leftovers that crept back in~~ **done**: none had
 11. The `firstTime` CALLS integer entirely, once every flag has a name
 12. Hardcoded slot numbers in every menu
-13. The `Shooter` page buttons if the crowd shrinks
+13. ~~The `Shooter` page buttons if the crowd shrinks~~ **done**: the crowd is one screenful, so there are no pages
 14. `QuestDay.TIERS` duplication with `QuestPool.build`
-15. The unused `Gear.GAS_LINGER` if clouds now clear on their own
-16. `Ship.WAS_EAST` once no world has ship 2 blocks left
-17. Any `System.currentTimeMillis` outside `Cal`
+15. The unused `Gear.GAS_LINGER` if clouds now clear on their own — **left alone**: it is not unused, it *is* how they clear
+16. `Ship.WAS_EAST` once no world has ship 2 blocks left — **left alone**: `clearSecond()` is a one-time migration and an old save may still need it
+17. ~~Any `System.currentTimeMillis` outside `Cal`~~ **done**: both calls are already inside Cal
 18. The `ArcadePackets` string-keyed games, in favour of an enum
 19. `Person.place`'s 3-block dedupe, now the sweep does it
-20. Dead lang keys in en_us.json
+20. ~~Dead lang keys in en_us.json~~ **done**: all 14 are live
 21. `Places.WINDOW_SEATS` as an array of two if a rectangle would do
-22. The `Buffet.MENU` heals field, now the dish of the day doubles it
-23. `State.get`/`State.set` if the named getters cover everything
-24. The lift's `NAMES` array, duplicating `Floors.name`
-25. Anything in README that describes what the mod used to do
+22. The `Buffet.MENU` heals field, now the dish of the day doubles it — **left alone**: it is the base the doubling doubles
+23. ~~`State.get`/`State.set` if the named getters cover everything~~ **done**: LAST_FIGHT, TOP_FIVE and LOG have named pairs and the generic ones are gone
+24. ~~The lift's `NAMES` array, duplicating `Floors.name`~~ **done**
+25. ~~Anything in README that describes what the mod used to do~~ **done**: the floor 14 upgrade buys Ben not Ship 2, ship 2 is reached through floor 18, and the crowd is 45
 
 ## Change (round two)
 
@@ -213,7 +213,7 @@ The struck-through ones are done.
 11. The bosses all fight the same way
 12. Plant armour is the only armour in the game
 13. Teleporting is silent to everybody but you
-14. The racer's time never changes
+14. ~~The racer's time never changes~~ **done**: see Take away 1
 15. Snake, Pac-Man and Galaga pay by different rules
 16. The daily reward is a flat 40
 17. Pets cannot be sold or given away

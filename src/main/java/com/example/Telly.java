@@ -31,24 +31,29 @@ public final class Telly {
 	/** How long the screen stays lit, in ticks. */
 	private static final int ON_FOR = 200;
 
-	/** Screens that are lit, and when each goes off again. */
-	private static final java.util.Map<BlockPos, Long> LIT = new java.util.HashMap<>();
+	/**
+	 * When the screen goes off again, or zero while it is dark.
+	 *
+	 * This was a Map<BlockPos, Long> keyed on the screen, iterated with a
+	 * defensive copy each tick. There is one television on the ship and it is
+	 * at Places.TV, so the map never held more than a single entry -- a long
+	 * says the same thing.
+	 */
+	private static long offAt = 0L;
 
 	public static void register() {
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
 				.register(server -> {
-			if (LIT.isEmpty() || server.getTickCount() % 20 != 0) {
+			if (offAt == 0L || server.getTickCount() % 20 != 0) {
 				return;
 			}
 			for (ServerLevel level : server.getAllLevels()) {
 				if (!ShipLifeMod.isShipLife(level)) {
 					continue;
 				}
-				for (BlockPos screen : new java.util.ArrayList<>(LIT.keySet())) {
-					if (level.getGameTime() >= LIT.get(screen)) {
-						LIT.remove(screen);
-						paint(level, Blocks.GRAY_CONCRETE);
-					}
+				if (level.getGameTime() >= offAt) {
+					offAt = 0L;
+					paint(level, Blocks.GRAY_CONCRETE);
 				}
 			}
 		});
@@ -64,19 +69,14 @@ public final class Telly {
 
 	/** Turn it on: light the screen and put the last fight on it. */
 	public static void watch(ServerPlayer player, ServerLevel level) {
-		String last = State.get(player, State.LAST_FIGHT);
+		String last = State.lastFight(player);
 
 		paint(level, Blocks.LIGHT_BLUE_CONCRETE);
-		LIT.put(Places.TV, level.getGameTime() + ON_FOR);
+		offAt = level.getGameTime() + ON_FOR;
 		level.playSound(null, Places.TV, SoundEvents.NOTE_BLOCK_HAT.value(),
 				SoundSource.BLOCKS, 0.6f, 1.6f);
 
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = Game.cell(Items.GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.GRAY_STAINED_GLASS_PANE);
 		page.setItem(4, Book.entry(Items.TARGET, "The Board", ChatFormatting.AQUA,
 				"Everything you have a record in.",
 				"Your last fight is in the middle."));
@@ -93,7 +93,11 @@ public final class Telly {
 						? "none yet" : Pool.time(State.bestLap(player)))));
 		page.setItem(23, Book.entry(Items.MINECART, "The Track", ChatFormatting.RED,
 				State.tally(player, State.RACES) + " races finished",
-				"The racer does five laps in " + Pool.time(Kart.RIVAL_TICKS)));
+				"Your best: " + (State.tally(player, State.BEST_RACE) == 0
+						? "none yet" : Pool.time(State.tally(player, State.BEST_RACE))),
+				// The racer keeps up with you now, so this has to ask rather
+				// than print the constant it used to.
+				"The racer does five laps in " + Pool.time(Kart.rivalTicks(player))));
 		page.setItem(25, Book.entry(Items.IRON_SWORD, "The Fighting", ChatFormatting.RED,
 				State.tally(player, State.WAVES) + " waves cleared",
 				State.tally(player, State.BOSSES) + " bosses beaten",

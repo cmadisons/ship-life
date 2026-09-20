@@ -164,12 +164,7 @@ public final class QuestDay {
 	}
 
 	private static void show(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = Game.cell(Items.GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.GRAY_STAINED_GLASS_PANE);
 		page.setItem(4, Book.entry(Items.WRITTEN_BOOK, "Quest Day", ChatFormatting.AQUA,
 				"Four quests. All four pays " + PAYOUT + " event tickets,",
 				"and then four more arrive.",

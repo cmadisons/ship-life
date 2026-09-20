@@ -531,12 +531,7 @@ public final class Shops {
 	}
 
 	private static SimpleContainer blank() {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = Game.cell(Items.GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-		return page;
+		return Book.page(Items.GRAY_STAINED_GLASS_PANE);
 	}
 
 	private static ItemStack closeButton() {

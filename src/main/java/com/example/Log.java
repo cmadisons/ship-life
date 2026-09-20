@@ -24,7 +24,7 @@ public final class Log {
 	public static void write(ServerPlayer player, String what) {
 		String day = String.valueOf(Cal.dayNumber());
 		java.util.List<String> lines = new java.util.ArrayList<>(
-				java.util.List.of(State.get(player, State.LOG).split("\n")));
+				java.util.List.of(State.log(player).split("\n")));
 		lines.removeIf(String::isEmpty);
 
 		// One line a day, added to rather than replaced, so a day reads as a
@@ -49,13 +49,13 @@ public final class Log {
 		while (lines.size() > DAYS) {
 			lines.remove(0);
 		}
-		State.set(player, State.LOG, String.join("\n", lines));
+		State.log(player, String.join("\n", lines));
 	}
 
 	/** The log in words, newest first. */
 	public static java.util.List<String> lines(ServerPlayer player) {
 		java.util.List<String> out = new java.util.ArrayList<>();
-		String[] lines = State.get(player, State.LOG).split("\n");
+		String[] lines = State.log(player).split("\n");
 		for (int i = lines.length - 1; i >= 0; i--) {
 			if (lines[i].isEmpty()) {
 				continue;

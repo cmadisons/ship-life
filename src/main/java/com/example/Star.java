@@ -61,12 +61,7 @@ public final class Star {
 	/** The five events, and what happens if you pick one. */
 	private static void pick(ServerPlayer player) {
 		// Six rows: the menu this opens in is a chest, and a chest is 54.
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = Game.cell(Items.GRAY_STAINED_GLASS_PANE, " ");
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.GRAY_STAINED_GLASS_PANE);
 		String on = Events.running(player);
 		page.setItem(4, Book.entry(Items.NETHER_STAR, "Go To Event Star",
 				ChatFormatting.AQUA,

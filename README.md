@@ -31,9 +31,10 @@ every piece you wear stops another tenth of the hit, so the full set stops four
 tenths of everything and banks the lot.
 - A **drawn heads-up display** — the star is out in the world where the quest is, through walls and through the floors of the ship, pinned to the edge of the screen with an arrow when it is behind you; the ship's clock, the date, your money and your tickets sit in the top-right corner.
 
-The lift does not offer a second ship any more. Ship 2 was this ship again floor
-for floor with nothing new on it, so the floor 14 upgrade buys floor 15 -- Ben --
-and nothing else.
+The lift does not offer a second ship any more, and the floor 14 passport
+upgrade buys floor 15 -- Ben -- rather than a boarding pass. Ship 2 itself is
+still there, but you reach it through the portal on floor 18 now, and its floor
+1 is the pool deck rather than another lobby.
 
 Floor 16 opens once you have paid out 1500 event tickets, used six of Ben's
 bombs, cleared wave 3 and put a boss down -- all four -- and Izzy lives up there -- the second friend, and the only one you fight
@@ -128,7 +129,7 @@ it, so you keep it, and nothing the mod builds is ever put back afterwards.
 | 11 | 🎁 A free reward every month you play | 1000 event tickets (buys 11, 12 and 13) |
 | 12 | 🐾 Pet store | " |
 | 13 | 🍽️ The Keg — a fancy restaurant | " |
-| 14 | 🛂 Passport upgrade -- 250 event tickets buys Ship 2 | 4.9% roll on floor 11 |
+| 14 | 🛂 Passport upgrade -- 250 event tickets, and floor 15 comes with it | 4.9% roll on floor 11 |
 
 ## The story
 
@@ -223,7 +224,7 @@ You can't do any event without floor 7.
 
 | Event | When | What happens |
 |---|---|---|
-| 👻 **Spooky Shooter** | Every Sunday in October | You're in a crowd of 100 people, some of them lookalikes. A picture of one shows at a time and you find and shoot that one. Right = **1–200 event tickets** (targets holding a lightsaber or a shield are worth more). Wrong = **–50**, and that innocent dies and is gone. Runs all day; the crowd refills to 100 with new looks. |
+| 👻 **Spooky Shooter** | Every Sunday in October | You're in a crowd of 45, some of them lookalikes, all of them on screen at once. A picture of one shows at a time and you find and shoot that one. Right = **1–200 event tickets** (targets holding a lightsaber or a shield are worth more). Wrong = **–50**, and that innocent dies and is gone. Runs all day; the crowd comes back with new looks next time. |
 | 🎄 **Christmas** | Every Sunday in December | The same, but 100 Santa Clauses that look mostly the same — no two identical. Right = **+250**. Innocent = **–50**. |
 | 🕹️ **Summer Break** | Weekends in summer and March break | **Double arcade tickets.** |
 | 📜 **Quest Day** | Every day nothing else is on | Four quests — a super easy, an easy, a medium and a hard. Finish all four for **500 event tickets**, then get another four, and so on. |

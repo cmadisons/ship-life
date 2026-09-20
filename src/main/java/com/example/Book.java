@@ -31,14 +31,33 @@ public final class Book {
 	private Book() {
 	}
 
-	public static void open(ServerPlayer player) {
+	/**
+	 * A blank double chest, glazed edge to edge.
+	 *
+	 * Every menu in the mod starts the same way: fifty-four slots filled with
+	 * a named-blank pane so the empty ones do not read as things you could
+	 * take. That loop was written out thirteen times across nine classes, in
+	 * three pane colours and two ways of naming them. It is written once here
+	 * now, and {@link Comforts#blank()} and the old Shops.blank() both come
+	 * through it.
+	 */
+	public static SimpleContainer page(net.minecraft.world.item.Item pane) {
 		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = new ItemStack(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
+		ItemStack filler = new ItemStack(pane);
 		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
 		for (int slot = 0; slot < 54; slot++) {
 			page.setItem(slot, filler.copy());
 		}
+		return page;
+	}
 
+	/** The usual one: light grey. */
+	public static SimpleContainer page() {
+		return page(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
+	}
+
+	public static void open(ServerPlayer player) {
+		SimpleContainer page = Book.page(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
 		int here = State.quest(player);
 
 		// Your money and the date, along the top.
@@ -126,13 +145,7 @@ public final class Book {
 	 * you have, what you have done, and what is on today.
 	 */
 	public static void more(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = new ItemStack(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
-		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
 		page.setItem(4, entry(Items.CLOCK, Cal.date(), ChatFormatting.AQUA,
 				Events.running(player) == null
 						? "Nothing on today."
@@ -196,13 +209,7 @@ public final class Book {
 	 * you do not own says what would open it.
 	 */
 	public static void map(ServerPlayer player) {
-		SimpleContainer page = new SimpleContainer(54);
-		ItemStack filler = new ItemStack(Items.BLACK_STAINED_GLASS_PANE);
-		filler.set(DataComponents.CUSTOM_NAME, Component.literal(" "));
-		for (int slot = 0; slot < 54; slot++) {
-			page.setItem(slot, filler.copy());
-		}
-
+		SimpleContainer page = Book.page(Items.BLACK_STAINED_GLASS_PANE);
 		int on = Places.floorAt(player.getY());
 		for (int floor = 1; floor <= Places.TOP_FLOOR; floor++) {
 			// Highest floor top-left, counting down each stack of six.
