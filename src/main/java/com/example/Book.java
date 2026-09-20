@@ -285,12 +285,22 @@ public final class Book {
 			int column = 2 + (fromTop / 6) * 2;
 			int row = fromTop % 6;
 			boolean yours = State.hasFloor(player, floor);
+			// Who is standing on it. A map of eighteen rooms that never says
+			// anybody is in them reads like a diagram; knowing Ben is on 15 is
+			// half of what you open a map for.
+			StringBuilder here = new StringBuilder();
+			for (Person.Findable body : Person.findable()) {
+				if (body.floor() == floor) {
+					here.append(here.isEmpty() ? "" : ", ").append(body.label());
+				}
+			}
 			page.setItem(row * 9 + column, entry(
 					floor == on ? Items.LIME_DYE : yours ? Items.WHITE_DYE : Items.IRON_DOOR,
 					"Floor " + floor + " -- " + Floors.name(floor),
 					floor == on ? ChatFormatting.GREEN
 							: yours ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY,
 					floor == on ? "You are here." : yours ? "Yours." : "Locked.",
+					here.isEmpty() ? "" : "Who is there: " + here,
 					yours ? "" : "Opens with: " + Floors.how(floor),
 					yours && floor != on ? "Click to ride there." : ""));
 		}

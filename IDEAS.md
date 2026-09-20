@@ -228,11 +228,11 @@ The struck-through ones are done.
 
 ## Make better (round two)
 
-1. The hull could have a name painted on it
+1. ~~The hull could have a name painted on it~~ **built**: SHIP over LIFE on the bow, in a 3x5 block alphabet
 2. ~~The bar could name what is left, not just how much~~ **built**: "Wave 3 -- 2 ghasts, 1 witch"
 3. ~~The Quest Book could remember which page you were on~~ **built**
 4. Pets could ride the lift with you
-5. The map could show where the people are standing
+5. ~~The map could show where the people are standing~~ **built**
 6. The fridge could hold more as the ship grows
 7. ~~Signs could show your best time on the pool floor~~ **built**: signs at both ends carry the rules; your own best cannot go on a shared block, so it greets you as you step out of the lift
 8. The arcade could have a demo screen when nobody is playing
@@ -245,8 +245,8 @@ The struck-through ones are done.
 15. ~~Bosses could taunt you between hits~~ **built**: their own lines, and only once they are actually losing
 16. ~~The shooter could show how close you were when you miss~~ **built**: n of 4 matched, and which one you had wrong
 17. Quest Day could pick harder quests as you get better
-18. The balcony could show the stars moving
-19. The gym could show a stronger you -- scale, like the pets
+18. ~~The balcony could show the stars moving~~ **built**: they only run while somebody is out there
+19. ~~The gym could show a stronger you -- scale, like the pets~~ **built**: a tenth taller at ten hearts, kept slight so you still fit in the lift
 20. The store could stock what you sold it
 21. ~~The wardrobe could remember what you wore last~~ **built**
 22. Ship 2's rooms could be laid out mirrored

@@ -114,10 +114,36 @@ public final class Gym {
 		}
 		health.removeModifier(EXTRA);
 		int hearts = hearts(player);
+		applyBuild(player, hearts);
 		if (hearts <= 0) {
 			return;
 		}
 		health.addPermanentModifier(new AttributeModifier(EXTRA, hearts * 2.0,
 				AttributeModifier.Operation.ADD_VALUE));
+	}
+
+	/**
+	 * You get visibly bigger.
+	 *
+	 * Ten extra hearts was a number on a bar and nothing else -- the pets
+	 * already scale so you can tell a lion from an ocelot across a room, and
+	 * the person who did the lifting looked exactly the same at the end of it.
+	 * A tenth over the ten hearts, so a full set of them is a tenth taller.
+	 * Deliberately slight: any more and you stop fitting through the lift.
+	 */
+	private static final net.minecraft.resources.Identifier BUILD =
+			ShipLifeMod.id("gym_build");
+
+	private static void applyBuild(ServerPlayer player, int hearts) {
+		var scale = player.getAttribute(Attributes.SCALE);
+		if (scale == null) {
+			return;
+		}
+		scale.removeModifier(BUILD);
+		if (hearts <= 0) {
+			return;
+		}
+		scale.addPermanentModifier(new AttributeModifier(BUILD,
+				0.01 * hearts, AttributeModifier.Operation.ADD_VALUE));
 	}
 }

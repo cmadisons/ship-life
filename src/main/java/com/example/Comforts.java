@@ -33,6 +33,7 @@ public final class Comforts {
 	private static final int EVERY = 400;
 
 	public static void register() {
+		stars();
 		// A record player in one room is a record player in one room. This
 		// one is wired to the ship: while there is a disc turning on floor 5,
 		// everybody aboard hears it, wherever they are.
@@ -351,6 +352,45 @@ public final class Comforts {
 					.append(Component.literal("Still running below: " + fight + ".")
 							.withStyle(ChatFormatting.RED)));
 		}
+	}
+
+	/**
+	 * The stars going past the balcony.
+	 *
+	 * The balcony was built to be somewhere you walk out and see space, and
+	 * space was a skybox that never moved -- which reads as a window, not as
+	 * a ship under way. White specks now drift past whoever is out there,
+	 * always the same direction, so the ship is visibly going somewhere.
+	 *
+	 * Only while somebody is on it, and only a handful at a time: this runs
+	 * four times a second and the balcony is not the point of the game.
+	 */
+	private static void stars() {
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK
+				.register(server -> {
+			if (server.getTickCount() % 5 != 0) {
+				return;
+			}
+			for (ServerLevel level : server.getAllLevels()) {
+				if (!ShipLifeMod.isShipLife(level)) {
+					continue;
+				}
+				for (ServerPlayer player : level.players()) {
+					if (player.blockPosition().distSqr(Places.BALCONY) > 144) {
+						continue;
+					}
+					for (int i = 0; i < 6; i++) {
+						double x = Places.BALCONY.getX() + 2 + level.getRandom().nextDouble() * 10;
+						double y = Places.BALCONY.getY() - 3 + level.getRandom().nextDouble() * 14;
+						double z = Places.BALCONY.getZ() - 8 + level.getRandom().nextDouble() * 16;
+						// All travelling the same way, which is what makes it
+						// the ship moving rather than weather.
+						level.sendParticles(player, net.minecraft.core.particles.ParticleTypes.END_ROD,
+								true, true, x, y, z, 0, 0.0, 0.0, -1.0, 0.45);
+					}
+				}
+			}
+		});
 	}
 
 	/**

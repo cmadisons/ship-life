@@ -610,6 +610,47 @@ public final class Ship {
 		}
 	}
 
+	/**
+	 * A three-by-five block alphabet, for the name on the hull.
+	 *
+	 * Only the seven letters the ship's name needs. Anything else is skipped
+	 * rather than guessed at, so adding a word means adding its letters here
+	 * and nothing else changes.
+	 */
+	private static final java.util.Map<Character, String[]> LETTERS = java.util.Map.of(
+			'S', new String[] { "###", "#  ", "###", "  #", "###" },
+			'H', new String[] { "# #", "# #", "###", "# #", "# #" },
+			'I', new String[] { "###", " # ", " # ", " # ", "###" },
+			'P', new String[] { "###", "# #", "###", "#  ", "#  " },
+			'L', new String[] { "#  ", "#  ", "#  ", "#  ", "###" },
+			'F', new String[] { "###", "#  ", "###", "#  ", "#  " },
+			'E', new String[] { "###", "#  ", "###", "#  ", "###" });
+
+	/**
+	 * Write a word on the north face, centred on x, top row at y.
+	 *
+	 * Rows read downwards, so row 0 of each letter is the highest line.
+	 */
+	private static void paint(ServerLevel level, String word, int x, int y, int z) {
+		int wide = word.length() * 4 - 1;
+		int startX = x - wide / 2;
+		for (int i = 0; i < word.length(); i++) {
+			String[] glyph = LETTERS.get(word.charAt(i));
+			if (glyph == null) {
+				continue;
+			}
+			for (int row = 0; row < glyph.length; row++) {
+				for (int col = 0; col < 3; col++) {
+					if (glyph[row].charAt(col) != '#') {
+						continue;
+					}
+					set(level, new BlockPos(startX + i * 4 + col, y - row, z),
+							Blocks.WHITE_CONCRETE);
+				}
+			}
+		}
+	}
+
 	/** One rung, hung on the face of the chair it climbs. */
 	private static void ladder(ServerLevel level, BlockPos where,
 			net.minecraft.core.Direction facing) {
@@ -1079,6 +1120,18 @@ public final class Ship {
 				}
 			}
 		}
+
+		// Her name on the bow.
+		//
+		// From the town this was a black box with lights on the corners, and
+		// nothing about it said which ship it was. A three-by-five block
+		// alphabet is enough for the letters this needs; "SHIP" over "LIFE"
+		// because the hull face is twenty-seven blocks wide and the two words
+		// side by side would be thirty-five.
+		// Top row at +7 of its own storey, so the five rows finish at +3 and
+		// sit clear of the grey deck line at +0 rather than straddling it.
+		paint(level, "SHIP", x, Places.floorY(14) + 7, z - r);
+		paint(level, "LIFE", x, Places.floorY(13) + 7, z - r);
 
 		// Running lights up the four corners.
 		for (int y = Places.GROUND; y <= top; y += 4) {
