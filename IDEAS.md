@@ -112,8 +112,8 @@ The struck-through ones are done.
 4. ~~Waves could say what is coming before it comes~~ **done**
 5. ~~The boss doors could show a health bar~~ **done**
 6. ~~The Quest Book map could be clickable to ride there~~ **done**
-7. The star could point at people as well as quests
-8. Pets could take names you choose
+~~The star could point at people as well as quests~~ **built**: six of them, picked from the book's last page
+~~Pets could take names you choose~~ **built**: `/petname dog Bess`
 ~~The armour's bank could be a bar rather than a message~~ **built**: ten cells filling towards 20, a whole player's health
 10. ~~The gas could spread rather than sit in a ball~~ **done**
 11. ~~The arcade could keep a top five per game~~ **done**
@@ -230,7 +230,7 @@ The struck-through ones are done.
 
 1. The hull could have a name painted on it
 2. ~~The bar could name what is left, not just how much~~ **built**: "Wave 3 -- 2 ghasts, 1 witch"
-3. The Quest Book could remember which page you were on
+3. ~~The Quest Book could remember which page you were on~~ **built**
 4. Pets could ride the lift with you
 5. The map could show where the people are standing
 6. The fridge could hold more as the ship grows

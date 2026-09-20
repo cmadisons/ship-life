@@ -56,7 +56,39 @@ public final class Book {
 		return page(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
 	}
 
+	/** Where the row of people starts on the "everything else" page. */
+	private static final int PERSON_FIRST = 28;
+
+	/** The three pages, as the save numbers them. */
+	private static final int QUESTS = 0, MAP = 1, MORE = 2;
+
+	/**
+	 * Open the book where you left it.
+	 *
+	 * It always opened on the quest list, so anybody using the map or the
+	 * "everything else" page had two clicks to make every single time. Which
+	 * page you were last on is remembered, and going back to the quests puts
+	 * it back to the quests.
+	 */
 	public static void open(ServerPlayer player) {
+		switch (State.tally(player, State.BOOK_PAGE)) {
+			case MAP -> {
+				map(player);
+				return;
+			}
+			case MORE -> {
+				more(player);
+				return;
+			}
+			default -> {
+			}
+		}
+		quests(player);
+	}
+
+	/** The quest list itself -- page one, and what "back" goes to. */
+	public static void quests(ServerPlayer player) {
+		player.setAttached(State.BOOK_PAGE, QUESTS);
 		SimpleContainer page = Book.page(Items.LIGHT_GRAY_STAINED_GLASS_PANE);
 		int here = State.quest(player);
 
@@ -184,6 +216,25 @@ public final class Book {
 				+ Log.count(player) + " / " + Log.FEATS.length, ChatFormatting.LIGHT_PURPLE,
 				Log.feats(player).toArray(new String[0])));
 
+		// Who is where, and the star will take you to any of them.
+		//
+		// It has only ever followed the quest you are on, which is no help
+		// when the quest IS "talk to Charlie" and you have forgotten which
+		// floor he is on -- or when you have no quest left and want the cook.
+		int pinned = State.tally(player, State.FINDING);
+		Person.Findable[] people = Person.findable();
+		for (int i = 0; i < people.length; i++) {
+			Person.Findable who = people[i];
+			boolean on = i == pinned;
+			page.setItem(PERSON_FIRST + i, entry(Items.PLAYER_HEAD, who.label(),
+					on ? ChatFormatting.GREEN : ChatFormatting.WHITE,
+					who.who(),
+					"Floor " + who.floor(),
+					"",
+					on ? "The star is on them. Click to stop."
+						: "Click to put the star on them."));
+		}
+
 		page.setItem(45, entry(Items.WRITABLE_BOOK, "Back", ChatFormatting.YELLOW,
 				"Back to the quests."));
 		page.setItem(49, entry(Items.BARRIER, "Close", ChatFormatting.RED, "Press Escape."));
@@ -192,10 +243,27 @@ public final class Book {
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
 						(clicker, slot) -> {
 							if (slot == 45) {
-								open(clicker);
-							} else if (slot == 49) {
-								clicker.closeContainer();
+								quests(clicker);
+								return;
 							}
+							if (slot == 49) {
+								clicker.closeContainer();
+								return;
+							}
+							int index = slot - PERSON_FIRST;
+							if (index < 0 || index >= Person.findable().length) {
+								return;
+							}
+							boolean already = State.tally(clicker, State.FINDING) == index;
+							clicker.setAttached(State.FINDING, already ? -1 : index);
+							Person.Findable target = Person.findable()[index];
+							clicker.sendSystemMessage(Component.literal(already
+									? "The star goes back to your quest."
+									: "★ The star is on " + target.label()
+											+ ", floor " + target.floor() + ".")
+									.withStyle(already ? ChatFormatting.GRAY
+											: ChatFormatting.GREEN));
+							more(clicker);
 						}),
 				Component.literal("Quest Book  --  Everything Else")));
 	}
@@ -238,7 +306,7 @@ public final class Book {
 				(id, inventory, who) -> new ReadOnlyMenu(id, inventory, page,
 						(clicker, slot) -> {
 							if (slot == 53) {
-								open(clicker);
+								quests(clicker);
 								return;
 							}
 							// A map you can only look at is a picture. Click a
@@ -311,10 +379,12 @@ public final class Book {
 			return;
 		}
 		if (slot == 42) {
+			player.setAttached(State.BOOK_PAGE, MAP);
 			map(player);
 			return;
 		}
 		if (slot == 45) {
+			player.setAttached(State.BOOK_PAGE, MORE);
 			more(player);
 			return;
 		}

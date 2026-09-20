@@ -102,6 +102,28 @@ public class Person extends PathfinderMob {
 	 * Run on every join. Anybody already standing where they should be is
 	 * left alone, so this can be called as often as it likes.
 	 */
+	/**
+	 * Somebody the star can point at, and where they stand.
+	 *
+	 * The star has only ever followed the quest you are on, which is fine
+	 * until the quest is "talk to Charlie" and you have forgotten which floor
+	 * he is on -- or until you have no quest at all and want to find the cook.
+	 * These are the six with a fixed spot, in the order the book lists them.
+	 */
+	public record Findable(String label, String who, BlockPos where, int floor) {
+	}
+
+	public static Findable[] findable() {
+		return new Findable[] {
+			new Findable("Charlie", "The manager, at the table", Places.CHAIR, 1),
+			new Findable("The front desk", "Passports and questions", Places.DESK.north(), 1),
+			new Findable("The lobby staff", "By the gangway door", Places.DOOR.east(2), 1),
+			new Findable("The cook", "Orders whatever you fancy", Places.BUFFET_COOK.east(), 4),
+			new Findable("Ben", "Armour and bombs", Places.BEN.south(), 15),
+			new Findable("Izzy", "Boots and the rest of the set", Places.IZZY.south(), 16),
+		};
+	}
+
 	public static void everyone(ServerLevel level) {
 		// Anybody left over from when these people had names of their own.
 		// Renaming them was not renaming them: it made a second Charlie stood

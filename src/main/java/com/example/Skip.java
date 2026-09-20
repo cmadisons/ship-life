@@ -47,6 +47,17 @@ public final class Skip {
 			// you want it.
 			dispatcher.register(Commands.literal("11reward")
 					.executes(context -> extraReward(context.getSource())));
+			// Name a pet. A chest menu cannot take typed words, so this is a
+			// command -- /petname dog Bess, or /petname dog to go back to
+			// calling it a Dog.
+			dispatcher.register(Commands.literal("petname")
+					.then(Commands.argument("kind", com.mojang.brigadier.arguments.StringArgumentType.word())
+							.executes(context -> petName(context.getSource(),
+									com.mojang.brigadier.arguments.StringArgumentType.getString(context, "kind"), ""))
+							.then(Commands.argument("name", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+									.executes(context -> petName(context.getSource(),
+											com.mojang.brigadier.arguments.StringArgumentType.getString(context, "kind"),
+											com.mojang.brigadier.arguments.StringArgumentType.getString(context, "name"))))));
 			// Every side quest you are carrying, finished and paid for.
 			dispatcher.register(Commands.literal("skipsidequest")
 					.executes(context -> skipSide(context.getSource())));
@@ -211,6 +222,47 @@ public final class Skip {
 		player.sendSystemMessage(Component.literal("Chapter 1 skipped -- "
 				+ State.dollars(State.money(player)) + " and you are on floor 1.")
 				.withStyle(ChatFormatting.YELLOW));
+		return 1;
+	}
+
+	/**
+	 * /petname &lt;kind&gt; [name] -- call a pet something, or nothing.
+	 *
+	 * A chest menu cannot take typed words and the ship has no anvil you are
+	 * meant to use, so naming a pet is a command. Leaving the name off puts it
+	 * back to being called what it is.
+	 */
+	private static int petName(net.minecraft.commands.CommandSourceStack source,
+			String kindName, String called) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			return 0;
+		}
+		Pets.Kind kind = null;
+		for (Pets.Kind each : Pets.Kind.values()) {
+			if (each.name().equalsIgnoreCase(kindName) || each.label.equalsIgnoreCase(kindName)) {
+				kind = each;
+			}
+		}
+		if (kind == null) {
+			source.sendFailure(net.minecraft.network.chat.Component.literal(
+					"No pet called that. Try: lion, dog, cat, dolphin, skeleton, shadow."));
+			return 0;
+		}
+		if (Pets.owned(player, kind) == 0) {
+			source.sendFailure(net.minecraft.network.chat.Component.literal(
+					"You do not have a " + kind.label + "."));
+			return 0;
+		}
+		String trimmed = called.trim();
+		if (trimmed.length() > 20) {
+			trimmed = trimmed.substring(0, 20);
+		}
+		Pets.rename(player, kind, trimmed);
+		player.sendSystemMessage(net.minecraft.network.chat.Component.literal(trimmed.isEmpty()
+				? "Your " + kind.label + " goes back to being called a " + kind.label + "."
+				: "Your " + kind.label + " is called " + trimmed + " now.")
+				.withStyle(net.minecraft.ChatFormatting.AQUA));
 		return 1;
 	}
 }

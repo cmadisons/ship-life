@@ -88,6 +88,37 @@ public final class State {
 	public static final AttachmentType<Integer> BEST_RACE = of("best_race", 0, Codec.INT);
 	/** The wardrobe outfit you last put on, by index, or -1 for none. */
 	public static final AttachmentType<Integer> OUTFIT = of("outfit", -1, Codec.INT);
+	/** Which page of the Quest Book you were last on: 0 quests, 1 map, 2 everything else. */
+	public static final AttachmentType<Integer> BOOK_PAGE = of("book_page", 0, Codec.INT);
+	/** Who the star is pointing at instead of a quest, by index, or -1 for the quest. */
+	public static final AttachmentType<Integer> FINDING = of("finding", -1, Codec.INT);
+	/** What you have called each kind of pet, as "lion=Rex,dog=Bess". */
+	public static final AttachmentType<String> PET_NAMES = of("pet_names", "", Codec.STRING);
+
+	/** The name you gave that kind of pet, or "" if you never did. */
+	public static String petName(ServerPlayer player, Pets.Kind kind) {
+		for (String pair : player.getAttachedOrCreate(PET_NAMES).split(",")) {
+			int mark = pair.indexOf('=');
+			if (mark > 0 && pair.substring(0, mark).equals(kind.name())) {
+				return pair.substring(mark + 1);
+			}
+		}
+		return "";
+	}
+
+	/** Name that kind of pet, or pass "" to go back to calling it what it is. */
+	public static void petName(ServerPlayer player, Pets.Kind kind, String called) {
+		java.util.List<String> kept = new java.util.ArrayList<>();
+		for (String pair : player.getAttachedOrCreate(PET_NAMES).split(",")) {
+			if (!pair.isEmpty() && !pair.startsWith(kind.name() + "=")) {
+				kept.add(pair);
+			}
+		}
+		if (!called.isEmpty()) {
+			kept.add(kind.name() + "=" + called);
+		}
+		player.setAttached(PET_NAMES, String.join(",", kept));
+	}
 	public static final AttachmentType<Integer> EVENT_EARNED = of("event_earned", 0, Codec.INT);
 	public static final AttachmentType<Integer> BRICKS = of("breakout_bricks", 0, Codec.INT);
 	public static final AttachmentType<Integer> WALLS = of("breakout_walls", 0, Codec.INT);

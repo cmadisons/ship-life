@@ -77,6 +77,37 @@ public final class Hud {
 		if (isBusy(player)) {
 			return;
 		}
+		// Pointing at somebody beats pointing at a quest: you asked for it by
+		// name and it stops as soon as you get there.
+		int finding = State.tally(player, State.FINDING);
+		Person.Findable[] people = Person.findable();
+		if (finding >= 0 && finding < people.length) {
+			Person.Findable who = people[finding];
+			BlockPos at = who.where();
+			int away = (int) Math.round(Math.sqrt(player.distanceToSqr(
+					at.getX() + 0.5, at.getY(), at.getZ() + 0.5)));
+			if (away < 4) {
+				// Arrived. Hand the star back to the quest rather than making
+				// you go and turn it off.
+				player.setAttached(State.FINDING, -1);
+				player.sendSystemMessage(Component.literal("You found " + who.label() + ".")
+						.withStyle(ChatFormatting.GREEN));
+			} else {
+				player.sendOverlayMessage(Component.literal("★ " + away + " blocks")
+						.withStyle(colourFor(away))
+						.append(Component.literal("  ·  " + who.label()
+								+ " (floor " + who.floor() + ")  ")
+								.withStyle(ChatFormatting.WHITE))
+						.append(clockPart()));
+				if (away < 48) {
+					level.sendParticles(player, ParticleTypes.HAPPY_VILLAGER, true,
+							true, at.getX() + 0.5, at.getY() + 1.6, at.getZ() + 0.5,
+							2, 0.2, 0.4, 0.2, 0.0);
+				}
+				return;
+			}
+		}
+
 		Quests.Part part = Quests.currentPart(player);
 		Component line;
 		if (part == null) {

@@ -79,6 +79,55 @@ public final class Pets {
 	}
 
 	/**
+	 * Call a kind of pet something, and rename any already following you.
+	 *
+	 * Renaming the entity as well as the save matters: a pet you named would
+	 * otherwise keep its old label until it was despawned and put back, which
+	 * happens on a portal and nowhere else.
+	 */
+	public static void rename(ServerPlayer player, Kind kind, String called) {
+		State.petName(player, kind, called);
+		if (!(player.level() instanceof ServerLevel level)) {
+			return;
+		}
+		String now = nameFor(player, kind);
+		for (net.minecraft.world.entity.Mob pet : level.getEntitiesOfClass(
+				net.minecraft.world.entity.Mob.class,
+				player.getBoundingBox().inflate(64.0),
+				mob -> mob.getCustomName() != null
+						&& kindOf(mob.getCustomName().getString()) == kind)) {
+			pet.setCustomName(Component.literal(now).withStyle(ChatFormatting.AQUA));
+			pet.setCustomNameVisible(true);
+		}
+	}
+
+	/**
+	 * Is this name one of ours, and which kind?
+	 *
+	 * A pet used to be recognised by being called exactly "Dog", which is also
+	 * why you could not call it anything else. A named one is "Rex the Dog",
+	 * so the kind is still in the name and both spellings are understood --
+	 * old worlds full of plain "Dog" keep working.
+	 */
+	public static Kind kindOf(String name) {
+		if (name == null) {
+			return null;
+		}
+		for (Kind kind : Kind.values()) {
+			if (name.equals(kind.label) || name.endsWith(" the " + kind.label)) {
+				return kind;
+			}
+		}
+		return null;
+	}
+
+	/** What this player's pet of that kind should be called. */
+	public static String nameFor(ServerPlayer player, Kind kind) {
+		String chosen = State.petName(player, kind);
+		return chosen.isEmpty() ? kind.label : chosen + " the " + kind.label;
+	}
+
+	/**
 	 * Keep the ones that cannot follow with you.
 	 *
 	 * A wolf follows its owner on its own. An ocelot and a dolphin do not, so
@@ -91,10 +140,7 @@ public final class Pets {
 				player.getBoundingBox().inflate(64.0),
 				mob -> mob.getCustomName() != null && !(mob instanceof TamableAnimal))) {
 			String name = pet.getCustomName().getString();
-			boolean ours = false;
-			for (Kind kind : Kind.values()) {
-				ours = ours || kind.label.equals(name);
-			}
+			boolean ours = kindOf(name) != null;
 			if (!ours) {
 				continue;
 			}
@@ -153,7 +199,7 @@ public final class Pets {
 					net.minecraft.world.entity.Mob.class,
 					player.getBoundingBox().inflate(24.0),
 					mob -> mob.getCustomName() != null
-							&& mob.getCustomName().getString().equals(kind.label)).isEmpty();
+							&& kindOf(mob.getCustomName().getString()) == kind).isEmpty();
 			if (!already) {
 				spawn(player, kind);
 			}
@@ -404,7 +450,7 @@ public final class Pets {
 				default -> 1.0;
 			});
 		}
-		pet.setCustomName(Component.literal(kind.label).withStyle(ChatFormatting.AQUA));
+		pet.setCustomName(Component.literal(nameFor(player, kind)).withStyle(ChatFormatting.AQUA));
 		pet.setCustomNameVisible(true);
 		pet.setPersistenceRequired();
 		level.playSound(null, at, SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.PLAYERS, 0.7f, 1.2f);
