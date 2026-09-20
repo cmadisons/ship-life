@@ -352,6 +352,35 @@ public final class Gear {
 				reach * 0.5, 0.8, reach * 0.5, 0.0);
 		level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
 				at.x, at.y + 0.4, at.z, 4, reach * 0.5, 0.6, reach * 0.5, 0.0);
+		stain(cloud);
+	}
+
+	/**
+	 * The gas marks the floor it is sitting on.
+	 *
+	 * The cloud hangs at chest height, so from above -- which is where you
+	 * are, in a fight, looking down at a room full of legs -- you could not
+	 * see where its edge was. A scatter of green on the floor underneath
+	 * draws the circle you are standing in or out of.
+	 *
+	 * Particles, not blocks. Staining a floor for real would mean putting the
+	 * old blocks back afterwards and getting that right on a crash, and the
+	 * ship's floors are not breakable anyway.
+	 */
+	private static void stain(Cloud cloud) {
+		ServerLevel level = cloud.level();
+		Vec3 at = cloud.at();
+		double reach = cloud.reach();
+		// Round the edge rather than across the middle: the edge is the bit
+		// worth knowing and it keeps the count down on a big cloud.
+		int marks = (int) Math.min(24, 8 + reach * 2);
+		for (int i = 0; i < marks; i++) {
+			double angle = Math.PI * 2 * i / marks;
+			double x = at.x + Math.cos(angle) * reach;
+			double z = at.z + Math.sin(angle) * reach;
+			level.sendParticles(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0x2E8B22),
+					x, at.y - 0.9, z, 1, 0.05, 0.0, 0.05, 0.0);
+		}
 	}
 
 	/** Nothing hostile should be able to keep gas alive across a reload. */

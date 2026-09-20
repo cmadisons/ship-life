@@ -94,6 +94,8 @@ public final class State {
 	public static final AttachmentType<Integer> FINDING = of("finding", -1, Codec.INT);
 	/** What you have called each kind of pet, as "lion=Rex,dog=Bess". */
 	public static final AttachmentType<String> PET_NAMES = of("pet_names", "", Codec.STRING);
+	/** How many Quest Day sets you have finished. Quest Day reads it to get harder. */
+	public static final AttachmentType<Integer> QUEST_DAYS = of("quest_days", 0, Codec.INT);
 
 	/** The name you gave that kind of pet, or "" if you never did. */
 	public static String petName(ServerPlayer player, Pets.Kind kind) {

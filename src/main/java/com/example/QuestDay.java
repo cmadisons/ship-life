@@ -110,12 +110,28 @@ public final class QuestDay {
 		show(player);
 	}
 
+	/**
+	 * How much harder Quest Day is for somebody who has done a lot of them.
+	 *
+	 * The four tiers were the same four numbers on your first Quest Day and
+	 * your fiftieth, so "hard" stopped being hard some time around the tenth.
+	 * Every ten sets finished adds a tenth to what each one asks for, up to
+	 * double -- so a veteran's medium is roughly a beginner's hard, and the
+	 * payout is the same 500 either way.
+	 */
+	private static double stretch(ServerPlayer player) {
+		return 1.0 + Math.min(1.0, State.tally(player, State.QUEST_DAYS) / 100.0);
+	}
+
 	/** Four quests, one of each tier, and the numbers you have to reach. */
 	private static void roll(ServerPlayer player) {
 		Random random = new Random();
 		StringBuilder set = new StringBuilder();
+		double stretch = stretch(player);
 		for (int tier = 0; tier < TIERS.length; tier++) {
-			Goal goal = TIERS[tier][random.nextInt(TIERS[tier].length)];
+			Goal base = TIERS[tier][random.nextInt(TIERS[tier].length)];
+			Goal goal = new Goal(base.stat(),
+					Math.max(1, (int) Math.round(base.amount() * stretch)));
 			int target = goal.stat().absolute()
 					? Math.max(goal.amount(), goal.stat().of(player) + 1)
 					: goal.stat().of(player) + goal.amount();
@@ -127,7 +143,10 @@ public final class QuestDay {
 		}
 		State.questDay(player, set.toString());
 		player.sendSystemMessage(Component.literal("Quest Day: four quests. All four is "
-				+ PAYOUT + " event tickets.").withStyle(ChatFormatting.AQUA));
+				+ PAYOUT + " event tickets." + (stretch > 1.0
+						? "  (" + Math.round((stretch - 1.0) * 100) + "% harder -- "
+								+ State.tally(player, State.QUEST_DAYS) + " sets behind you.)"
+						: "")).withStyle(ChatFormatting.AQUA));
 	}
 
 	/** Anything finished? And is the whole set done? */
@@ -152,6 +171,9 @@ public final class QuestDay {
 		}
 		if (all) {
 			Events.payTickets(player, PAYOUT, "all four Quest Day quests");
+			// Counted before the next set is rolled, so the next set is the
+			// one that gets harder.
+			State.add(player, State.QUEST_DAYS, 1);
 			State.questDay(player, "");
 			roll(player);
 		}

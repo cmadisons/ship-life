@@ -17,12 +17,13 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 
 /**
- * The fridge in your room: five shelves you can actually put food on.
+ * The fridge in your room: shelves you can actually put food on.
  *
- * Five because a fridge with a chest inside it is a chest, and the room is
- * meant to be a room rather than storage. Five slots is a hopper's worth,
- * which is why the screen is a hopper's -- Minecraft already draws that one
- * five slots wide.
+ * Five to start with, because a fridge with a chest inside it is a chest and
+ * the room is meant to be a room. It grows with the ship -- nine once you own
+ * the rewards floor, twenty-seven once you own the lot -- and those three
+ * numbers are a hopper, a dispenser and a chest, which are the three screens
+ * Minecraft already draws.
  *
  * What is in it is saved on you rather than in the block, so it survives the
  * ship being repaired around it and comes with you if the room is ever
@@ -81,11 +82,35 @@ public final class Fridge {
 		}
 	}
 
-	/** Open it: the five shelves, with whatever you left on them. */
+	/**
+	 * How many shelves this player's fridge has.
+	 *
+	 * Five to start with, because a fridge with a chest inside it is a chest
+	 * and the room is meant to be a room. It grows with the ship, though: by
+	 * the time you own the rewards floor you are carrying food for boss
+	 * fights, and by the time you own the lot you are provisioning for the
+	 * Nether.
+	 *
+	 * The three sizes are the three Minecraft already draws -- a hopper's
+	 * five, a dispenser's nine, a chest's twenty-seven -- because the screen
+	 * has to match the container or the menu does not line up.
+	 */
+	public static int shelves(ServerPlayer player) {
+		if (State.hasFloor(player, Places.TOP_FLOOR)) {
+			return 27;
+		}
+		if (State.hasFloor(player, 11)) {
+			return 9;
+		}
+		return SHELVES;
+	}
+
+	/** Open it: your shelves, with whatever you left on them. */
 	public static void open(ServerPlayer player) {
+		int size = shelves(player);
 		// Saved on every change rather than when the screen closes, so pulling
 		// the game out from under it cannot lose what is inside.
-		SimpleContainer shelves = new SimpleContainer(SHELVES) {
+		SimpleContainer shelves = new SimpleContainer(size) {
 			@Override
 			public void setChanged() {
 				super.setChanged();
@@ -93,7 +118,7 @@ public final class Fridge {
 			}
 		};
 		List<ItemStack> saved = player.getAttachedOrCreate(INSIDE);
-		for (int slot = 0; slot < SHELVES && slot < saved.size(); slot++) {
+		for (int slot = 0; slot < size && slot < saved.size(); slot++) {
 			shelves.setItem(slot, saved.get(slot).copy());
 		}
 
@@ -101,8 +126,15 @@ public final class Fridge {
 		player.level().playSound(null, Places.FRIDGE, SoundEvents.IRON_DOOR_OPEN,
 				SoundSource.BLOCKS, 0.6f, 1.4f);
 		player.openMenu(new SimpleMenuProvider(
-				(id, inventory, who) -> new HopperMenu(id, inventory, shelves),
-				Component.literal("Fridge").withStyle(ChatFormatting.AQUA)));
+				(id, inventory, who) -> switch (size) {
+					case 27 -> net.minecraft.world.inventory.ChestMenu
+							.threeRows(id, inventory, shelves);
+					case 9 -> new net.minecraft.world.inventory.DispenserMenu(
+							id, inventory, shelves);
+					default -> new HopperMenu(id, inventory, shelves);
+				},
+				Component.literal("Fridge  --  " + size + " shelves")
+						.withStyle(ChatFormatting.AQUA)));
 	}
 
 	private static void save(ServerPlayer player, net.minecraft.world.Container shelves) {
