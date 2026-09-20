@@ -581,19 +581,27 @@ public final class Ship {
 		BlockPos where = new BlockPos(Places.LIFT_X + Places.LIFT_SIZE + 1,
 				Places.floorY(floor) + 2, Places.LIFT_Z + 2);
 		set(level, where.east(), Blocks.POLISHED_BLACKSTONE);
+		sign(level, where, Direction.WEST, "Floor " + floor, Floors.name(floor), "", "");
+	}
+
+	/**
+	 * Four lines on a wall, waxed so nobody can rub them out.
+	 *
+	 * The floor names were the only thing using signs and had this written
+	 * inline; the pool wanted some too, so it lives here now.
+	 */
+	private static void sign(ServerLevel level, BlockPos where, Direction facing,
+			String a, String b, String c, String d) {
 		level.setBlockAndUpdate(where, Blocks.OAK_WALL_SIGN.defaultBlockState()
-				.setValue(net.minecraft.world.level.block.WallSignBlock.FACING,
-						Direction.WEST));
+				.setValue(net.minecraft.world.level.block.WallSignBlock.FACING, facing));
 		if (level.getBlockEntity(where)
 				instanceof net.minecraft.world.level.block.entity.SignBlockEntity sign) {
 			net.minecraft.world.level.block.entity.SignText text =
 					sign.getFrontText()
-							.setMessage(0, net.minecraft.network.chat.Component
-									.literal("Floor " + floor))
-							.setMessage(1, net.minecraft.network.chat.Component
-									.literal(Floors.name(floor)))
-							.setMessage(2, net.minecraft.network.chat.Component.empty())
-							.setMessage(3, net.minecraft.network.chat.Component.empty());
+							.setMessage(0, net.minecraft.network.chat.Component.literal(a))
+							.setMessage(1, net.minecraft.network.chat.Component.literal(b))
+							.setMessage(2, net.minecraft.network.chat.Component.literal(c))
+							.setMessage(3, net.minecraft.network.chat.Component.literal(d));
 			sign.setText(text, true);
 			sign.setWaxed(true);
 			sign.setChanged();
@@ -703,6 +711,21 @@ public final class Ship {
 				}
 			}
 		}
+
+		// Signs at both ends, so the rules are on the wall rather than behind a
+		// click on the record board. A shared sign cannot carry YOUR best lap
+		// -- it is one block and there may be several of you -- so that number
+		// is put in front of you as you step out of the lift instead.
+		set(level, new BlockPos(Places.POOL_START - 2, y + 2, Places.SHIP_Z + half + 2),
+				Blocks.PRISMARINE_BRICKS);
+		sign(level, new BlockPos(Places.POOL_START - 2, y + 2, Places.SHIP_Z + half + 1),
+				Direction.NORTH,
+				"THE POOL", "A lap is there", "and back.", "15s opens floor 9");
+		set(level, new BlockPos(Places.POOL_END + 2, y + 2, Places.SHIP_Z + half + 2),
+				Blocks.PRISMARINE_BRICKS);
+		sign(level, new BlockPos(Places.POOL_END + 2, y + 2, Places.SHIP_Z + half + 1),
+				Direction.NORTH,
+				"TURN HERE", "Red end.", "Board on the", "west wall.");
 
 		// A line of colour at each end, on the bottom, so a turn is visible.
 		for (int z = Places.SHIP_Z - half; z <= Places.SHIP_Z + half; z++) {

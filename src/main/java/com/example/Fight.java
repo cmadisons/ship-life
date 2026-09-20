@@ -201,6 +201,19 @@ public final class Fight {
 			} else {
 				BAR.setProgress(Math.min(1.0f, SPAWNED.size() / (float) WHOLE));
 			}
+			// And what is left, not just how much of it. A bar at a third
+			// tells you to keep going; "2 ghasts, 1 witch" tells you what to
+			// go and look for, which is the thing you actually wanted to know
+			// when three of them are hiding behind a pillar.
+			BAR.setName(Component.literal(barTitle + "  --  " + shapeOf(SPAWNED)));
+
+			if (server.getTickCount() % 200 == 0) {
+				for (ServerLevel level : server.getAllLevels()) {
+					if (ShipLifeMod.isShipLife(level)) {
+						taunt(level);
+					}
+				}
+			}
 
 			if (SPAWNED.isEmpty()) {
 				BAR.setVisible(false);
@@ -323,8 +336,9 @@ public final class Fight {
 		double toughness = (1.0 + number * 0.1) * (hard ? 1.5 : 1.0);
 
 		// What is coming, before it comes. A wave you can see the shape of is
-		// a wave you can plan for.
-		java.util.Map<String, Integer> coming = new java.util.LinkedHashMap<>();
+		// a wave you can plan for. Counted by shapeOf, the same way the bar
+		// counts what is left, so the promise and the tally agree.
+		int before = SPAWNED.size();
 		for (int i = 0; i < howMany; i++) {
 			EntityType<? extends Mob> kind = switch (RANDOM.nextInt(5)) {
 				case 0 -> EntityType.ENDERMAN;
@@ -333,16 +347,9 @@ public final class Fight {
 				case 3 -> EntityType.WITCH;
 				default -> EntityType.VINDICATOR;
 			};
-			coming.merge(kind.getDescription().getString(), 1, Integer::sum);
 			spawn(level, kind, spot(level, 9), toughness, hard ? "Hard" : null);
 		}
-		StringBuilder shape = new StringBuilder();
-		for (java.util.Map.Entry<String, Integer> each : coming.entrySet()) {
-			if (!shape.isEmpty()) {
-				shape.append(", ");
-			}
-			shape.append(each.getValue()).append(" ").append(each.getKey());
-		}
+		String shape = shapeOf(SPAWNED.subList(before, SPAWNED.size()));
 		player.sendSystemMessage(Component.literal("Coming out: " + shape + ".")
 				.withStyle(ChatFormatting.GRAY));
 		showBar(player, (hard ? "Wave " + number + " -- hard" : "Wave " + number), howMany);
@@ -441,8 +448,105 @@ public final class Fight {
 				SoundSource.PLAYERS, 1.0f, 0.5f);
 	}
 
+	/**
+	 * What a boss says while you are hitting it.
+	 *
+	 * A boss that never speaks is a health bar with legs. One line every ten
+	 * seconds or so, picked for whichever one is out, and only while it is
+	 * actually losing -- a taunt from something on full health is just noise.
+	 */
+	private static final java.util.Map<String, String[]> TAUNTS = java.util.Map.of(
+			"Arachnes", new String[] {
+					"The web holds. You do not.",
+					"My brood eat what you leave.",
+					"Smaller things than you have lasted longer." },
+			"The dragon", new String[] {
+					"You are very far from the End.",
+					"That was a scratch.",
+					"The ship will burn after you." },
+			"Broodmother", new String[] {
+					"There are always more of us.",
+					"Mind your feet.",
+					"You have not met the little ones yet." },
+			"The Watcher", new String[] {
+					"I have been watching you since floor one.",
+					"You take the stairs like somebody who is tired.",
+					"I know which way you turn." },
+			"Magma Boss", new String[] {
+					"Cold little thing.",
+					"The floor is getting warmer. Had you noticed?",
+					"You will not last the heat." },
+			"Ender Dragon", new String[] {
+					"You are very far from the End.",
+					"That was a scratch.",
+					"The ship will burn after you." });
+
+	/** Say something, if there is anything to say. */
+	private static void taunt(ServerLevel level) {
+		if (SPAWNED.size() != 1) {
+			return;
+		}
+		Mob boss = SPAWNED.get(0);
+		if (boss.getMaxHealth() <= 40.0f || boss.getHealth() >= boss.getMaxHealth() * 0.98f) {
+			return;                       // not a boss, or not hurt yet
+		}
+		String[] lines = TAUNTS.get(lastBoss);
+		if (lines == null) {
+			return;
+		}
+		String line = lines[RANDOM.nextInt(lines.length)];
+		for (ServerPlayer player : level.players()) {
+			if (Places.floorAt(player.getY()) != 10) {
+				continue;
+			}
+			player.sendSystemMessage(Component.literal(lastBoss + ": ")
+					.withStyle(ChatFormatting.DARK_RED)
+					.append(Component.literal("\u201c" + line + "\u201d")
+							.withStyle(ChatFormatting.RED)));
+		}
+	}
+
+	/**
+	 * What a pile of mobs is, in words: "3 creepers, 2 ghasts".
+	 *
+	 * Used by the wave announcement before a fight and by the bar during it,
+	 * so the thing the button promised and the thing hanging over your head
+	 * are counted the same way.
+	 */
+	public static String shapeOf(java.util.Collection<Mob> mobs) {
+		java.util.Map<String, Integer> counted = new java.util.LinkedHashMap<>();
+		for (Mob mob : mobs) {
+			if (mob.isAlive()) {
+				counted.merge(mob.getType().getDescription().getString(), 1, Integer::sum);
+			}
+		}
+		if (counted.isEmpty()) {
+			return "nearly done";
+		}
+		StringBuilder out = new StringBuilder();
+		for (java.util.Map.Entry<String, Integer> each : counted.entrySet()) {
+			if (!out.isEmpty()) {
+				out.append(", ");
+			}
+			out.append(each.getValue()).append(" ").append(each.getKey());
+		}
+		return out.toString();
+	}
+
+	/** What is going on right now, for the intercom to read out. */
+	public static String onNow() {
+		busy();
+		if (SPAWNED.isEmpty()) {
+			return null;
+		}
+		return barTitle + ": " + shapeOf(SPAWNED) + " still up";
+	}
+
 	/** Hang a bar over the fight and point it at the player. */
+	private static String barTitle = "Floor 9";
+
 	private static void showBar(ServerPlayer player, String name, int howMany) {
+		barTitle = name;
 		BAR.setName(Component.literal(name));
 		BAR.setProgress(1.0f);
 		BAR.addPlayer(player);

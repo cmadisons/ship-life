@@ -34,6 +34,42 @@ public class Shooter extends Game {
 			return face == other.face && hat.equals(other.hat)
 					&& shirt.equals(other.shirt) && holding.equals(other.holding);
 		}
+
+		/** How many of the four things matched. Four is the same person. */
+		int likeness(Person other) {
+			int same = 0;
+			if (face == other.face) {
+				same++;
+			}
+			if (hat.equals(other.hat)) {
+				same++;
+			}
+			if (shirt.equals(other.shirt)) {
+				same++;
+			}
+			if (holding.equals(other.holding)) {
+				same++;
+			}
+			return same;
+		}
+
+		/** What you got wrong about them, for the miss to say. */
+		String missedOn(Person other) {
+			java.util.List<String> wrong = new java.util.ArrayList<>();
+			if (face != other.face) {
+				wrong.add("the face");
+			}
+			if (!hat.equals(other.hat)) {
+				wrong.add("the hat");
+			}
+			if (!shirt.equals(other.shirt)) {
+				wrong.add("the shirt");
+			}
+			if (!holding.equals(other.holding)) {
+				wrong.add("what they were holding");
+			}
+			return String.join(", ", wrong);
+		}
 	}
 
 	private static final String[] HATS = {
@@ -190,9 +226,18 @@ public class Shooter extends Game {
 		State.event(player, -50);
 		player.level().playSound(null, player.blockPosition(),
 				SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 0.8f, 0.6f);
+		// How close you were. A miss that only says "wrong" teaches you
+		// nothing about a crowd built out of near-identical people -- three of
+		// four right means you were looking at the correct sort of person and
+		// got one detail out, which is worth knowing before the next shot.
+		int close = shot.likeness(wanted);
 		player.sendSystemMessage(Component.literal(
 				"That was somebody innocent. -50 event tickets, and they are gone. You have "
 				+ State.event(player) + ".").withStyle(ChatFormatting.RED));
+		player.sendSystemMessage(Component.literal(close + " of 4 matched"
+				+ (close == 0 ? " -- nothing about them was right."
+						: " -- you had " + shot.missedOn(wanted) + " wrong."))
+				.withStyle(close >= 3 ? ChatFormatting.YELLOW : ChatFormatting.GRAY));
 		if (crowd.isEmpty() || !crowd.contains(wanted)) {
 			pickWanted();
 		}

@@ -131,7 +131,29 @@ public final class Gear {
 		return player.getAttachedOrCreate(CHARGE);
 	}
 
-	/** Put damage in the bank and say so. */
+	/**
+	 * How much the bar can show before it is simply full.
+	 *
+	 * Twenty is a player's whole health, so a bar that reads full means the
+	 * next swing kills anything with as many hearts as you have.
+	 */
+	private static final float BAR_FULL = 20.0f;
+
+	/** The bank, drawn. */
+	private static String bar(float banked) {
+		int lit = Math.min(10, Math.round(banked / BAR_FULL * 10.0f));
+		return "\u25B0".repeat(lit) + "\u25B1".repeat(10 - lit);
+	}
+
+	/**
+	 * Put damage in the bank and show it.
+	 *
+	 * This used to be a number in a sentence -- "+7 on your next hit" -- which
+	 * told you the figure and nothing about whether that was a lot. A ten-cell
+	 * bar filling towards twenty, a player's whole health, says at a glance
+	 * whether the next swing is worth spending or worth saving. The number is
+	 * still on the end for anybody who wants it.
+	 */
 	public static void bank(ServerPlayer player, float amount) {
 		if (amount <= 0) {
 			return;
@@ -139,8 +161,10 @@ public final class Gear {
 		float total = charge(player) + amount;
 		player.setAttached(CHARGE, total);
 		Hud.busy(player, 30);
-		player.sendOverlayMessage(Component.literal("+" + Math.round(total)
-				+ " on your next hit").withStyle(ChatFormatting.GREEN));
+		player.sendOverlayMessage(Component.literal(bar(total) + "  ")
+				.withStyle(total >= BAR_FULL ? ChatFormatting.GOLD : ChatFormatting.GREEN)
+				.append(Component.literal("+" + Math.round(total) + " on your next hit")
+						.withStyle(ChatFormatting.GREEN)));
 	}
 
 	/**

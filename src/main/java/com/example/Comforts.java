@@ -166,10 +166,16 @@ public final class Comforts {
 		page.setItem(4, Book.entry(Items.LEATHER_CHESTPLATE, "Your Wardrobe",
 				ChatFormatting.AQUA, "Pick something to wear.",
 				"Ben and Izzy's armour goes over the top."));
+		// Which one you had on last. The wardrobe used to look identical
+		// whatever you were wearing, so you had to remember -- and the whole
+		// point of four outfits is that you change between them.
+		int wearing = State.tally(player, State.OUTFIT);
 		for (int i = 0; i < OUTFITS.length; i++) {
 			Outfit outfit = OUTFITS[i];
+			boolean on = i == wearing;
 			page.setItem(20 + i, Book.entry(Items.LEATHER_CHESTPLATE, outfit.name(),
-					ChatFormatting.WHITE, outfit.what(), "", "Click to put it on."));
+					on ? ChatFormatting.GREEN : ChatFormatting.WHITE, outfit.what(), "",
+					on ? "You are wearing this." : "Click to put it on."));
 		}
 		page.setItem(29, Book.entry(Items.BARRIER, "Take it all off",
 				ChatFormatting.GRAY, "Back to nothing."));
@@ -202,6 +208,7 @@ public final class Comforts {
 					player.setItemSlot(where, ItemStack.EMPTY);
 				}
 			}
+			player.setAttached(State.OUTFIT, -1);
 			player.closeContainer();
 			return;
 		}
@@ -218,6 +225,7 @@ public final class Comforts {
 				Items.LEATHER_LEGGINGS, outfit);
 		put(player, net.minecraft.world.entity.EquipmentSlot.FEET,
 				Items.LEATHER_BOOTS, outfit);
+		player.setAttached(State.OUTFIT, index);
 		player.sendSystemMessage(Component.literal("You put on the " + outfit.name() + ".")
 				.withStyle(ChatFormatting.AQUA));
 		player.closeContainer();
@@ -333,6 +341,16 @@ public final class Comforts {
 								? "  Nothing tomorrow either."
 								: "  Tomorrow: " + next + ".")
 						.withStyle(ChatFormatting.GRAY)));
+
+		// And what is happening downstairs. The intercom already reads out the
+		// calendar; a fight in progress is the other thing worth announcing,
+		// and it is the one you might have walked away from.
+		String fight = Fight.onNow();
+		if (fight != null) {
+			player.sendSystemMessage(Component.literal("*ding* ").withStyle(ChatFormatting.GOLD)
+					.append(Component.literal("Still running below: " + fight + ".")
+							.withStyle(ChatFormatting.RED)));
+		}
 	}
 
 	/**

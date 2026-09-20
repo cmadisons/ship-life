@@ -253,9 +253,35 @@ public final class Kart {
 		}
 
 		int was = State.tally(player, State.BEST_RACE);
-		if (was <= 0 || ticks < was) {
+		boolean personalBest = was <= 0 || ticks < was;
+		if (personalBest) {
 			player.setAttached(State.BEST_RACE, ticks);
 		}
+
+		// The racer says something at the line.
+		//
+		// They are the only person on the ship you spend two minutes beside
+		// who never spoke. What they say depends on how it went and on whether
+		// you have beaten them before, so the second win does not read like
+		// the first.
+		String said;
+		if (place == 1 && was <= 0) {
+			said = "First time out and you had me. Nobody does that.";
+		} else if (place == 1 && personalBest) {
+			said = "That is your best yet, and it was enough. I will find some more.";
+		} else if (place == 1) {
+			said = "You had me again. I am going to have to stop letting you.";
+		} else if (place == 2) {
+			said = "Close. You want the long corner earlier than you are taking it.";
+		} else if (personalBest) {
+			said = "Quickest you have gone, and still behind us both. Keep at it.";
+		} else {
+			said = "Run out of gas again, did you?";
+		}
+		player.sendSystemMessage(Component.literal(RIVAL + ": ")
+				.withStyle(ChatFormatting.GOLD)
+				.append(Component.literal("\u201c" + said + "\u201d")
+						.withStyle(ChatFormatting.YELLOW)));
 		player.sendSystemMessage(Component.literal("You finished " + place
 				+ switch (place) {
 					case 1 -> "st";

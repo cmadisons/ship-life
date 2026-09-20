@@ -86,6 +86,8 @@ public final class State {
 	public static final AttachmentType<Integer> RACES = of("races_finished", 0, Codec.INT);
 	/** Your quickest five laps on floor 6, in ticks. Zero until you finish one. */
 	public static final AttachmentType<Integer> BEST_RACE = of("best_race", 0, Codec.INT);
+	/** The wardrobe outfit you last put on, by index, or -1 for none. */
+	public static final AttachmentType<Integer> OUTFIT = of("outfit", -1, Codec.INT);
 	public static final AttachmentType<Integer> EVENT_EARNED = of("event_earned", 0, Codec.INT);
 	public static final AttachmentType<Integer> BRICKS = of("breakout_bricks", 0, Codec.INT);
 	public static final AttachmentType<Integer> WALLS = of("breakout_walls", 0, Codec.INT);

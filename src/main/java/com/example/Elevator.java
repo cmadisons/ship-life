@@ -198,6 +198,17 @@ public final class Elevator {
 		ride(player, floor);
 	}
 
+	/** Ticks between notes of the lift music. */
+	private static final int MUSIC_GAP = 8;
+
+	/**
+	 * The lift music, as note-block numbers.
+	 *
+	 * A major triad wandering up and back down and resolving nowhere, which is
+	 * what lift music is. Kept short so the loop is obvious rather than hidden.
+	 */
+	private static final int[] MUZAK = { 12, 16, 19, 16, 14, 17, 14, 12 };
+
 	/** Doors close, the car moves, doors open. */
 	public static void ride(ServerPlayer player, int floor) {
 		ServerLevel level = (ServerLevel) player.level();
@@ -228,12 +239,39 @@ public final class Elevator {
 		// The whirr while it moves, then the doors at the far end.
 		Ticker.after(Math.min(20, takes / 2), () -> level.playSound(null, from,
 				SoundEvents.ELYTRA_FLYING, SoundSource.BLOCKS, 0.5f, 0.8f));
+
+		// And lift music over the top of it.
+		//
+		// Every ship has some. It is deliberately bland -- a major triad going
+		// nowhere in particular on a xylophone -- and it is cut to the length
+		// of the ride, so a hop to floor 2 gets two notes and the climb to 18
+		// gets the whole loop round twice. Nothing to skip, because it stops
+		// when the doors do.
+		for (int note = 0; note * MUSIC_GAP < takes - 4; note++) {
+			final int which = note % MUZAK.length;
+			Ticker.after(note * MUSIC_GAP, () -> level.playSound(null, from,
+					SoundEvents.NOTE_BLOCK_XYLOPHONE.value(), SoundSource.BLOCKS,
+					0.35f, (float) Math.pow(2.0, (MUZAK[which] - 12) / 12.0)));
+		}
 		Ticker.after(takes, () -> {
 			BlockPos to = Places.lift(floor);
 			player.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
 			level.playSound(null, to, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8f, 1.0f);
 			player.sendOverlayMessage(Component.literal("Floor " + floor
 					+ " -- " + Floors.name(floor)).withStyle(ChatFormatting.AQUA));
+
+			// Floor 3 tells you your own best on the way in. The signs down
+			// there carry the rules, but a block on a wall cannot hold a
+			// number that is different for each of you.
+			if (floor == 3) {
+				int best = State.bestLap(player);
+				player.sendSystemMessage(Component.literal(best == 0
+						? "No lap on the board yet. Fifteen seconds opens floor 9."
+						: "Your best lap: " + Pool.time(best)
+								+ (best <= 300 ? " -- floor 9 is open."
+										: " -- fifteen seconds opens floor 9."))
+						.withStyle(ChatFormatting.AQUA));
+			}
 
 			// Quest 3: pressing the button for floor 5 is the whole part.
 			if (floor == 5 && Quests.on(player, 2, 1)) {

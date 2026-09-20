@@ -114,7 +114,7 @@ The struck-through ones are done.
 6. ~~The Quest Book map could be clickable to ride there~~ **done**
 7. The star could point at people as well as quests
 8. Pets could take names you choose
-9. The armour's bank could be a bar rather than a message
+~~The armour's bank could be a bar rather than a message~~ **built**: ten cells filling towards 20, a whole player's health
 10. ~~The gas could spread rather than sit in a ball~~ **done**
 11. ~~The arcade could keep a top five per game~~ **done**
 12. ~~Snake could speed up as it grows~~ **done**
@@ -229,27 +229,27 @@ The struck-through ones are done.
 ## Make better (round two)
 
 1. The hull could have a name painted on it
-2. The bar could name what is left, not just how much
+2. ~~The bar could name what is left, not just how much~~ **built**: "Wave 3 -- 2 ghasts, 1 witch"
 3. The Quest Book could remember which page you were on
 4. Pets could ride the lift with you
 5. The map could show where the people are standing
 6. The fridge could hold more as the ship grows
-7. Signs could show your best time on the pool floor
+7. ~~Signs could show your best time on the pool floor~~ **built**: signs at both ends carry the rules; your own best cannot go on a shared block, so it greets you as you step out of the lift
 8. The arcade could have a demo screen when nobody is playing
-9. The intercom could announce the wave you are on
+9. ~~The intercom could announce the wave you are on~~ **built**
 10. Sleeping could pass the ship's day, not the world's
 11. Trophies could be picked up and moved
 12. The gas could stain the floor while it lasts
 13. The plant set could look different as you finish it
-14. The lift could have music while you ride
-15. Bosses could taunt you between hits
-16. The shooter could show how close you were when you miss
+14. ~~The lift could have music while you ride~~ **built**: cut to the length of the ride, so a hop gets two notes
+15. ~~Bosses could taunt you between hits~~ **built**: their own lines, and only once they are actually losing
+16. ~~The shooter could show how close you were when you miss~~ **built**: n of 4 matched, and which one you had wrong
 17. Quest Day could pick harder quests as you get better
 18. The balcony could show the stars moving
 19. The gym could show a stronger you -- scale, like the pets
 20. The store could stock what you sold it
-21. The wardrobe could remember what you wore last
+21. ~~The wardrobe could remember what you wore last~~ **built**
 22. Ship 2's rooms could be laid out mirrored
 23. The Nether ship could have lava outside the windows
-24. The racer could talk to you at the finish line
+24. ~~The racer could talk to you at the finish line~~ **built**: six lines depending on how it went and whether you had beaten them before
 25. Every counter could take both currencies at a rate
